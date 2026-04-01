@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PLC>
+  <version>1.0</version>
+  <Name>plcm74</Name>
+  <PublicAllVariablesAndPOU>0</PublicAllVariablesAndPOU>
+  <PublicAllGlobalVariables>0</PublicAllGlobalVariables>
+  <DependenciesList>
+    <Dependence>
+      <Name>OmcncLib</Name>
+    </Dependence>
+  </DependenciesList>
+  <ApplicationExecutables>
+    <RunBeforeLoadPLC>
+      <Path />
+      <Argument />
+      <WaitCompletion />
+    </RunBeforeLoadPLC>
+    <RunAfterLoadPLC>
+      <Path />
+      <Argument />
+      <WaitCompletion />
+    </RunAfterLoadPLC>
+    <RunBeforeUnLoadPLC>
+      <Path />
+      <Argument />
+      <WaitCompletion />
+    </RunBeforeUnLoadPLC>
+    <RunAfterUnLoadPLC>
+      <Path />
+      <Argument />
+      <WaitCompletion />
+    </RunAfterUnLoadPLC>
+  </ApplicationExecutables>
+  <POUList>
+    <POU>
+      <Name>plcGestTasto</Name>
+    </POU>
+    <POU>
+      <Name>plcInit</Name>
+    </POU>
+    <POU>
+      <Name>plcMain</Name>
+    </POU>
+    <POU>
+      <Name>plcTerminate</Name>
+    </POU>
+    <POU>
+      <Name>plcExtCommex</Name>
+    </POU>
+    <POU>
+      <Name>plcReset</Name>
+    </POU>
+  </POUList>
+  <VariablesList />
+</PLC>
