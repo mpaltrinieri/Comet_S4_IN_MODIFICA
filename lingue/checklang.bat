@@ -1,4 +1,0 @@
-
-checklang.js
-
-pause
