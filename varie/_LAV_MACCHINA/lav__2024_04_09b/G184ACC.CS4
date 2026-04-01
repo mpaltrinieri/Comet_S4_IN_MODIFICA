@@ -1,0 +1,15 @@
+{IMPOSIZIONE ACCELERAZIONE E JERK PER ASSI X Y Z Q IN MASCHIATURA RIGIDA}
+
+N10  G66
+N20  (%V6082.3=(FTI(R748)))  { Definizione curve ad S: 2=standard; 16=curve ad S; 32=cubiche}
+
+N30  IF (R748 < 20) JMP [CURVE_S]
+N40  IF (R748 > 20) JMP [CURVE_C]
+
+[CURVE_S]
+N110 (V1004=0)        {usa jerk massimo di taratura}
+N140 RET
+
+[CURVE_C]
+N240 (V1004=R7992)    {usa jerk per G184ACC}
+N250 RET

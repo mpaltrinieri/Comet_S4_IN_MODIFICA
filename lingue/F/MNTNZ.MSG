@@ -1,0 +1,5 @@
+[SERV0]
+TEXT=Tête angulaire
+R=466
+TIME=100
+

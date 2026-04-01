@@ -1,0 +1,4 @@
+[SERV0]
+TEXT=Winkelkopf
+R=466
+TIME=100

@@ -1,0 +1,31 @@
+
+{ -- VERIFICA NECESSITA' DI MOVIMENTARE gli assi per il carico -- }
+{ ------------- se non serve non chiudo i ripari -----------------}
+
+
+N10  IF (R602 > (R400+0.01)) JMP [MOVE]			{Dov'è Z ?
+N20  IF (R602 < (R400-0.01)) JMP [MOVE]
+
+N30  IF (R601 > (R401+0.01)) JMP [MOVE]			{Dov'è Y ?
+N40  IF (R601 < (R401-0.01)) JMP [MOVE]
+
+N50  IF (R624 > (90+0.01)) JMP [MOVE]			{Dov'è A ?
+N60  IF (R624 < (90-0.01)) JMP [MOVE]
+
+N200 IF (R644<1.5) JMP [MOVE]			{Tavola NON in posizione avanti ?
+
+N300 JMP [FINE]
+
+[MOVE]
+N500 $M59					{chiusura riparo anteriore
+N510 G0 G53 Z=R400			{muovo l'asse non è in posizione
+N520 G0 G53 Y=R401 A=90 $M91		{posiziona assi e tavola per il carico
+
+[FINE]
+N2000  L SNGCNT.CS4
+N2010  RET
+
+
+
+
+

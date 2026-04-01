@@ -1,0 +1,87 @@
+
+{=================================================================================================}
+{================================ ATTESA MACCHINA PRONTA AL LAVORO ===============================}
+{=================================================================================================}
+
+N8  IF (R649 == 1) $M05        {arresta mandrino}
+N9  IF (R649 == 1) $M227       {fine maschiatura rigida}
+N10 L<SNGCNT.CS4>
+
+{identificazione movimento TAVOLA da fare (non piu usato) }
+N50 R683=90+R535               {R535: 0=macchina  1=operatore   M90 tavola verso macchina    M91 tavola verso operatore
+
+[CONTM]
+N100  R631 = 0
+N130  IF (R505 == 0) [APRI_M]
+N140  IF (R505 == 1) [CAR_M]
+N150  IF (R505 == 2) [SCA_M]
+N160  IF (R505 == 5) [SCA_PEZZI]   {scarico pezzi finiti dalla barra}
+N190  JMP [FINEALL]
+
+
+{----------- Memoria Apri Morse ---------------}
+[APRI_M]
+N100 L <SNGCNT.CS4>
+N110 R638=1					{memoria morse da aprire
+N210 JMP [FINEALL]
+
+
+{---------------- Carico Pezzi ----------------}
+[CAR_M]
+N600 R400=R349					{Z fuori ingombro : evitiamo crash con la tavola
+N610 R401=(R7182-1)				{Y fuori ingombro : tutto raccolto
+N620 L <CKMOVCAR.CS4>	        {Verifica se serve muovere e preparare tutto (Z-Y-mov.pneumatici)
+
+N650 IF (R638>0.5)  L <OPENALL.CS4>
+
+N1000 $M183							{Ottimizza battute e ripari aperti: tutti nello stesso momento 
+N1010 IF(R737 == 0) IF(R7893 < 1.5) $M81      {attesa macchina pronta al lavoro}
+N1020 IF(R737 >  0) G4 F=R738		          {attesa simulata in ENDURANCE}
+N1030 IF(R737 == 0) IF(R7893 > 1.5) G4 F=R738 {attesa simulata in programma FIERA}
+N1040 IF (R513==0) $M193					{chiudi riparo ant. SX e DX	e diaframma e battute basse - no ERGONOMICO
+N1050 IF (R513==1) IF (R668< R386) $M129	{abbassa tutte le battute e basta (non ultimo carico in ergonomico)
+N1060 IF (R513==1) IF (R668==R386) $M193	{abbassa tutte le battute e salita riparo contemporaneo (ultimo carico in ergonomico)
+N1070 JMP [FINE_CAR]
+
+
+[FINE_CAR]
+N1500 L <SNGCNT.CS4>
+N1510 $M196 R631=1 R1=0 
+N1520 JMP [FINEALL]
+
+
+{--------------- Scarico Pezzi ----------------}
+[SCA_M]
+N2000 G0 G53 Z=R349
+
+N2010 G0 G53 A=90 C=180 Y=(R7182-1) $M91      {Muovi Tavola/e e posiziona assi per lo scarico
+
+N2050 L <OPENALL.CS4>                         {eliminata R509 per disattivare cmq l'alta pressione
+N2060 $M58                                    {apertura riparo
+N2070 IF(R737 == 0) IF(R7893 < 1.5) $M81      {attesa macchina pronta al lavoro}
+N2080 IF(R737 >  0) G4 F=R738		          {attesa simulata in ENDURANCE}
+N2090 IF(R737 == 0) IF(R7893 > 1.5) G4 F=R738 {attesa simulata in programma FIERA}
+N2100 JMP [FINEALL]
+
+
+{--------------- scarico pezzi finiti dalla barra ----------------}
+
+[SCA_PEZZI]
+N3000 G0 G53 Z=R349
+
+N3010 G0 G53 A=90 C=180 Y=(R7182-1) $M91      {Muovi Tavola/e e posiziona assi per lo scarico
+
+N3050 L <OPENALL.CS4>                         {eliminata R509 per disattivare cmq l'alta pressione
+N3060 $M58                                    {apertura riparo
+N3070 IF(R737 == 0) IF(R7893 < 1.5) $M81      {attesa macchina pronta al lavoro}
+N3080 IF(R737 >  0) G4 F=R738		          {attesa simulata in ENDURANCE}
+N3090 IF(R737 == 0) IF(R7893 > 1.5) G4 F=R738 {attesa simulata in programma FIERA}
+N3095 R6213=1                               {scarico pezzi in multipezzo eseguito: dopo posiziona le morse, no riposizionamento}
+N3100 $M59                                  {chiusura ripari}
+N3110 JMP [FINEALL]
+
+
+[FINEALL]
+N9000 L <SNGCNT.CS4>
+N9010 RET
+

@@ -1,0 +1,11 @@
+{***** DEFINISCE SEQUENZA OPERAZIONI IN CAMBIO UTENSILE *****}
+{R6034= nel cambio utensile muovi prima Z e dopo Y (deposito in fila inferiore e prelievo da superiore)}
+
+N100 R6034=0
+N200 IF(R400>0.5) JMP [SOLOPREL]      {no deposito, solo prelievo}
+
+N500 IF((V6003/2)<R6491) R6034=1      {muovi prima Z e dopo Y}
+N600 L SNGCNT.CS4
+
+[SOLOPREL]
+N1000 RET

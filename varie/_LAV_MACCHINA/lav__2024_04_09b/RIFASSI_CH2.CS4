@@ -1,0 +1,68 @@
+{------------------ GESTIONE RIFERIMENTO ASSI IN AUTOMATICO E MANUALE -----------------}
+
+N40  IF(R459<0.5) JMP [FINE_SET]
+N50  IF(R453>0.5) JMP [FINE_SET]    {se assi riferiti salta a fine set}
+
+
+[MORSA_15]
+N1000 IF (FTL(R700)&'2000' == 0) JMP [MORSA_14]
+N1010 IF(R459>0.5) G302 P
+N1020 IF(R459>0.5) G312 ON P
+N1030 IF(R459>0.5) G861 P0     {impone quota di zero su marca}
+N1040 IF(R459>0.5) G878 P2600  {impone quota desiderata}
+N1050 IF(R459>0.5) G312 OFF P
+
+[MORSA_14]
+N1100 IF (FTL(R700)&'1000' == 0) JMP [MORSA_13]
+N1110 IF(R459>0.5) G302 V
+N1120 IF(R459>0.5) G312 ON V
+N1130 IF(R459>0.5) G861 V0     {impone quota di zero su marca}
+N1140 IF(R459>0.5) G878 V2400  {impone quota desiderata}
+N1150 IF(R459>0.5) G312 OFF V
+
+[MORSA_13]
+N1200 IF (FTL(R700)&'0800' == 0) JMP [MORSA_14]
+N1210 IF(R459>0.5) G302 U
+N1220 IF(R459>0.5) G312 ON U
+N1230 IF(R459>0.5) G861 U0     {impone quota di zero su marca}
+N1240 IF(R459>0.5) G878 U2000  {impone quota desiderata}
+N1250 IF(R459>0.5) G312 OFF U
+
+[MORSA_12]
+N1300 IF (FTL(R700)&'0400' == 0) JMP [MORSA_11]
+N1310 IF(R459>0.5) G302 C 
+N1320 IF(R459>0.5) G312 ON C
+N1330 IF(R459>0.5) G861 C0     {impone quota di zero su marca}
+N1340 IF(R459>0.5) G878 C1800  {impone quota desiderata}
+N1350 IF(R459>0.5) G312 OFF C
+
+[MORSA_11]
+N1400 IF (FTL(R700)&'0200' == 0) JMP [MORSA_10]
+N1410 IF(R459>0.5) G302 B
+N1420 IF(R459>0.5) G312 ON B
+N1430 IF(R459>0.5) G861 A=0    {impone quota di zero su marca}
+N1440 IF(R459>0.5) G878 B1600  {impone quota desiderata}
+N1450 IF(R459>0.5) G312 OFF B
+
+[MORSA_10]
+N1500 IF (FTL(R700)&'0100' == 0) JMP [FINE_SET]
+N1510 IF(R459>0.5) G302 A
+N1520 IF(R459>0.5) G312 ON A
+N1530 IF(R459>0.5) G861 A0     {impone quota di zero su marca}
+N1540 IF(R459>0.5) G878 A1400  {impone quota desiderata}
+N1550 IF(R459>0.5) G312 OFF A
+
+
+[FINE_SET]
+N9000 IF(R450<0.5) JMP [FINE2]  {se macchina non in manuale}
+
+[MANUALE]                  {Operazioni eseguite solo in manuale 
+N9500 $M02                 {Solo in manuale
+N9600 RET
+
+[FINE2]
+N10000 G4 F1
+N10010 L <SNGCNT_CH2.CS4>
+   {N10040 R6865=0+0+0  
+   {N10050 L <SYNCNC1_CH2.CS4>
+N10060 RET

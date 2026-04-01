@@ -1,0 +1,211 @@
+{ ////////////////////////////////// }
+{ /// RILIEVO DIMENSIONI UTENSILI // }
+{ ////////////////////////////////// }
+
+{ V6003/* = posizione assoluta asse (pos. in G53)
+{ V5041/* = valore origine attiva per l'asse
+{ V5040/* = valore di traslazione assoluta asse (G59)
+{ V5039/* = valore di traslazione incrementale asse (G58)
+
+{ R6058 (Utensile rotto):  PLC > CNC > Hdrill
+
+N1220  IF(R6243>8.5) $M00
+N1230  L SNGCNT.CS4
+
+N1240  IF(ABS(R450-1)<0.5)  JMP [FINE]           {MANUALE}
+
+N1250  IF(R611< 0.5)        JMP [FINE]           {ut. errato}
+N1260  IF(R611>12.5)        JMP [FINE]           {ut. errato}
+
+N1264  IF(ABS(R611-R7523)<0.5) JMP [FINE]        {slot del presetting
+
+N1270  IF(R7510<1.5)        JMP [FINE]           {Dispositivo rilievo dimensioni utensili non presente}
+N1280  IF(R575 <0.5)        JMP [FINE]           {Dispositivo rilievo dimensioni utensili non abilitato per questo utensile}
+
+N1290  IF(R737>0.5)         JMP [FINE]           {Endurance limitato}
+
+{DIMENSIONI UTENSILI COMPATIBILI COL PRESETTER  (21/09/2022)
+{Lunghezza min: 90mm  }
+{Lunghezza max: 190mm }
+{Raggio    max: 20mm  }
+
+{VERIFICA COMPATIBILITA TARATURE PRESETTER E DIMENSIONI UTENSILE (SOLO DEL RAGGIO, DATO CHE OCCORRE RILEVARNE LA LUNGHEZZA)
+N1410  IF(R620<21) IF(R508<21) IF(R7516<20) IF(R7517<11) IF(R7518<4000) IF(R7519<5000) IF(R7520<200) JMP [START]
+
+{VERIFICA COMPATIBILITA TARATURE PRESETTER (NON DELLE DIMENSIONI UTENSILE DATO CHE OCCORRE RILEVARNE RAGGIO E LUNGHEZZA)
+N1410  IF(R620<21) IF(R575 >1.5) IF(R576 >0.5) IF(R7516<20) IF(R7517<11) IF(R7518<4000) IF(R7519<5000) IF(R7520<200) JMP [START]
+
+{ R7510<1.5 =  {Dispositivo rilievo dimensioni utensili non presente}
+{ R575 <1.5 =  {Dispositivo rilievo diametro   utensili non abilitato per questo utensile}
+{ R576 <0.5 =  {Dispositivo rilievo diametro   utensili non abilitato per questo utensile}
+
+
+N1420  L SNGCNT.CS4   
+N1430  R695=20030  {ERRORE: DIMENSIONI UTENSILE, O TARATURE PRESETTER, ERRATE}
+N1440  $M00        {ERRORE: DIMENSIONI UTENSILE, O TARATURE PRESETTER, ERRATE}
+N1450  $M02        {ERRORE: DIMENSIONI UTENSILE, O TARATURE PRESETTER, ERRATE}
+
+{ *************************************************************************************************
+
+[START]
+N2210  L SNGCNT.CS4   
+N2220  $M21                                      {inizio rilievo lunghezza utensile}
+N2230  R6057=2                                   {memoria rilievo lunghezza utensile eseguita
+{{ N2240  IF((V6003/2)<R349) G00 G53 Z=R349      {Z: max}
+N2250  IF((V6003/1)>R7182) G00 G53 Y=R7182       {Y: mandrino eventualm. fuori ingombro mag.ut.}
+
+N2420  L SNGCNT.CS4                              {impedisce che R68 venga letta in anticipo}
+N2430  R68=R7515                                 {carica posizione asse W}
+N2440  L MOVIND_W.CS4                            {W: quota di rilievo lunghezza utensile}
+N2450  G00 G53 A=R7513 C=R7514                   {AC: in posiz di rilievo lunghezza ut}
+{ N2460  L WAIT_W.CS4                            {POSTICIPATO IN N2480:  W: attesa fine movimento asse indipendente}
+
+N2462  R401=2                                    {causale per attesa avanzamento tavole FATM}
+N2464  L MOV_TAV.CS4
+N2466  L SNGCNT.CS4                              {impedisce che R401 venga lette in anticipo}
+
+N2470  G00 G53 Z=R7512                           {Z: in quota di verifica ut}
+N2480  L WAIT_W.CS4                              {W: attesa fine movimento asse indipendente}
+
+N2620  $M12                                      {verifica presetter (ok se MI_2_69=1 entro 3sec)}
+
+{*** Calcolo quote Y di rilievo lunghezza utensile
+N2820  R401=R7511-R764-200-R7516                 {Y1: quota Y che porta la punta dell'utensile piu lungo 5mm prima del presetter
+N2830  R402=R7511-R764-90 +R7517                 {Y2: quota Y che porta la punta dell'utensile piu corto 4mm oltre il  presetter
+
+{*** Verifica quote Y: devono essere maggiori della Y che porta il culo mandrino contro le morse, altrimenti stop esecuzione
+N2920  IF(R401 >= R7522) IF(R402 >= R7522) JMP [QUOTE_OK]
+
+N2940  L SNGCNT.CS4                              {impedisce che R695 venga letta in anticipo}
+
+{Verifica quota Y: deve essere maggiore della Y che porta il culo mandrino contro le morse, altrimenti stop esecuzione
+N3210  IF(R401 < R7522) R695=20031               {ERRORE: QUOTA Y CALCOLATA (R401) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+N3220  IF(R401 < R7522) $M00                     {ERRORE: QUOTA Y CALCOLATA (R401) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+N3230  IF(R401 < R7522) $M02                     {ERRORE: QUOTA Y CALCOLATA (R401) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+                                                 
+N3420  IF(R402 < R7522) R695=20032               {ERRORE: QUOTA Y CALCOLATA (R402) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+N3430  IF(R402 < R7522) $M00                     {ERRORE: QUOTA Y CALCOLATA (R402) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+N3440  IF(R402 < R7522) $M02                     {ERRORE: QUOTA Y CALCOLATA (R402) PORTEREBBE IL CULO MANDRINO IN POTENZIALE COLLISIONE DELLE MORSE
+
+[QUOTE_OK]
+{*** avvicinamento per successivo rilievo lunghezza utensile ***
+N3620  G00 G53 Y=R401                            {Y: vicino quota di verifica ut}
+N3622  L SNGCNT.CS4
+
+N3630  IF(R6243>6.5) $M00
+
+N3670  IF(R7509>0.5) $M03 S1500                  {Dispositivo rilievo dimensioni utensili laser: rotazione mandrino per verifica integrità}
+
+{*** inizio movimento Y di ricerca presetter ***
+N3820 G302 Y                                     {Y: asse indipendente}
+N3830 FF Y=R7518                                 {Y: setta velocita' media }
+N3840 G90 Y=R402                                 {Y: vai a quota di fine ricerca utensile }
+N3850 <WAT:FRE;Y>                                {Y: quando l'utensile raggiunge il presetter, il PLC annulla il movimento di Y e l'esecuzione prosegue oltre WAT:FRE
+
+N3860 L <SNGCNT.CS4>                             
+N3870 G4 F0.15                                   {aggiunto per spartaco}
+
+{*** QUANDO ESECUZIONE ARRIVA QUI DOVREBBE ESSER PREMUTO IL PRESETTER, ALTRIMENTI SUCCESSIVAMENTE SI GENERA ALLARME (CON M14) ***
+N4220  $M13                                      {Verifica integrità utensile (OK se MI_2_69=0 entro 3sec) }
+N4230  L SNGCNT.CS4                              {attende set di R6058 dal plc
+N4240  IF(R6243>6.5) $M00
+
+N4250  IF(R6058<0.5) JMP [RIL_OK]
+
+N4420  $M14                                      {abilita allarme utensile rotto: allarme resettabile  (reset plc resetta R6058 se R7899=0) }
+N4430  JMP [ERR]                                 {ERRORE: UT. ROTTO O DIMENSIONI UTENSILE INCOMPATIBILI COL PRESETTER}
+
+[RIL_OK]
+{*** Rilevato utensile di dimensioni compatibili ***
+
+N4620 IF(R6243<0.5) $M49                         {Disabilita potenziometro
+
+N4820 FF Y=R7519                                 {setta velocita' alta asse Y}
+N4830 G91 G887 Y-30                              {rilascia micro}
+N4840 <WAT:FRE;Y>                                
+N4850 G4 F0.15                                   {aggiunto per spartaco}
+
+N4890  IF(R6243>6.5) $M00
+
+N5220 FF Y=R7520                                 {setta velocita' bassa asse Y}
+N5230 G91 G885 Y15                               {ritorna su micro}
+N5240 <WAT:FRE;Y>                                
+N5250 G4 F0.15                                   {aggiunto per spartaco}
+
+N5260 $M48                                       {Abilita potenziometro
+N5270 G4 F0.15                                   {aggiunto per spartaco}
+
+N5420 L <SNGCNT.CS4>
+N5430 R403=( (V6003/1)-(V5041/1)-(V5040/1)-(V5039/1) )     {Y: quota attuale 
+N5440 R404=R554=R507= R7511-R764-R403+R7521                {**** CALCOLA E IMPOSTA LUNGHEZZA UTENSILE **********************
+N5460 L <SNGCNT.CS4>
+
+N5620  IF(R6243>6.5) $M00
+
+[ERR]
+N5820 G303 Y                                     {Y: rimette asse cnc}
+N5830 G25
+N5840 G90
+
+{*** EVENTUALE RILEVAMENTO DIAMETRO UTENSILE ******************************************************
+
+N5905  IF(R6243>9.5) $M00
+
+N5910  IF(R7509<0.5)  JMP [NO_RIL_DIAM]          {Dispositivo rilievo diametro utensili non presente: non di tipo laser}
+N5920  IF(R575 <1.5)  JMP [NO_RIL_DIAM]          {Dispositivo rilievo diametro utensili non abilitato per questo utensile}
+N5930  IF(R576 <0.5)  JMP [NO_RIL_DIAM]          {Dispositivo rilievo diametro utensili non abilitato per questo utensile}
+N5932  IF(R6058>0.5)  JMP [NO_RIL_DIAM]          {utensile rotto inutile rilevarne il diametro}
+
+N5935  IF(R6243<0.5) $M49                        {Disabilita potenziometro
+
+N5940  L SNGCNT.CS4                              {impedisce lettura anticipata delle prossime R
+N5950  R65=-30                                   {W: spostamento relativo max che può compiere l'asse
+N5960  R66=R7518                                 {W: velocità (media) nello spostamento relativo
+N5970  R67=2                                     {W: tipo di interruzione movimento:  1=G885(ritorna su micro)  2=G887(rilascia micro)
+N5980  L MOV_2_W.CS4                             {W: macro di spostamento fino a variazione micro
+N5990  L WAIT_W.CS4                              {W: attesa fine movimento
+
+N5995  IF(R6243>9.5) $M00
+
+N6010  L SNGCNT.CS4                              {impedisce lettura anticipata delle prossime R
+N6020  R65=20                                    {W: spostamento relativo max che può compiere l'asse
+N6030  R66=R7520                                 {W: velocità (bassa) nello spostamento relativo
+N6040  R67=1                                     {W: tipo di interruzione movimento:  1=G885(ritorna su micro)  2=G887(rilascia micro)
+N6050  L MOV_2_W.CS4                             {W: macro di spostamento fino a variazione micro
+N6060  L WAIT_W.CS4                              {W: attesa fine movimento
+
+N6062  G90
+
+N6070  $M48                                      {Abilita potenziometro
+
+N6080  L SNGCNT.CS4
+N6090  R407=( (V6003/5)-(V5041/5)-(V5040/5)-(V5039/5) )     {W: quota attuale 
+N6110  R408=R508= R7515-R407+R7524                          {**** CALCOLA E IMPOSTA RAGGIO UTENSILE **********************
+N6120  L SNGCNT.CS4
+
+N6190  IF(R6243>9.5) $M00
+
+[NO_RIL_DIAM]
+
+{*** FINE RILEVAMENTO DIAMETRO UTENSILE ***********************************************************
+
+N6210  IF(R7509>0.5) S0                          {Dispositivo rilievo dimensioni utensili laser: stop rotazione mandrino per verifica integrità}
+
+N6220  L <SNGCNT.CS4>
+N6230  R405=R7511-R507-R764-R7516                
+{ N6240  IF(R507>90) G00 G53 Y=R405              {Y: mandrino indietro, allontana 5mm l'utensile dal presetter}
+
+N6250  IF(R6243>5.5) $M00
+
+N6420  G00 G53 Y=R7182                           {Y: mandrino indietro, fuori ingombro magazzino}
+N6420  G00 G53 Z=R349                            {Z: Zmax}
+N6430  L SNGCNT.CS4
+
+{ N6630 L <FASTACC.CS4>                          {ripristino accelerazione alta tolta per evitare scossoni
+
+[FINE]
+N9210  IF(R7509>0.5) $M05                        {Dispositivo rilievo dimensioni utensili laser: stop rotazione mandrino per verifica integrità}
+N9220  $M22                                      {fine rilievo lunghezza utensile}
+N9230  L SNGCNT.CS4
+N9240  IF(R6243>8.5) $M00
+N9250  RET

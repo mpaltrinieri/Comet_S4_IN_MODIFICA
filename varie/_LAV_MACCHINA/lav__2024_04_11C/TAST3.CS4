@@ -1,0 +1,325 @@
+{Calcolo della rototraslazione del piano YZ a partire dai dati memorizzati di tre tastature ortogonali alle due superfici 
+{e alla conoscenza dell'angolo delle due superfici dello spigolo
+
+{****** NB: AREE DI MEMORIA UTILIZZABILI: A1000 -> A2047 ******
+
+{DATI INGRESSO:
+
+{R336: Indice per correzione gruppo tastatura; valori da 1 a 79}
+{R337: Num tastata; valori cosecutivi da 1 a 3}
+
+{Caricate in F29.SXT
+{(V11006.1000) = Py1  = 1°punto teorico:  quota Y (segno gia invertito in 29.SXT rispetto a Drill)
+{(V11006.1002) = Pz1  = 1°punto teorico:  quota Z 
+{(V11006.1004) = Py2  = 2°punto teorico:  quota Y (segno gia invertito in 29.SXT rispetto a Drill)
+{(V11006.1006) = Pz2  = 2°punto teorico:  quota Z  
+{(V11006.1008) = Py3  = 3°punto teorico:  quota Y (segno gia invertito in 29.SXT rispetto a Drill)
+{(V11006.1010) = Pz3  = 3°punto teorico:  quota Z 
+
+{(V11006.1012) = Py1' = 1°punto misurato: quota Y 
+{(V11006.1014) = Pz1' = 1°punto misurato: quota Z 
+{(V11006.1016) = Py2' = 2°punto misurato: quota Y
+{(V11006.1018) = Pz2' = 2°punto misurato: quota Z
+{(V11006.1020) = Py3' = 3°punto misurato: quota Y 
+{(V11006.1022) = Pz3' = 3°punto misurato: quota Z 
+
+{(V11006.1024) = Alfa = angolo della 3° tastatura (valore di Camplus: da -90(diretto verso macchina) a +90(diretto verso operatore))
+
+
+{VARIABILI TEMPORANEE UTILIZZATE PER I PUNTI TEORICI:
+{(V11006.1026) = DP_1_2y    = distanza y fra i punti P1 e P2
+{(V11006.1028) = DP_1_2z    = distanza z fra i punti P1 e P2
+{(V11006.1030) = ModDP_1_2  = distanza fra i punti P1 e P2
+{(V11006.1032) = u_j        = componente j del versore P1P2
+{(V11006.1034) = u_k        = componente k del versore P1P2
+{(V11006.1036) = v_j        = componente j del versore di angolo Alfa rispetto P1P2 (lato "verticale")
+{(V11006.1038) = v_k        = componente k del versore di angolo Alfa rispetto P1P2 (lato "verticale")
+{(V11006.1040) = a1         = parametro a della retta P1P2 in forma implicita
+{(V11006.1042) = b1         = parametro b della retta P1P2 in forma implicita 
+{(V11006.1044) = c1         = parametro c della retta P1P2 in forma implicita
+{(V11006.1046) = a2         = parametro a della retta il cui versore forma un angolo Alfa rispetto P1P2e passante per P3' in forma implicita
+{(V11006.1048) = b2         = parametro b della retta il cui versore forma un angolo Alfa rispetto P1P2e passante per P3' in forma implicita
+{(V11006.1050) = c2         = parametro c della retta il cui versore forma un angolo Alfa rispetto P1P2e passante per P3' in forma implicita
+{(V11006.1052) = Det        = determinante della matrice intersezione delle rette teoriche
+{(V11006.1054) = Dy         = determinante della matrice intersezione delle rette teoriche 
+{(V11006.1056) = Dz         = determinante della matrice intersezione delle rette teoriche 
+{(V11006.1058) = Psy        = coordinata y dello spigolo teorico
+{(V11006.1060) = Psz        = coordinata z dello spigolo teorico
+
+{VARIABILI TEMPORANEE UTILIZZATE PER I PUNTI MISURATI:
+{(V11006.1066) = DP_1_2y'     {DP_1_2y' = distanza y fra i punti P1' e P2'
+{(V11006.1068) = DP_1_2z'     {DP_1_2z' = distanza z fra i punti P1' e P2'
+{(V11006.1070) = ModDP_1_2'   {ModDP_1_2' = distanza fra i punti P1' e P2'
+{(V11006.1072) = u_j'         {u_j' = componente j del versore P1'P2'
+{(V11006.1074) = u_k'         {u_k' = componente k del versore P1'P2'
+{(V11006.1076) = v_j'         {v_j' = componente j del versore di angolo Alfa rispetto P1'P2' (lato "verticale")
+{(V11006.1078) = v_k'         {v_k' = componente k del versore di angolo Alfa rispetto P1'P2' (lato "verticale")
+{(V11006.1080) = a1'          {a1' = parametro a della retta P1'P2' in forma implicita
+{(V11006.1082) = b1'          {b1' = parametro b della retta P1'P2' in forma implicita 
+{(V11006.1084) = c1'          {c1' = parametro c della retta P1'P2' in forma implicita
+{(V11006.1086) = a2'          {a2' = parametro a della retta il cui versore forma un angolo Alfa rispetto P1'P2'e passante per P3' in forma implicita
+{(V11006.1088) = b2'          {b2' = parametro b della retta il cui versore forma un angolo Alfa rispetto P1'P2'e passante per P3' in forma implicita
+{(V11006.1090) = c2'          {c2' = parametro c della retta il cui versore forma un angolo Alfa rispetto P1'P2'e passante per P3' in forma implicita
+{(V11006.1092) = Det'         {Det' = determinante della matrice intersezione delle rette
+{(V11006.1094) = Dy'          {Dy' = determinante della matrice intersezione delle rette
+{(V11006.1096) = Dz'          {Dz' 
+{(V11006.1098) = Psy'         {Psy' = coordinata y dello spigolo
+{(V11006.1100) = Psz'         {Psz' = coordinata z dello spigolo
+
+{VARIABILI TEMPORANEE UTILIZZATE PER IL CALCOLO DI BETA:
+{(V11006.1102)                {num1_2 = variabile di appogio per il calcolo di Beta
+{(V11006.1104)                {den1_2 = variabile di appogio per il calcolo di Beta
+
+{CODICI D'ERRORE:
+{ERRORE_PTI_COINCIDENTI
+{ERRORE_PTI_ORTOGONALI
+{ERRORE_RETTE_PARALLELE
+
+
+{DATI D'USCITA DI UN GRUPPO DI 3 TASTATE 
+{(V11006.1110)                {Beta = angolo di rotazione del pezzo destrogiro sull'asse i^
+{(V11006.1112)                {DPy  = shift y
+{(V11006.1114)                {DPz  = shift z
+
+{DATI POS_AXES.SXT
+{(V11006.400-1000	(PRESISTENTI)
+{(V11006.1120-1138  (NUOVI X TAST.3PUNTI)
+
+
+{DATI SALVATI DI TUTTI I GRUPPI DI TASTATE (PER POS_AXES.SXT)
+{(V11006.1200->1356)    {correzione A [gradi]	(79elementi)
+{(V11006.1360->1516)    {Psy					(79elementi)
+{(V11006.1520->1676)    {Psz					(79elementi)
+{(V11006.1680->1836)    {Psy'					(79elementi)
+{(V11006.1840->1996)    {Psz'					(79elementi)
+
+
+
+
+{_________________________________________________________________________
+{Calcolo equazione della Retta passante per P1, P2 (in forma implicita)
+{1a) DP_1_2y = Py2 - Py1 distanza y fra i punti P1 e P2
+(V11006.1026 = V11006.1004 - V11006.1000)
+
+{2a) DP_1_2z = Pz2 - Pz1 distanza z fra i punti P1 e P2
+(V11006.1028 = V11006.1006 - V11006.1002)
+
+{3a) ModDP_1_2 = SQR(DP_1_2y * DP_1_2y + DP_1_2z * DP_1_2z) distanza fra i punti P1 e P2
+(V11006.1030 = SQR(V11006.1026 * V11006.1026 + V11006.1028 * V11006.1028))
+
+IF (V11006.1030 == 0) (%#10=ERRORE_PTI_COINCIDENTI) L ERROR JMP [ERR] {Allarme per punti di tastatura coincidenti
+
+{4a) u_j = DP_1_2y / ModDP_1_2 componente j del versore P1P2
+(V11006.1032 = V11006.1026 / V11006.1030)
+
+{5a) u_k = DP_1_2z / ModDP_1_2 componente k del versore P1P2
+(V11006.1034 = V11006.1028 / V11006.1030)
+
+{6a) a1 = u_k
+(V11006.1040 = V11006.1034)
+
+{7a) b1 = - u_j
+(V11006.1042 = - V11006.1032)
+
+{8a) c1 = Py1 * u_k - Pz1 * u_j
+(V11006.1044 = V11006.1000 * V11006.1034 - V11006.1002 * V11006.1032)
+
+{_________________________________________________________________________
+{Calcolo equazione della Retta passante per P'1, P'2  (in forma implicita)
+{1b) DP_1_2y' = Py2' - Py1' distanza y fra i punti P'1 e P'2
+(V11006.1066 = V11006.1016 - V11006.1012)
+
+{2b) DP_1_2z' = Pz2' - Pz1' distanza z fra i punti P'1 e P'2
+(V11006.1068 = V11006.1018 - V11006.1014)
+
+{3b) ModDP_1_2' = SQR(DP_1_2y' * DP_1_2y' + DP_1_2z' * DP_1_2z') distanza fra i punti P'1 e P'2
+(V11006.1070 = SQR(V11006.1066 * V11006.1066 + V11006.1068 * V11006.1068))
+
+IF (V11006.1070 == 0) (%#10=ERRORE_PTI_COINCIDENTI) L ERROR JMP [ERR] {Allarme per punti di tastatura coincidenti
+
+{4b) u_j' = DP_1_2y' / ModDP_1_2' componente j del versore P1P2
+(V11006.1072 = V11006.1066 / V11006.1070)
+
+{5b) u_k' = DP_1_2z' / ModDP_1_2' componente k del versore P1P2
+(V11006.1074 = V11006.1068 / V11006.1070)
+
+{6b) a1' = u_k'
+(V11006.1080 = V11006.1074)
+
+{7b) b1' = - u_j'
+(V11006.1082 = - V11006.1072)
+
+{8b) c1' = Py1' * u_k' - Pz1' * u_j'
+(V11006.1084 = V11006.1012 * V11006.1074 - V11006.1014 * V11006.1072)
+
+
+{_________________________________________________________________________
+{Calcolo dell'ANGOLO DI ROTAZIONE del pezzo (angolo A di Planet)
+{num1_2 = u_j * u_k' - u_k * u_j'
+(V11006.1102 = V11006.1032 * V11006.1074 - V11006.1034 * V11006.1072)
+
+{den1_2 = u_j * u_j' + u_k * u_k'
+(V11006.1104 = V11006.1032 * V11006.1072 + V11006.1034 * V11006.1074)
+
+IF (V11006.1104 == 0) (%#10=ERRORE_PTI_ORTOGONALI) L ERROR JMP [ERR] {Allarme per pezzo misurato ortogonale al pezzo teorico (situazione solo ipotetica)
+
+{9) Beta = ATN(num1_2 / den1_2)
+(V11006.1110 = ATN(V11006.1102 / V11006.1104))
+
+
+{_________________________________________________________________________
+{Calcolo equazione della retta passante per P3(teorico) il cui versore è ad un angolo Alfa dalla retta passante per i primi 2 punti
+
+{10a) v_j = u_j * COS(Alfa) - u_k * SIN(Alfa)		componente j del versore di angolo Alfa (lato "verticale")
+(V11006.1036 = V11006.1032 * COS(V11006.1024) - V11006.1034 * SIN(V11006.1024))
+
+{11a) v_k = u_j * SIN(Alfa) + u_k * COS(Alfa)		componente k del versore di angolo Alfa (lato "orizzontale")
+(V11006.1038 = V11006.1032 * SIN(V11006.1024) + V11006.1034 * COS(V11006.1024))
+
+{12a) a2 = v_k
+(V11006.1046 = V11006.1038)
+
+{13a) b2 = - v_j
+(V11006.1048 = - V11006.1036)
+
+{14a) c2 = Py3 * v_k - Pz3 * v_j
+(V11006.1050 = V11006.1008* V11006.1038 - V11006.1010 * V11006.1036)
+
+{_________________________________________________________________________
+{Calcolo equazione della retta passante per P3(misurato) il cui versore è ad un angolo Alfa dalla retta passante per i primi 2 punti
+
+{10b) v_j' = u_j' * COS(Alfa) - u_k' * SIN(Alfa)	componente j del versore di angolo Alfa (lato "verticale")
+(V11006.1076 = V11006.1072 * COS(V11006.1024) - V11006.1074 * SIN(V11006.1024))
+
+{11b) v_k' = u_j' * SIN(Alfa) + u_k' * COS(Alfa)	componente k del versore di angolo Alfa (lato "orizzontale")
+(V11006.1078 = V11006.1072 * SIN(V11006.1024) + V11006.1074 * COS(V11006.1024))
+
+{12b) a2' = v_k'
+(V11006.1086 = V11006.1078)
+
+{13b) b2' = - v_j'
+(V11006.1088 = - V11006.1076)
+
+{14b) c2' = Py3' * v_k' - Pz3' * v_j'
+(V11006.1090 = V11006.1020 * V11006.1078 - V11006.1022 * V11006.1076)
+
+
+{_________________________________________________________________________
+{Calcolo delle coordinate dello spigolo teorico (punto di Intersezione delle rette teoriche)
+
+{15a) Det = a1 * b2 - a2 * b1
+(V11006.1052 = V11006.1040 * V11006.1048 - V11006.1046 * V11006.1042)
+
+{16a) Dy  = c1 * b2 - b1 * c2
+(V11006.1054  = V11006.1044 * V11006.1048 - V11006.1042 * V11006.1050)
+
+{17a) Dz  = a1 * c2 - c1 * a2
+(V11006.1056  = V11006.1040 * V11006.1050 - V11006.1044 * V11006.1046)
+
+IF ((V11006.1052) == 0) (%#10=ERRORE_RETTE_PARALLELE) L ERROR JMP [ERR] {Determinante della matrice = 0
+
+{18a) Psy = Dy / Det
+(V11006.1058 = V11006.1054 / V11006.1052)
+
+{19a) Psz = Dz / Det
+(V11006.1060 = V11006.1056 / V11006.1052)
+
+
+{_________________________________________________________________________
+{Calcolo delle coordinate dello spigolo misurato (punto di Intersezione delle rette misurate)
+
+{15b) Det' = a1' * b2' - a2' * b1'
+(V11006.1092 = V11006.1080 * V11006.1088 - V11006.1086 * V11006.1082)
+
+{16b) Dy'  = c1' * b2' - b1' * c2'
+(V11006.1094  = V11006.1084 * V11006.1088 - V11006.1082 * V11006.1090)
+
+{17b) Dz'  = a1' * c2' - c1' * a2'
+(V11006.1096  = V11006.1080 * V11006.1090 - V11006.1084 * V11006.1086)
+
+IF (V11006.1092 == 0) (%#10=ERRORE_RETTE_PARALLELE) L ERROR JMP [ERR] {Determinante della matrice = 0
+
+{18b) Psy' = Dy' / Det'
+(V11006.1098 = V11006.1094 / V11006.1092)
+
+{19b) Psz' = Dz' / Det'
+(V11006.1100 = V11006.1096 / V11006.1092)
+
+
+{_________________________________________________________________________
+{TRASLAZIONE
+{20) DPY = Psy' - Psy
+(V11006.1112 = V11006.1098 - V11006.1058)
+
+{21) DPZ = Psz' - Psz
+(V11006.1114 = V11006.1100 - V11006.1060)
+
+{_________________________________________________________________________
+{SALVATAGGIO DEI DATI ****************************************************
+
+{R336=1-79	=> 0-156
+
+R3047 = 1200+(R336-1)*2				{(1200->1356)
+(V11006.(FTI(R3047)) = V11006.1110)	{correzione A [gradi]
+
+R3048 = 1360+(R336-1)*2				{(1360->1516)
+(V11006.(FTI(R3048)) = V11006.1058)	{Psy
+R3049 = 1520+(R336-1)*2				{(1520->1676)
+(V11006.(FTI(R3049)) = V11006.1060)	{Psz
+
+R3048 = 1680+(R336-1)*2				{(1680->1836)
+(V11006.(FTI(R3048)) = V11006.1098)	{Psy'
+R3049 = 1840+(R336-1)*2				{(1840->1996)
+(V11006.(FTI(R3049)) = V11006.1100)	{Psz'
+
+
+{_________________________________________________________________________
+L SNGCNT.SXT
+RET
+
+
+
+
+{DATI SALVATI DI TUTTI I GRUPPI DI TASTATE (PER POS_AXES.SXT)
+{(V11006.1200->1356)    {correzione A [gradi]	(79elementi)
+{(V11006.1360->1516)    {Psy					(79elementi)
+{(V11006.1520->1676)    {Psz					(79elementi)
+{(V11006.1680->1836)    {Psy'					(79elementi)
+{(V11006.1840->1996)    {Psz'					(79elementi)
+{{_________________________________________________________________________
+{{_________________________________________________________________________
+{{ROTOTRASLAZIONE DI UN GENERICO PUNTO (E' SOLO UN ESEMPIO)
+{
+{{DATI D'INGRESSO
+{{PY           {Py = quota y
+{{PZ           {Pz = quota z
+{
+{{DATI DI USCITA
+{{PYRT         {PYRT = quota Y rototraslata
+{{PZRT         {PZRT = quota Z rototraslata
+{
+{{VARIABILI TEMPORANEE:
+{{PY_sh1
+{{PZ_sh1
+{{PYsh1_rot
+{{PZsh1_rot
+{{PYsh1_rot_sh2
+{{PYsh1_rot_sh2
+{
+{{_________________________________________________________________________
+{{Shift delle coordinate su Ps
+{PY_sh1 = PY - (V11006.1058)
+{PZ_sh1 = PZ - (V11006.1060)
+{
+{{_________________________________________________________________________
+{{Rotazione di P rispetto Ps
+{PYsh1_rot = PYsh1 * COS((V11006.1110)) + PZsh1 * SIN((V11006.1110))
+{PZsh1_rot = - PYsh1 * SIN((V11006.1110))+ PZsh1 * COS((V11006.1110))
+{
+{{_________________________________________________________________________
+{{Shift di PsPs' e ritorno su coordinate originali
+{PYsh1_rot_sh2 = PYsh1_rot + (V11006.1098)
+{PZsh1_rot_sh2 = PZsh1_rot + (V11006.1100)
+{
+{PYRT = PYsh1_rot_sh2 {PYRT = quota Y rototraslata
+{PZRT = PZsh1_rot_sh2 {PZRT = quota Z rototraslata

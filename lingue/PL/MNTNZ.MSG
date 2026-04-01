@@ -1,0 +1,5 @@
+[SERV0]
+TEXT=Double Head
+R=466
+TIME=100
+

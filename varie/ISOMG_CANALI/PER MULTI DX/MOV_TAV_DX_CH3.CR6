@@ -1,0 +1,23 @@
+{***** DISATTIVA CHIUSURA MORSE IN ALTA FORZA E MUOVE TAVOLE *****}
+{R6207 = indice delle morse chiuse in alta forza}
+{R522 = Riposizionamento Morse a DX in pendolare}
+{R533 = Riposizionamento Morse con Pezzo sopra in multipezzo}
+
+N100 IF(R522<0.5) IF(R533<0.5) JMP [DIS_HF]  {disattiva chiusura in alta forza morse a SX}
+N110 JMP [MOV_TAV]                           {muovi tavola SX o entrambe}
+
+[DIS_HF]
+N210 IF((FTL(R6207)&'0040') > 0.5) $M297 {disattiva chiusura in alta forza morsa 13
+N220 IF((FTL(R6207)&'0080') > 0.5) $M298 {disattiva chiusura in alta forza morsa 14
+N230 IF((FTL(R6207)&'0100') > 0.5) $M299 {disattiva chiusura in alta forza morsa 15
+N240 IF((FTL(R6207)&'0200') > 0.5) $M300 {disattiva chiusura in alta forza morsa 16
+N250 IF((FTL(R6207)&'0400') > 0.5) $M301 {disattiva chiusura in alta forza morsa 17
+N260 IF((FTL(R6207)&'0800') > 0.5) $M302 {disattiva chiusura in alta forza morsa 18
+
+[MOV_TAV]
+N300 $M206                               {disinserzione trascinatore morse su asse H}
+N310 IF(R569<0.5) $M95                   {in singolo manda avanti tavole SX e DX verso operatore}
+N310 IF(R569>0.5) $M93                   {in pendolare manda avanti tavola DX verso operatore}
+
+[FINE]
+N1000  RET

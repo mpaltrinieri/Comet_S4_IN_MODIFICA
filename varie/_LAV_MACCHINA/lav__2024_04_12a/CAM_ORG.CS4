@@ -1,0 +1,56 @@
+{CALCOLO TRASLAZIONE ORIGINE CON LE COMPONENTI DEGLI OFFSET MANDRINO}
+{GENERATE DAGLI ANGOLI DEGLI ASSI A E C}
+{****** FILE CREATO PER INTERFACCIAMENTO CON CAMAELON: NON MODIFICARE ******}
+
+{PARAMETRI IN INGRESSO}
+
+{POSIZIONE  ASSE A  R603=((V6003/3)-(V5041/3)-(V5040/3)-(V5039/3))}
+{POSIZIONE  ASSE C  R604=((V6003/4)-(V5041/4)-(V5040/4)-(V5039/4))}
+
+{VALORE OFFSET Y MANDRINO -OK- R763 (a questo è sommato l'offset Z testina)}
+{VALORE OFFSET Z MANDRINO -OK- R764 (a questo è sommato l'offset Y testina)}
+{VALORE OFFSET X MANDRINO -OK- R765}
+{VALORE OFFSET Y TESTINA R5015}
+{VALORE OFFSET Z TESTINA R5016}
+{VALORE OFFSET Distanza tra asse A e centro rotazione asse C -OK- R819}
+{VALORE LUNGHEZZA UTENSILE -OK- R619}
+
+{MASCHIATURA RIGIDA ATTIVA -OK- R649}
+{FIGURA DI TASTATURA ATTIVA -OK- R6093}
+{APPOGGIO OFFSET TASTATORE DI PUNTA -OK- R3090 (SOLO FIGURA 29.CS4)}
+
+R4401=(V5041/3)  {lettura valore origine asse A}
+R4402=(V5041/4)  {lettura valore origine asse C}
+
+R4403=(V5041/0)  {lettura valore origine asse X}
+R4404=(V5040/0)  {lettura valore spostamento origine asse X in G59}
+
+R4405=(V5041/1)  {lettura valore origine asse Y}
+R4406=(V5040/1)  {lettura valore spostamento origine asse Y in G59}
+
+R4407=(V5041/2)  {lettura valore origine asse Z}
+R4408=(V5040/2)  {lettura valore spostamento origine asse Z in G59}
+
+
+L SNGCNT.CS4
+N01 IF(R5960<0.5) JMP [NO_FORZA_B_C]  {solo in programmazione ISO Drill-Camaelon forziamo R213 ed R214}
+R689=((V6003/3)-(V5041/3)-(V5040/3)-(V5039/3))+R4401
+R699=((V6003/4)-(V5041/4)-(V5040/4)-(V5039/4))+R4402
+[NO_FORZA_B_C]
+N05 L SNGCNT.CS4
+
+N30  R216=ATN(R763/R764)        {calcolo angolo generato asse A}
+N40  R217=R764/COS(R216)        {calcolo ipotenusa generata asse A}
+
+N200 R218=R217*COS(R689+R216)                                      {raggio generato da asse A}     
+N210 R222=(R217*SIN(R689+R216))                                    {traslazione asse Z}
+N220 R219=ATN(R765/(R218-R819))                                    {angolo generato asse C}  
+N230 R215=(R218-R819)/COS(R219)                                    {calcolo ipotenusa generata da C} 
+N240 R221=(R215*SIN(R219-R699))                                    {traslazione asse Y}
+N250 R220=0-(R215*COS(R219-R699))                                  {traslazione asse X}
+
+N300 R4411=(R4404+R220) R4412=(R4406+R221) R4413=(R4408+R222)      {calcolo traslazione assoluta dell'origine}
+N310 G59 X=(R4411)      Y=(R4412)          Z=(R4413)               {traslazione assoluta dell'origine}
+
+N900 L SNGCNT.CS4
+N910 RET

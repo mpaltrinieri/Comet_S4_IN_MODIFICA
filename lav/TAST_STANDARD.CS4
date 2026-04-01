@@ -1,0 +1,166 @@
+{*** TASTATURA CAMPLUS STANDARD E TASTATURA TRE PUNTI (SOLO PREVISTA, SVILUPPATA SU PLANET K30) ***}
+
+N10   IF (R905 < 0.5) JMP [FINE]                   {gestione di tastatura camplus disabilitata}
+N11   IF (R7991 > 0.5) JMP [FINE]                  {simulatore SIMUX OFFLINE}
+
+N20   R3044=0
+N30   R3045=0
+N40   R3046=0
+N50   R3504=0
+N60   R3505=0
+N70   R3506=0
+N80   R3510=0
+N90   R3511=0
+N100  R3512=0
+
+N110  IF (R6093 == 1) JMP [FINE]                   {la lavorazione è una tastatura: non si deve applicare una correzione}
+N120  IF (R3499 > 0.5) JMP [TAST_2]                {correzione con la media di due tastature}
+
+{*******************************************************************}
+{***** APPLICAZIONE DELLA CORREZIONE DI UNA SINGOLA TASTATURA ******}
+{*******************************************************************}
+N130  IF (R340 <  0) $M184                         {errore indice tastatura}
+N140  IF (R340 > 99) $M184                         {errore indice tastatura}
+N150  IF (R341 <  0) $M184                         {errore indice tastatura}
+N160  IF (R341 > 99) $M184                         {errore indice tastatura}
+N170  IF (R342 <  0) $M184                         {errore indice tastatura}
+N180  IF (R342 > 99) $M184                         {errore indice tastatura}
+N190  IF (R340 >  0) R3047=400+((R340-1)*2)        {calcolo indice appoggio correzione asse X} 
+N200  IF (R341 >  0) R3048=600+((R341-1)*2)        {calcolo indice appoggio correzione asse Y} 
+N210  IF (R342 >  0) R3049=800+((R342-1)*2)        {calcolo indice appoggio correzione asse Z} 
+N220  IF (R340 >  0) R3044=(V11006.(FTI(R3047)))   {visualizza correzione asse X} 
+N230  IF (R341 >  0) R3045=(V11006.(FTI(R3048)))   {visualizza correzione asse Y} 
+N240  IF (R342 >  0) R3046=(V11006.(FTI(R3049)))   {visualizza correzione asse Z} 
+
+N300  IF (R585 == 0) JMP [5FACES]                  {sistema a facce di posizionamento assi}
+N310  IF (R585 > 0.5) JMP [COMP]                   {sistema assoluto di posizionamento assi}
+
+[5FACES]
+N400  IF (R340 >  0) IF (R203 == 1) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+N410  IF (R340 >  0) IF (R203 == 2) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+N420  IF (R340 >  0) IF (R203 == 3) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+N430  IF (R340 >  0) IF (R203 == 4) R690=R690-(V11006.(FTI(R3047))) {applica correzione asse X} 
+N440  IF (R340 >  0) IF (R203 == 5) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+N450  IF (R340 >  0) IF (R203 == 6) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+
+N460  IF (R341 >  0) IF (R203 == 1) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N470  IF (R341 >  0) IF (R203 == 2) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N480  IF (R341 >  0) IF (R203 == 3) R691=R691+(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N490  IF (R341 >  0) IF (R203 == 4) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N500  IF (R341 >  0) IF (R203 == 5) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N510  IF (R341 >  0) IF (R203 == 6) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+
+N520  IF (R342 >  0)                R692=R692+(V11006.(FTI(R3049))) {applica correzione asse Z} 
+N530  JMP [TAST_3P]
+
+[COMP]
+N600  IF (R340 >  0) R690=R690+(V11006.(FTI(R3047))) {applica correzione asse X} 
+N610  IF (R341 >  0) R691=R691-(V11006.(FTI(R3048))) {applica correzione asse Y} 
+N620  IF (R342 >  0) R692=R692+(V11006.(FTI(R3049))) {applica correzione asse Z} 
+N630  JMP [TAST_3P]
+
+[TAST_2]
+{*******************************************************************}
+{****** APPLCAZIONE DELLA CORREZIONE MEDIA TRA DUE TASTATURE *******}
+{*******************************************************************}
+N700  IF (R340 <  0) $M184                         {errore indice tastatura}
+N710  IF (R340 > 99) $M184                         {errore indice tastatura}
+N720  IF (R341 <  0) $M184                         {errore indice tastatura}
+N730  IF (R341 > 99) $M184                         {errore indice tastatura}
+N740  IF (R342 <  0) $M184                         {errore indice tastatura}
+N750  IF (R342 > 99) $M184                         {errore indice tastatura}
+
+N760  IF (R3500 <  0) $M184                        {errore indice tastatura}
+N770  IF (R3500 > 99) $M184                        {errore indice tastatura}
+N780  IF (R3501 <  0) $M184                        {errore indice tastatura}
+N790  IF (R3501 > 99) $M184                        {errore indice tastatura}
+N800  IF (R3502 <  0) $M184                        {errore indice tastatura}
+N810  IF (R3502 > 99) $M184                        {errore indice tastatura}
+
+N900  IF (R340 >  0) R3047=400+((R340-1)*2)        {calcolo indice appoggio correzione 1 asse X} 
+N910  IF (R341 >  0) R3048=600+((R341-1)*2)        {calcolo indice appoggio correzione 1 asse Y} 
+N920  IF (R342 >  0) R3049=800+((R342-1)*2)        {calcolo indice appoggio correzione 1 asse Z} 
+N930  IF (R340 >  0) R3044=(V11006.(FTI(R3047)))   {visualizza correzione asse X primo punto} 
+N940  IF (R341 >  0) R3045=(V11006.(FTI(R3048)))   {visualizza correzione asse Y primo punto} 
+N950  IF (R342 >  0) R3046=(V11006.(FTI(R3049)))   {visualizza correzione asse Z primo punto} 
+
+N960  IF (R3500 >  0) R3507=400+((R3500-1)*2)      {calcolo indice appoggio correzione 2 asse X} 
+N970  IF (R3501 >  0) R3508=600+((R3501-1)*2)      {calcolo indice appoggio correzione 2 asse Y} 
+N980  IF (R3502 >  0) R3509=800+((R3502-1)*2)      {calcolo indice appoggio correzione 2 asse Z} 
+N990  IF (R3500 >  0) R3504=(V11006.(FTI(R3507)))  {visualizza correzione asse X secondo punto} 
+N1000 IF (R3501 >  0) R3505=(V11006.(FTI(R3508)))  {visualizza correzione asse Y secondo punto} 
+N1010 IF (R3502 >  0) R3506=(V11006.(FTI(R3509)))  {visualizza correzione asse Z secondo punto}
+
+N1100 IF (R340 >  0) IF (R3500 >  0.5) R3510=(((V11006.(FTI(R3047))) + (V11006.(FTI(R3507)))) / 2)  {valore medio di correzione in X}
+N1110 IF (R341 >  0) IF (R3501 >  0.5) R3511=(((V11006.(FTI(R3048))) + (V11006.(FTI(R3508)))) / 2)  {valore medio di correzione in Y}
+N1120 IF (R342 >  0) IF (R3502 >  0.5) R3512=(((V11006.(FTI(R3049))) + (V11006.(FTI(R3509)))) / 2)  {valore medio di correzione in Z}	
+
+N1130 IF (R340 >  0) IF (R3500 <  0.5) R3510=(V11006.(FTI(R3047)))  {valore singolo di correzione in X}
+N1140 IF (R341 >  0) IF (R3501 <  0.5) R3511=(V11006.(FTI(R3048)))  {valore singolo di correzione in Y}
+N1150 IF (R342 >  0) IF (R3502 <  0.5) R3512=(V11006.(FTI(R3049)))  {valore singolo di correzione in Z}
+
+N1160 IF (R585 == 0) [5FACES_2]                  {sistema a facce di posizionamento assi}
+N1170 IF (R585 > 0.5) [COMP_2]                   {sistema assoluto di posizionamento assi}
+
+[5FACES_2]
+N1500 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 1) R690=R690+R3510   {applica correzione asse X} 
+N1510 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 2) R690=R690+R3510   {applica correzione asse X} 
+N1520 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 3) R690=R690+R3510   {applica correzione asse X} 
+N1530 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 4) R690=R690-R3510   {applica correzione asse X} 
+N1540 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 5) R690=R690+R3510   {applica correzione asse X} 
+N1550 IF (R340 >  0) IF (R3500 >=  0) IF (R203 == 6) R690=R690+R3510   {applica correzione asse X} 
+
+N1560 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 1) R691=R691-R3511   {applica correzione asse Y} 
+N1570 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 2) R691=R691-R3511   {applica correzione asse Y} 
+N1580 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 3) R691=R691+R3511   {applica correzione asse Y} 
+N1590 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 4) R691=R691-R3511   {applica correzione asse Y} 
+N1600 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 5) R691=R691-R3511   {applica correzione asse Y} 
+N1610 IF (R341 >  0) IF (R3501 >=  0) IF (R203 == 6) R691=R691-R3511   {applica correzione asse Y} 
+
+N1620 IF (R342 >  0) IF (R3502 >=  0)                R692=R692+R3512   {applica correzione asse Z} 
+N1630 JMP [TAST_3P]
+
+[COMP_2]
+N1700 IF (R340 >  0) IF (R3501 >=  0) R690=R690+R3510   {applica correzione asse X} 
+N1710 IF (R341 >  0) IF (R3502 >=  0) R691=R691-R3511   {applica correzione asse Y} 
+N1720 IF (R342 >  0) IF (R3503 >=  0) R692=R692+R3512   {applica correzione asse Z} 
+N1730 JMP [TAST_3P]
+
+[TAST_3P]
+N2000 IF (R336==0) JMP [FINE]               {nessuna terna di tastature associate}
+N2010 IF (R336< 0) $M184                    {errore indice tastatura}
+N2020 IF (R336>79) $M184                    {errore indice tastatura}
+
+N2030 R3048=1360+(R336-1)*2
+N2040 (V11006.1120 = V11006.(FTI(R3048))) {Psy
+
+N2050 R3049=1520+(R336-1)*2
+N2060 (V11006.1122 = V11006.(FTI(R3049))) {Psz
+
+N2070 R3048=1680+(R336-1)*2
+N2080 (V11006.1124 = V11006.(FTI(R3048))) {Psy'
+
+N2090 R3049=1840+(R336-1)*2
+N2100 (V11006.1126 = V11006.(FTI(R3049))) {Psz'
+
+N2110 {Shift delle coordinate su Ps
+N2120 (V11006.1128 = -R691 - V11006.1120) {PYsh1 = PY-Psy
+N2130 (V11006.1130 =  R692 - V11006.1122) {PZsh1 = PZ-Psz
+
+N2140 {Rotazione di P rispetto Ps
+N2150 R3047=1200+(R336-1)*2
+N2160 R3044 = (V11006.(FTI(R347))) {Beta
+N2170 (V11006.1132 =   V11006.1128 * COS(-R3044) + V11006.1130 * SIN(-R3044)) { PYsh1*cos(Beta)+PZsh1*sen(Beta)
+N2180 (V11006.1134 = - V11006.1128 * SIN(-R3044) + V11006.1130 * COS(-R3044)) {-PYsh1*sen(Beta)+PZsh1*cos(Beta)
+
+N2200 {Shift di PsPs' e ritorno su coordinate originali
+N2210 (V11006.1136 = V11006.1132 + V11006.1124) {PYsh1_rot+(Psy'-Psy)+Psy
+N2220 (V11006.1138 = V11006.1134 + V11006.1126) {PZsh1_rot+(Psz'-Psz)+Psz
+N2230 R691 = (-V11006.1136) {Origine Y delle lavorazioni ruotato
+N2240 R692 = (V11006.1138) {Origine Z delle lavorazioni ruotato
+
+N2250 IF (R699<180) R3044 = R3044 * (-1) {a seconda di C cambia il verso della rotazione per la correzione
+N2260 IF (R337==1) R689 = R689 + R3044   {Correzione di A se richiesta
+
+[FINE]
+N10000 RET

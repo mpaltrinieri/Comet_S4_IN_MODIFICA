@@ -1,0 +1,5 @@
+[SERV0]
+TEXT=Cabezal angular
+R=466
+TIME=100
+

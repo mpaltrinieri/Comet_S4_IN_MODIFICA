@@ -1,0 +1,22 @@
+{R5941 = Array delle morse da aprire (dalla 1 alla 12) in autofeed dopo taglio}
+{R5942 = Array delle morse da aprire (dalla 13 alla 24) in autofeed dopo taglio}
+{HDRILL passa R5941 come se le morse fossero dalla 1 alla 12}
+{ e passa sempre R5942=0}
+
+N10 R400=0
+N20 IF( (FTL(R5941) & '0008') > 0.5) R400=R400+(2**9)
+N30 IF( (FTL(R5941) & '0010') > 0.5) R400=R400+(2**10)
+N40 IF( (FTL(R5941) & '0020') > 0.5) R400=R400+(2**11)
+N50 R400=(RND(R400)+0.2)
+
+N60 R5942=0
+N70 IF( (FTL(R5941) & '0040') > 0.5) R5942=R5942+(2**0)
+N80 IF( (FTL(R5941) & '0080') > 0.5) R5942=R5942+(2**1)
+N90 IF( (FTL(R5941) & '0100') > 0.5) R5942=R5942+(2**2)
+N95 R5942=(RND(R5942)+0.2)
+
+N140 L SNGCNT.CS4
+N150 R5941=R400
+
+N170 L SNGCNT.CS4
+N180 RET

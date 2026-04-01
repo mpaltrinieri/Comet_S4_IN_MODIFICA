@@ -1,0 +1,31 @@
+{***** MUOVI MORSE MOTORIZZATE DI ZONA SX *****}
+{A = asse morsa numero 7}
+{B = asse morsa numero 8}
+{C = asse morsa numero 9}
+{U = asse morsa numero 10}
+{V = asse morsa numero 11}
+{P = asse morsa numero 12}
+{R700 = morsa motorizzata presente}
+
+N100 R418=0
+
+N150 IF((FTL(R700) & '0020')>0.5) R418=R418+1  {morsa 7 presente}
+N140 IF((FTL(R700) & '0040')>0.5) R418=R418+2  {morsa 8 presente}
+N130 IF((FTL(R700) & '0080')>0.5) R418=R418+4  {morsa 9 presente}
+N120 IF((FTL(R700) & '0100')>0.5) R418=R418+8  {morsa 10 presente}
+N110 IF((FTL(R700) & '0200')>0.5) R418=R418+16 {morsa 11 presente}
+N100 IF((FTL(R700) & '0400')>0.5) R418=R418+32 {morsa 12 presente}
+
+N180 L <WAIT_CH2_CH0.CR6>
+
+N200 IF((FTL(R418) & '003F')>0.5) G1 G53 F=R721 A=R870 B=R871 C=R872 U=R873 V=R874 P=R875
+N210 IF((FTL(R418) & '003E')>0.5) G1 G53 F=R721 B=R871 C=R872 U=R873 V=R874 P=R875
+N220 IF((FTL(R418) & '003C')>0.5) G1 G53 F=R721 C=R872 U=R873 V=R874 P=R875
+N230 IF((FTL(R418) & '0038')>0.5) G1 G53 F=R721 U=R873 V=R874 P=R875
+N240 IF((FTL(R418) & '0030')>0.5) G1 G53 F=R721 V=R874 P=R875
+N250 IF((FTL(R418) & '0020')>0.5) G1 G53 F=R721 P=R875
+
+N500 L <SNGCNT_CH2.CR6>
+N600 R6867=R6867+4        {libera l'attesa sul CH0 dal CH2}
+
+N1000 RET

@@ -1,0 +1,151 @@
+{***** CARICO PEZZO A SX *****}
+{R485 = Attesa posizionamento morse e battute a DX in pendolare}
+{R486 = Attesa caricamento pezzo a DX in pendolare}
+{R463 = Rotazione pezzo in corso (1=sx, 2=dx)}
+{R672 = Pezzo in carico con asse 2 (0=nessuno,1-6=numero pezzo)}
+{R673 = Appoggio Assi P/H presenti per facile controllo}
+{R566 = Posizione battuta SX per carico pezzo (0=bassa, 1=alta)}
+{R126 = Quota_H per carico con battuta_H del pezzo 6 DX  (-1 se fissa, -2 se non usata)
+{R127 = Quota_H per carico con battuta_H del pezzo 5 DX  (-1 se fissa, -2 se non usata)
+{R128 = Quota_H per carico con battuta_H del pezzo 4 DX  (-1 se fissa, -2 se non usata)
+{R129 = Quota_H per carico con battuta_H del pezzo 3 DX  (-1 se fissa, -2 se non usata)
+{R130 = Quota_H per carico con battuta_H del pezzo 2 DX  (-1 se fissa, -2 se non usata)
+{R131 = Quota_H per carico con battuta_H del pezzo 1 DX  (-1 se fissa, -2 se non usata)
+{R138 = Gestione a Bit - Indicazione se l'asse H Appoggia contro la testa/coda del pezzo
+{                      Bit0 : pezzo 1 - ininfluente sempre su battuta fissa
+{                      Bit1 : pezzo 2 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit2 : pezzo 3 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit3 : pezzo 4 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit4 : pezzo 5 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit5 : pezzo 6 - 0=appoggiato in testa 1=appoggiato in coda
+{R519 = Attendere conferma di scarico pezzo prima di abbassare la battuta dell'asse H (zona DX)
+{R784 = Abilitazione Attesa conferma di scarico pezzo prima della discesa battute degli assi P/H se quote di carico diverse da precedenti
+{R6206 = indice delle morse chiuse in bassa forza}
+{R6207 = indice delle morse chiuse in alta forza}
+{R522 = Riposizionamento Morse a SX in pendolare}
+{R533 = Riposizionamento Morse con Pezzo sopra in multipezzo}
+{R6957 = Appoggio indici morse controllate a SX}
+{R6958 = Appoggio indici morse controllate a DX}
+
+
+N10  L <SNGCNT_CH3.CR6>
+N20  R400=0                   {reset appoggio}
+N30  R401=0                   {reset appoggio}
+N40  R402=0                   {reset appoggio}
+N50  R403=0                   {reset appoggio}
+N60  R404=0                   {reset appoggio}
+N100 R485=0                   {reset Attesa posizionamento morse e battute a DX in pendolare}
+
+N120 IF(R486<0.5) JMP [FINE]  {se nessun carico da fare}
+N130 R672=0                   {azzero il carico che sto eseguendo }
+N140 $M93                     {avanti tavola DX per carico}
+N150 IF(R566>0.5) $M122       {salita/inserimento battuta DX4}
+N160 IF(R566<0.5) $M123       {discesa/disinserimento battuta DX4}
+
+N170 IF(R673<0.5) JMP [NO_CAR_H]
+N180 IF(R126<0) IF(R127<0) IF(R128<0) IF(R129<0) IF(R130<0) IF(R131<0) R403=1  {nessun carico con asse H}
+N185 IF(R126<0) IF(R127<0) IF(R128<0) IF(R129<0) IF(R130<0) IF(R131<0) JMP [NO_CAR_H]
+N190 IF(R131>0) R672=1        {Carico in corso partendo dal primo pezzo}
+N200 IF(R131<0) R672=2        {Carico in corso partendo dal secondo pezzo (il primo con battuta fissa)}
+
+{***** ESEGUE CARICO SEQUENZIALE CON ASSE H ******}
+N300 $M156                                                 {Controllo il valore delle posizioni battute con asse H}
+
+[REPEAT]                                                   {Ripeti fino a terminare pezzi da caricare}
+N310 $M63                                                  {Chiusura riparo DX}
+N320 $M223                                                 {disinserzione battuta su asse H per conferma}
+N330 R400=(131-R672+1)                                     {indice della R di posizione battuta da raggiungere}
+N340 IF((FTL(R138) & '0001')>0.5) IF(R672==1) R401=R401+1  {Pezzo 1 appoggiato in coda}
+N350 IF((FTL(R138) & '0002')>0.5) IF(R672==2) R401=R401+2  {Pezzo 2 appoggiato in coda}
+N360 IF((FTL(R138) & '0004')>0.5) IF(R672==3) R401=R401+4  {Pezzo 3 appoggiato in coda}
+N370 IF((FTL(R138) & '0008')>0.5) IF(R672==4) R401=R401+8  {Pezzo 4 appoggiato in coda}
+N380 IF((FTL(R138) & '0010')>0.5) IF(R672==5) R401=R401+16 {Pezzo 5 appoggiato in coda}
+N390 IF((FTL(R138) & '0020')>0.5) IF(R672==6) R401=R401+32 {Pezzo 6 appoggiato in coda}
+N400 R402=R(FTI(R400))                                     {posizione a cui portare la battuta su asse H}
+N410 IF(R401>0.5) G1 G53 F=R755 H=R402+1                   {posiziona H per inserire la battuta distante 1 mm per non graffiare il pezzo}
+N420 IF(R401<0.5) G1 G53 F=R755 H=R402-1                   {posiziona H per inserire la battuta distante 1 mm per non graffiare il pezzo}
+N500 IF(R519>0.5) IF(R784>0.5) JMP [POSBAT_H]
+N510 $M222                                                 {inserisci battuta su asse H}
+N520 R404=1                                                {battuta inserita}
+
+[POSBAT_H]
+N520 G1 G53 F=R755 H=R402                                  {porta la battuta in posizione}
+
+{***** nessun carico da fare con l'asse P: CASE 3100 *****}
+[NO_CAR_H]                    
+N600 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0040')>0.5) $M297  {disattiva chiusura in alta forza morsa 13
+N610 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0080')>0.5) $M298  {disattiva chiusura in alta forza morsa 14
+N620 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0100')>0.5) $M299  {disattiva chiusura in alta forza morsa 15
+N630 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0200')>0.5) $M300  {disattiva chiusura in alta forza morsa 16
+N640 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0400')>0.5) $M301  {disattiva chiusura in alta forza morsa 17
+N650 IF(R522<0.5) IF(R533<0.5) IF((FTL(R6207)&'0800')>0.5) $M302  {disattiva chiusura in alta forza morsa 18
+
+N680 IF(R509<0.5) IF(R520<0.5) IF(R672<3) IF(R463<1.5) $M244      {apri tutte le morse di DX}
+N690 IF(R509<0.5) IF(R520<0.5) IF(R672<3) IF(R463>2.5) $M244      {apri tutte le morse di DX}
+N700 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0040')>0.5) $M237  {apertura morsa morsa 13
+N710 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0080')>0.5) $M238  {apertura morsa morsa 14
+N720 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0100')>0.5) $M239  {apertura morsa morsa 15
+N730 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0200')>0.5) $M240  {apertura morsa morsa 16
+N740 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0400')>0.5) $M241  {apertura morsa morsa 17
+N750 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0800')>0.5) $M242  {apertura morsa morsa 18
+
+N800 $M62                           {apertura riparo DX}
+N810 IF(R403>0.5) JMP [NOWAIT_H]    {se nessun carico con asse H}
+N820 IF(R784<0.5) JMP [NOWAIT_H]    {Se non abilitata Attesa conferma di scarico pezzo prima della discesa battuta H}
+
+N830 IF(R519>0.5) JMP [WAITCONF]    {attesa conferma}
+
+[OK_CONF]
+N840 $M222                          {inserisci battuta asse H}
+N850 R404=1                         {battuta inserita}
+
+
+[NOWAIT_H]
+N900 R506=1                         {=1 Per attesa carico pezzo}
+N910 IF(R737<0.5) $M87              {Macchina pronta al lavoro zona DX}
+M920 $M63                           {chiusura riparo DX}
+
+N940 IF(R404>0.5) IF(R673>0.5) IF(R401>0.5) G1 G53 F=R755 H=R402+1  {posiziona H per togliere la battuta distante 1 mm per non graffiare il pezzo}
+N950 IF(R404>0.5) IF(R673>0.5) IF(R401<0.5) G1 G53 F=R755 H=R402-1  {posiziona H per togliere la battuta distante 1 mm per non graffiare il pezzo}
+
+N1000 IF(R404<0.5) IF(R673>0.5) JMP [FC_AX_H]                       {manda H al finecorsa negativo}
+N1010 IF(R673<0.5) JMP [NO_AX_H]
+
+N1100 $M223                          {disinserisce battuta asse H}
+N1110 $M123                          {disinserisce battuta DX4}
+
+N1120 R400=(131+R672)                {indice della R di posizione battuta da raggiungere}
+N1130 R402=R(FTI(R400))              {posizione a cui portare la battuta su asse H}
+N1140 IF(R402>0) R672=R672+1         {R402 indica se ci sono altri pezzi da caricare}
+N1150 IF(R402>0) JMP [REPEAT]        {torna indietro e carica gli altri pezzi}
+N1160 L <SNGCNT_CH3.CR6>
+N1170 R672=0
+N1180 JMP [FC_AX_H]
+
+
+[FC_AX_H]    {****** CASE 3600 *******}
+N2000 G1 G53 F=R755 H=R381 $M123     {Riporta H al finecorsa positivo e disinserisci battuta DX4}
+N2010 R672=0
+
+[NO_AX_H]    {****** CASE 4000 *******}
+N3000 R485=R486=R488=R482=0
+N3020 $M63                                {chiusura riparo DX}
+N3030 IF((FTL(R6206)&'0040') > 0.5) $M277 {Chiusura morsa 13 in alta forza
+N3040 IF((FTL(R6206)&'0080') > 0.5) $M278 {Chiusura morsa 14 in alta forza
+N3050 IF((FTL(R6206)&'0100') > 0.5) $M279 {Chiusura morsa 15 in alta forza
+N3060 IF((FTL(R6206)&'0200') > 0.5) $M280 {Chiusura morsa 16 in alta forza
+N3070 IF((FTL(R6206)&'0400') > 0.5) $M281 {Chiusura morsa 17 in alta forza
+N3080 IF((FTL(R6206)&'0800') > 0.5) $M282 {Chiusura morsa 18 in alta forza
+N3090 $M223                               {disinserzione battuta su asse H}
+N3100 $M123                               {disinserzione battuta DX4}
+N3110 JMP [FINE]
+
+[WAITCONF]
+N4000 IF(R519<0) JMP [OK_CONF]      {conferma ottenuta}
+N4000 L <SNGCNT_CH3.CR6>
+N4010 G4 F0.1
+N4020 JMP [WAITCONF]
+
+
+[FINE]
+N5000 RET

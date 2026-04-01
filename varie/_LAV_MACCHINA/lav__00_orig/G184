@@ -1,0 +1,336 @@
+{ G184: MASCHIATURA RIGIDA CUSTOMIZZATA PER EMMEGI; GESTISCE LA PERCENTUALE DI DECREMENTO DA DRILL ED IL FEED FORWARD MANDRINO
+{**** ATTENZIONE USATI R189 E R585 - LASCIARLI LIBERI NEL PROGETTO ****}
+
+IF (R459 < 0.5) JMP [G184]
+IF (R459 > 0.5) JMP [G184SIMU]
+
+[G184SIMU]
+{ ENT=#48  SPD=#427  PCH=#59 
+G0 Z0
+G4 F0.2
+M03 S=#427 
+G1 F=(#427*#59) Z=#48
+M04
+G4 F0.5
+Z0
+RET
+
+
+[G184]
+	(%#34=0)
+N10	IF ( (%V4005 & '200')==0 ) (%#34=1) <CNT>	{ abilita funzion. in "continua"
+	IF ( (%V4005 & '400') == 0 ) N80
+	<%#9=FTI(ABS(#46))><%#0=%V2036&'OCT010'>{ Salvataggio programmazione assoluta/incrementale }
+	G00 <MVM:<%#9>;<#49>> G90              { movimento a quota RAL }
+	{ programmazione ass./increm.}
+	IF ( %#0 ) G91
+N20 	IF ( (%V4005 &'200')==0) RET
+N30	IF ( %#34 ) (%#34=0) <SNG>
+	RET
+
+N80 <%#10=0> <%#1=1> <#65=#66=0> <SET:284>
+	G304 CNC
+	(V4033=0)(%V4068=0)		{ Azzera CSGL e IVEL 
+{------------------- controllo  trasformazioni dinamiche --------------
+	(%%#45 = 0)(%%#13 = 0)(%#9=FTI(ABS(#46)) )
+	GOSUB N2000 
+{-----------------------------------------------------------------------
+N140 <%%#5=ITL(%V5014)>			{ salvataggio abilitazione SPC }
+N160 <SPC:OFF>
+N170 <%#9=FTI(ABS(#46))><%#0=%V2036&'OCT010'><%#2=%V4059&'00FF'><%#3=3><%#4=4><#150=1> { numero asse del c.f.;program. assoluta/incrementale;asse mandrino }
+{----------------------------- inch o mm -------------------------------}
+N190 <IFF<%V2036&'OCT04'>:N200;N220;N200>
+N200 <#150=25.4>
+{----------------------- INIZIALIZZAZIONE DATI -------------------------}
+N220 <%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quote primo e secondo asse}
+N230 <%#7=((%V4051/<%#5>)&'FF00')/256+1> <%#8=((%V4051/<%#6>)&'FF00')/256+1> <#128=V2012> <#129=V2013> <#140=V2014>
+{-----------------------------------------------------------------------}
+N390 <IFF<%#2-15>:N400;N400;N930>	{ asse mandrino : > all.25003 
+N400 <IFF<%V4031/<%#2>&'OCT400'>:N930;N930;N410>  { encoder non presente: all 25003 }
+N410 G304 CNC
+N420 <IFF<%V4002/<%#2>&'40'>:N430;N430;N480>  {verif.se fatto set asse mandrino}
+N430 $M05
+N435 IF(R98<0.5) (%#92=%V4059)  {asse mandrino
+     IF(R98<0.5) (%V4036/(%#92)=FTI(R189))
+     IF(R98<0.5) (IN2=LTF(%%V4035/(%#92)) * ITF(%V4036/(%#92)) /100)
+     IF(R98<0.5) G317 (%#92) ;'80'; (FTL(IN2))  {imposta FEED FORWARD al valore di R189
+N440 IF (0) M19  {M19 mai
+N445 G304 FRE
+N450 G304 CNC;MND
+N460 G303 (%#2)		{ asse mandrino reso cnc }
+{----------------------------------------------------------------------}
+N480 <IFF<#61-3>:N930;N520;N490>           { <ROT> = 3 : < all.25003 }
+N490 <IFF<#61-4>:N930;N500;N930>           { <ROT> = 4 : < all.25003 }
+N500 <%#1=-1>                              { appoggio segno con ROT = 4 }
+{----------------------------------------------------------------------}
+N520 <IFF<%V4031/<%V4059&'00FF'>&'OCT100000'>:N530;N550;N550>   { < 0 = CCW }
+N530 <%#1=-%#1>
+N540 {----------------------------------------------------------------------}
+N550 <#55=ABS(#48-#47)> <#56=#55/#59> <#57=#427*360> <#58=#56*360*ITF(%#1)> <#63=#427*#59> <#64=SQR((#63*#63)+(#57*#57))>
+N560 {-(ENT-RAP);num.angoli giro;velocita' mandr. per angolo giro;angolo totale di filett.;velocta' mandr.per passo;velocita' di filett.}
+N570 <IFF<#63-(V4054/<%#9>/V4065*60)>:N580;N580;N950> {<SPD> : > 0 ALL.25004}
+N580 <IFF<#57-(V4054/<%#2>/V4065*60)>:N600;N600;N950> { feed : > 0 ALL.25004}
+{---------------------- DISCESA A QUOTA <RAP> -------------------------}
+N600 
+GOSUB [QUORAP]
+G00 G315 (%#9)(#220) G315 (%#5)(#221) G315 (%#6)(#222)G90
+{------------------- ORIENTAMENTO MANDRINO A 0 ------------------------}
+	(#55 = V2008)	{salva feed
+N620 G950 <MVM:<%#2>;0> F<#64>
+{------------------- MOVIMENTO A QUOTA <ENT> --------------------------}
+GOSUB [QUOENT]
+N640 G01 G315 (%#9)(#223) G315 (%#5)(#224) G315 (%#6)(#225)  G315 (%#2)(#58*R311/R310) {aumento la corsa di avanzamento del mandrino della percentuale di decremento
+{----------------------------------------------------------------------}
+N660 <IFF<#53>:N670;N720;N670>{<DAX> : = 0 maschiatura rigida;<> filettatura}
+N670 <WAT:CNC>
+{------------------- DISTACCO <DAX> DAL FILETTO -----------------------}
+N690 <MVM:<%#5>;<#85*#150-#53*COS((#56-ITF(FTI(#56)))*360)>> <MVM:<%#6>;<#86*#150-#53*SIN((#56-ITF(FTI(#56)))*360)>>
+N700 <JMP:N740>
+{-------------- MASCHIATURA RIGIDA : RISALITA QUOTA <RAP> -------------}
+N720 GOSUB [QUORAP1]
+N730 G315 (%#9)(#220) G315 (%#5)(#221) G315 (%#6)(#222) G315(%#2)(#58*(1-(R310/R311))) {diminuisco la corsa di ritorno del mandrino della percentuale di decremento
+{------------------------ RISALITA QUOTA <RAL> ------------------------}
+N740 GOSUB [QUORAL]
+N742 <SNG>
+N744 <CNT>
+N750 G00 G315 (%#9)(#226) G315 (%#5)(#227) G315 (%#6)(#228)
+{----------------------------------------------------------------------}
+N760 G318:280
+{------------------------- CHIUSURA PROGRAMMA --------------------------
+N780 <IFF<%%#5&'OCT1'>:N800;N800;N790>       { ripristina stato SPC }
+N790 <SPC:<%V4051/<%V5019.0>>;<%V4051/<%V5019.1>>;<%V4051/<%V5019.2>>>
+N800 <IFF<%#0>:N810;N820;N810>               { programmazione ass./increm.
+N810 G91
+N820 <V2012=#128> <V2013=#129> <V2014=#140>     { ripristino quote centri 
+{-----------------------------------------------------------------------
+N840 <WAT:CNC>
+N850 <V4033=V1000> <%V4068=%V1001>         { Ripristina IVEL e CSGL }
+N860 <IFF<%V4005&'OCT1000'>:N890;N890;N870>
+N870 <IFF<%#34>:N890;N890;N880>
+N880 <SNG> <%#34=0>
+N890 <WAT:CNC>
+ 	F( #55*60/V4065)	{ ripristina feed
+	$M05			{ per agg. mandrinino in velocita'
+N895 IF(R98<0.5) (%#92=%V4059)  {asse mandrino
+     IF(R98<0.5) (%V4036/(%#92)=FTI(100))
+     IF(R98<0.5) (IN2=LTF(%%V4035/(%#92)) * ITF(%V4036/(%#92)) /100)
+     IF(R98<0.5) G317 (%#92) ;'80'; (FTL(IN2))  {imposta FEED FORWARD a 100
+
+	{ da ripristinare C.L.U. ?
+	IF ( %%#45 & '0001' ) (%V2032=LTI(%%#44))(%%#44=0) (%%#45 = %%#45 & 'FFFE')
+	{ Da ripristinare matrice dinamica
+	IF ( (%%#45 & '0040') == 0 ) RET
+	IF ( %%#13 == 4 ) L DRTXYZ
+	IF ( %%#13 == 5 ) L DRZYX
+	(%%#45 = 0)(%%#13 = 0)
+	RET
+{------------------------- GESTIONE ERRORI ----------------------------
+N930 <%#10=25003>  { <ROT> mal programmato o asse mandrino inesistente
+N940 JMP N990
+N950 <%#10=25004>  { feed o <SPD> supera la massima ammessa 
+{------------- ROUTINE VISUALIZZA COMMENTI CON ALLARMI -----
+{        ATTENZIONE .....       ALLARME IN G184 
+{-----------------------------------------------------------
+N990 <WAT:CNC>
+N1000 <IFF<%V4005&'OCT1000'>:N1030;N1030;N1010>
+N1010 <IFF<%#34>:N1030;N1030;N1020>
+N1020 <SNG> <%#34=0>                     { ripristina funzionalita' "singola" }
+N1030 L ERROR
+	RET
+
+
+N2000	(#150=1)     
+	IF (%V2036 & '04' ) (#150=25.4)
+	IF ( (%V5014 & '0004') ) N2050 
+
+	(#247 = 0)
+
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+{	appoggia quote programmate in X e Y	
+	(#230 = #85) (#231 = #86)
+
+{	RAP
+	(#220 = #47) ( #221 = #230) (#222 = #231)
+{	ENT
+	(#223 = #48)
+	(#224 = #221) (#225 = #222)
+{	RAL
+	(#226 = #49)
+	(#227 = #221) (#228 = #222)
+	RET
+
+{	calcola coefficienti
+N2050	
+	IF (%V2036 & '04' ) (#150=25.4)
+{	appoggia quote programmate in X e Y e Z	
+	{ Set flag, salva e anulla C.L.U.
+	(%%#45=%%#45 | '0001')(%%#44=ITL(%V2032))(%V2032=0)
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	<#219=(V2001/<%#9>)*#150> 
+	{ segno C.L.U.
+	(#51 = -1)
+	IF ( %V2033 ) (#51 = 1)
+	{ se C.L.U. aggiungi lung. ut.
+	IF ( %%#44 ) (#219 = #219 + V4090*#150*#51) 
+	(#270 = #85) (#271 = #86)
+	G320 OFF
+	(#247 = 1)
+	<%#51=1>
+	<%#16=(%V4032/<%V5079.0&'00FF'>&'OCT4')/4>		{ concordanza/disc 1 asse MTX }
+	<%#17=(%V4032/<(%V5079.0&'FF00')/'0100'>&'OCT4')/4>	{ concordanza/disc 2 asse MTX }
+	<%#18=(%V4032/<%V5079.1&'00FF'>&'OCT4')/4>		{ concordanza/disc 3 asse MTX }
+N2060	<IFF<ABS(ITF(%#16-%#17-%#18))-1>:N2080;N2070;N2080>	{ 0 = discordanza assi MTX }
+N2070	<%#51=-1>						{ inverte segno dell' angolo }
+N2080	<ANR=ANR*ITF(%#51)><AN2=AN2*ITF(%#51)><AN3=AN3*ITF(%#51)>
+{-----------------------------------------------------------------------}
+{TEST MODALITA MULTIANGOLO
+N2085 IF (R585 == 1) N2210
+{DRTXYZ
+N2100 	<#238=COS(AN3)*COS(AN2)>
+N2110	<#239=-SIN(AN3)*COS(AN2)>
+N2120 	<#240=SIN(AN2)>
+{-----------------------------------------------------------------------}
+N2140	<#241=SIN(AN3)*COS(ANR)+COS(AN3)*SIN(AN2)*SIN(ANR)>
+N2150	<#242=COS(AN3)*COS(ANR)-SIN(AN3)*SIN(AN2)*SIN(ANR)>
+N2160	<#243=-COS(AN2)*SIN(ANR)>
+{-----------------------------------------------------------------------}
+N2180	<#244=SIN(AN3)*SIN(ANR)-COS(AN3)*SIN(AN2)*COS(ANR)>
+N2190	<#245=COS(AN3)*SIN(ANR)+SIN(AN3)*SIN(AN2)*COS(ANR)>
+N2200	<#246=COS(AN2)*COS(ANR)>
+{ Per RESET : deve ripristinare DRTXYZ
+	(%%#13=4)   
+{Ricorda mat. dinamica attiva
+	(%%#45=%%#45 | '0040')
+	(#150=1)
+	G90
+	RET
+{
+{DRZYX
+N2210 	<#238=COS(AN3)*COS(AN2)>
+		<#239=SIN(ANR)*SIN(AN2)*COS(AN3)-SIN(AN3)*COS(ANR)>
+	 	<#240=COS(AN3)*SIN(AN2)*COS(ANR)+SIN(AN3)*SIN(ANR)>
+{-----------------------------------------------------------------------}
+		<#241=SIN(AN3)*COS(AN2)>
+		<#242=SIN(AN3)*SIN(AN2)*SIN(ANR)+COS(AN3)*COS(ANR)>
+		<#243=SIN(AN3)*SIN(AN2)*COS(ANR)-COS(AN3)*SIN(ANR)>
+{-----------------------------------------------------------------------}
+		<#244=-SIN(AN2)>
+		<#245=COS(AN2)*SIN(ANR)>
+		<#246=COS(AN2)*COS(ANR)>
+{ Per RESET : deve ripristinare DRZYX
+	(%%#13=5)   
+{Ricorda mat. dinamica attiva
+	(%%#45=%%#45 | '0040')
+	(#150=1)
+	G90
+	RET
+
+[QUORAP]
+	IF ( #247 ) N2250 
+	(#220 = #47) ( #221 = #230) (#222 = #231)
+	RET
+
+N2250	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	(#230 = #85) (#231 = #86)
+	<#232=(V2001/<%#9>)*#150>
+
+{	calcola quota RAP trasformata in X
+	(#262 = #261 = #47*#240 + #270*#238 + #271*#239)
+{	calcola quota attuale trasformata in X
+	(#251 = #219*#240 + #270*#238 + #271*#239)
+	(#221 = #230+ #261 - #251)
+{	calcola quota RAP trasformata in Y
+	(#263 = #261 = #47*#243 + #270*#241 + #271*#242)
+{	calcola quota attuale trasformata in Y
+	(#251 = #219*#243 + #270*#241 + #271*#242)
+	(#222 = #231 + #261 - #251 )
+{	calcola quota RAP trasformata in Z
+	(#264 = #261 = #47*#246 + #270*#244 + #271*#245)
+{	calcola quota attuale trasformata in Z
+	(#251 = #219*#246 + #270*#244 + #271*#245)
+	(#220 = #232 + #261 - #251 )
+	RET
+
+[QUORAP1]
+	IF ( #247 ) N2225 
+	(#220 = #47) ( #221 = #230) (#222 = #231)
+	RET
+
+N2225	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	(#230 = #85) (#231 = #86)
+	<#232=(V2001/<%#9>)*#150>
+
+	(#251 = #262)
+{	calcola quota RAP trasformata in X
+	(#262 = #261 = #47*#240 + #270*#238 + #271*#239)
+{	calcola quota attuale trasformata in X
+	(#221 = #230 + #261 - #251)
+	(#251 = #263)
+{	calcola quota RAP trasformata in Y
+	(#263 = #261 = #47*#243 + #270*#241 + #271*#242)
+	(#222 =  #231 + #261 - #251)
+	(#251 = #264)
+{	calcola quota RAP trasformata in Z
+	(#264 = #261 = #47*#246 + #270*#244 + #271*#245)
+	(#220 =  #232 + #261 -  #251)
+	RET
+
+
+[QUOENT]
+{	appoggia quote programmate in X e Y e Z	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	<#219=(V2001/<%#9>)*#150>
+	(#230 = #85) (#231 = #86)
+	IF ( #247 ) N2350 
+	(#220 = #48) ( #221 = #230) (#222 = #231)
+	RET
+
+N2350	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	(#230 = #85) (#231 = #86)
+	<#232=(V2001/<%#9>)*#150>
+
+{	calcola quota ENT trasformata in X
+	(#251 = #262)
+	(#262 = #261 = #48*#240 + #270*#238 + #271*#239)
+	(#224 =  #230 + #261 -  #251)
+	(#251 = #263)
+{	calcola quota ENT trasformata in Y
+	(#263 = #261 = #48*#243 + #270*#241 + #271*#242)
+	(#225 =  #231 + #261 - #251 )
+	(#251 = #264)
+{	calcola quota ENT trasformata in Z
+	(#264 = #261 = #48*#246 + #270*#244 + #271*#245)
+	(#223 =  #232 + #261 -  #251)
+	RET
+	
+[QUORAL]
+{	appoggia quote programmate in X e Y e Z	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+{	appoggia quote programmate in X e Y e Z	
+	(#230 = #85) (#231 = #86)
+	IF ( #247 ) N2450 
+	(#220 = #48) ( #221 = #230) (#222 = #231)
+	RET
+
+{	calcola quota RAL trasformata in X
+N2450	
+	<%#5=%V5018&'FF'> <%#6=(%V5018&'FF00')/256> <#56=#85=(V2001/<%#5>)*#150> <#57=#86=(V2001/<%#6>)*#150>{num. primo asse e secondo asse; quot
+	(#230 = #85) (#231 = #86)
+	<#232=(V2001/<%#9>)*#150>
+
+	(#251 = #262)
+{	calcola quota RAL trasformata in X
+	(#262 = #261 = #49*#240 + #270*#238 + #271*#239)
+	(#227 =  #230 + #261 -  #251 )
+	(#251 = #263)
+{	calcola quota RAL trasformata in Y
+	(#263 = #261 = #49*#243 + #270*#241 + #271*#242)
+	(#228 =  #231 + #261 - #251 )
+	(#251 = #264)
+{	calcola quota RAL trasformata in Z
+	(#264 = #261 = #49*#246 + #270*#244 + #271*#245)
+	(#226 =  #232 + #261 -  #251 )
+	RET

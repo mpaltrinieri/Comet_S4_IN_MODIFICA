@@ -1,0 +1,22 @@
+
+
+{---------------------------- CONFERMA MACCHINA FINE LAVORAZIONI ---------------------------}
+{-------------------------------- Operazioni Conclusive -------------------------------}
+
+
+N10  S0                             {arresto mandrino
+
+N11 R495=-1				            {Assegno un valore di default impossibile per l'appoggio rotazione
+N12 R496=-1				            {Assegno un valore di default impossibile per l'appoggio velocità
+N14 IF (R649 == 1) $M227            {fine maschiatura rigida}
+
+N20  $M85                           {macchina fine lavoro
+N30  G0 G53 Z=R349                  {asse Z fuori ingombro
+
+N50  $M91							{posiziona TAVOLA per carico (non serve il mov.Y)
+
+
+N70  L <SNGCNT.CS4>
+N80  R631=0                         {fine conteggio tempo ciclo 
+N90  RET
+

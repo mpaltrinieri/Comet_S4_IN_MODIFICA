@@ -1,0 +1,36 @@
+{--------- Macchina in Posizione di Riposo ------}
+{--------- Azzero Rotazione Piani Matrice Dinamica --------}
+
+N10 L <SNGCNT.CS4>
+N20 G90				{ristabiliamo i movimenti assoluti - mai sbagliato
+N50 $M59				{chiusura riparo 
+
+N100  $M247 {ciclo posizionamento assi in riposo}
+N110  <DTC : OFF>			{elimina rotazione piani}
+N120  G601 (RAT=1)			{elimina rotazione figura}
+N130  <MTX:X;Y;Z>			{assi soggetti a rotazione}
+N140  <DMX:X;Y;Z>			{rotazione dinamica}
+N150  (DTX=0) (DTY=0) (DTZ=0) (ANR=0) (AN2=0) (AN3=0)  {resetta variabili}
+N160  R621=0
+
+
+N200  L<OPENALL.CS4>	{apertura morse se gestite dalla macchina}
+N210  $M51				{bloccaggio utensile su mandrino}
+N220  $M202				{disinserzione trascinamento morse X
+
+
+N250  $M129				{Discesa Battute di carico ZONA SX E ZONA DX}
+N260  $M27              {Disinserzione, Salita Battuta di precisione
+
+
+N1000 L <FASTACC.CS4>
+N1010 G1 F4000 Z=R349						{asse Z fuori ingombro}
+N1020 G1 F2000 A=90 Y=(R7182-1)							{asse A verticale, Y fuori ingombro magazzino
+N1030 $M91									{tavola fuori ingombro per sicurezza, avanti verso operatore
+N1050 $M248									{fine posizionamento di riposo}
+
+N2000 L <SNGCNT.CS4>
+N2010 G90				{ristabiliamo i movimenti assoluti - mai sbagliato
+
+N9900 RET
+

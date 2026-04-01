@@ -1,0 +1,308 @@
+{------------------ GESTIONE RIFERIMENTO ASSI IN AUTOMATICO E MANUALE -----------------}
+
+R3951=0  {reset restart dopo pausa di verifica quote 
+R3952=0  {reset contatore pause
+
+N01 IF(R450<0.5) R6970=5 R6866=0    {AUTO: causale per eseguire il riferimento assi}
+N02 L SNGCNT.CS4
+N06 L <WAIT_W_AVAILABLE_CH0.CS4>
+
+N11 L FC_SIMU.CS4           {Forza valori dei finecorsa in TimeX}
+N12 L <SNGCNT.CS4>
+
+N13 $M198                   {Conferma ciclo in corso per reset richieste
+N14 $M195                   {Memoria ciclo in corso
+
+N15 L MIDACC.CS4
+
+N16 G54.01
+
+N18 R3090=0                 {reset appoggio offset tastatore di punta
+
+{ Reset Quote Target
+N20	R873=R874=R875=R876=R877=R878=0
+
+{ Reset Param Immediati usati nel controllo di quote
+N25	R408=R409=R410=R411=R412=R413=R414=R415=R416=R417=R418=R419=0
+
+{---- Non posso settare velocità assi indipendenti : si fa nel movimento ----
+
+N40 <DTC : OFF>             {elimina rotazione piani}
+N41 G601 (RAT=1)            {elimina rotazione figura}
+N42 <MTX:X;Y;Z>             {assi soggetti a rotazione}
+N43 <DMX:X;Y;Z>             {rotazione dinamica}
+N44 (DTX=0) (DTY=0) (DTZ=0) (ANR=0) (AN2=0) (AN3=0)  {resetta variabili}
+N45 R621=0
+N46 R535=0                {resetta pos.tavola SX da PC}
+N48 R668=0                {Azzero memoria conferma operatore multi per Ergonomico
+
+N64 R505=0
+N65 R515=0
+N67 R6093=0               {Reset flag tastatura attiva
+N68 R6213=0               {Reset flag scarico pezzi in multipezzo eseguito
+
+N70 L <RTOFF.CS4>         {reset RTCP e ripristino quota asse C}
+
+N80 G303 X Y Z A C W        {assi CNC
+N82 G312 OFF X Y Z A C W    {Abilitazione dei Finecorsa Software
+N110 $M129                  {discesa battute - non è sbagliato e alla peggio da allarme
+N112 $M202                  {disinserimento trascinatore asse X
+N115 $M57                   {disinserzione micro di ricerca morse}
+N116 $M69                   {reset aree A di tastatura}
+
+N117 IF (R6146 < 0.5) $M59  {chiusura riparo se battuta inserita
+N118 $M27                   {Salita battuta di precisione
+
+N119  IF (R674<0.5) $M333   {Blocca tutte le morse, NON sono motorizzate
+
+N180  IF (R737 == 2) $M130  {Endurance per fiera se = 2 : chiudi le morse per sicurezza
+N182  IF (R737 == 2) R509=1 {Endurance per fiera se = 2 : movimentazione morse = 0
+
+N183  IF(ABS(R450-1)<0.5) $M20 {manuale: Verifica mandrino fuori ingombro magazzino
+N184  L<OPENALL.CS4>        {apertura morse se gestite dalla macchina}
+
+N195  IF (R453<0.5) R6029 = 0     { RESET FLAG DI CORREZIONI ATTIVATE (assi assoluti senza riferimento: probabile anomalia avvenuta)
+
+N200  IF(R450>0.5)  JMP [RIFERAX]     {manuale:    esegue sempre riferimento   
+N230  IF(R6029>0.5) JMP [FINE]        {automatico: correzioni gia attive: esce
+N290  L <SNGCNT.CS4>
+
+[RIFERAX]
+N500  $M59                  {chiusura riparo 
+N510  $M64                  {abilita assi per riferimento
+N520  $M49                  {Disattiva i potenziometri
+N540  $M51                  {bloccaggio utensile su mandrino}
+
+{------------------------------------- Asse Z --------------------------------------}
+[ASSEZ]
+
+N1100   IF (FTL(R700)&'0004' == 0) JMP [ASSEY]
+
+N1110   $M49                                        {Disattiva i potenziometri
+        IF(R459>0.5) G302 Z
+        IF(R459>0.5) G312 ON Z
+        IF(R459>0.5) (NSA = 2)
+        IF(R459>0.5) L<SETAL.CS4>                   {esegue riferimento asse Z}
+        IF(R459>0.5) G304 FRE
+        IF(R459>0.5) R72 = DIS                      {appoggio la selezione di zero assi simulato
+        IF(R459>0.5) IF (R72<0.5) R12 = (V11007.5)  {carica distanza micro-marca}
+        IF(R459>0.5) L <SNGCNT.CS4>
+        IF(R459>0.5) G861 Z0                        {impone quota di zero su marca}
+        IF(R459>0.5) G878 Z=R349                    {impone quota desiderata}
+        IF(R459>0.5) G303 Z
+        IF(R459>0.5) G312 OFF Z
+        IF(R693<40000) $M49 G01 F3000 Z=R349
+        $M48                                        {Riattiva i potenziometri
+
+{------------------------------------- Asse Y --------------------------------------}
+[ASSEY]
+
+N1200   IF (FTL(R700)&'0002' == 0) JMP [ASSEA]
+
+N1210   $M49                                       {Disattiva i potenziometri
+        IF(R459>0.5) G302 Y
+        IF(R459>0.5) G312 ON Y
+        IF(R459>0.5) (NSA = 1)
+        IF(R459>0.5) L<SETAL.CS4>                   {esegue riferimento asse Y}
+        IF(R459>0.5) G304 FRE
+        IF(R459>0.5) R71 = DIS                      {appoggio la selezione di zero assi simulato
+        IF(R459>0.5) IF (R71<0.5) R11 = (V11007.5)  {carica distanza micro-marca}
+        IF(R459>0.5) L <SNGCNT.CS4>
+        IF(R459>0.5) G861 Y0                        {impone quota di zero su marca}
+        IF(R459>0.5) G878 Y=(R7182-1)               {impone quota desiderata}
+        IF(R459>0.5) G303 Y
+        IF(R459>0.5) G312 OFF Y
+        IF(R693<40000) $M49 G01 F3000 Y=(R7182-1)   {Y fuori ingombro magazzino utensili e diaframma}
+        $M48                                        {Riattiva i potenziometri
+
+{------------------------------------- Asse A --------------------------------------}
+[ASSEA]
+
+N1300   IF (FTL(R700)&'0008' == 0) JMP [ASSEC]
+
+N1310   $M49                                        {Disattiva i potenziometri
+        IF(R821>0.5) $M260                          {disattiva correzioni asse A
+        IF(R459>0.5) G302 A
+        IF(R459>0.5) G312 ON A
+        IF(R459>0.5) (NSA = 3)
+        IF(R459>0.5) L<SETAL.CS4>                   {esegue riferimento asse A}
+        IF(R459>0.5) G304 FRE
+        IF(R459>0.5) R73 = DIS                      {appoggio la selezione di zero assi simulato
+        IF(R459>0.5) IF (R73<0.5) R13 = (V11007.5)  {carica distanza micro-marca}
+        IF(R459>0.5) L <SNGCNT.CS4>
+        IF(R459>0.5) G861 A=0                       {impone quota di zero su marca}
+        IF(R459>0.5) G878 A=90                      {impone quota desiderata}        
+        IF(R459>0.5) G303 A
+        IF(R459>0.5) G312 OFF A
+        IF(R821>0.5) $M261                          {attiva correzioni asse A
+        IF(R693<40000) $M49 G1 F=R718 A=90          {asse A a 90° con velocità definibile in CONFMAC per riferimento}
+        $M48                                        {Riattiva i potenziometri
+
+{------------------------------------- Asse C --------------------------------------}
+[ASSEC]
+
+N1300   IF (FTL(R700)&'0010' == 0) JMP [ASSEW]
+
+N1310   $M49                                        {Disattiva i potenziometri
+        IF(R825>0.5) $M268                          {disattiva correzioni asse C
+                     G302 C
+                     G312 ON C
+                     (NSA = 4)
+                     L<SETAL.CS4>                   {esegue riferimento asse C}
+                     G304 FRE
+                     R74 = DIS                      {appoggio la selezione di zero assi simulato
+                     IF (R74<0.5) R13 = (V11007.5)  {carica distanza micro-marca}
+                     L <SNGCNT.CS4>
+                     G861 C0                        {impone quota di zero su marca}
+                     G878 C=180                     {impone quota desiderata}
+                     G303 C
+                     G312 OFF C
+        IF(R825>0.5) $M269                          {attiva correzioni asse C
+        IF(R693<40000) $M49 G00 C180                {asse C a 180°}
+        $M48                                        {Riattiva i potenziometri
+
+{------------------------------------- Asse W --------------------------------------}
+[ASSEW]
+
+N1400   IF (FTL(R700)&'100000' == 0) JMP [ASSEX]
+
+N1402   L <WAIT_W_AVAILABLE_CH0.CS4>
+
+N1410   $M49                                        {Disattiva i potenziometri
+        
+        IF(R459>0.5) G302 W                         {Setto l'asse indipendente e lo lascio così
+        IF(R459>0.5) G312 ON W
+        IF(R459>0.5) (NSA = 5)
+        IF(R459>0.5) L<SETAL>
+        IF(R459>0.5) G304 FRE
+        IF(R459>0.5) R75 = DIS                      {appoggio la selezione di zero assi simulato	
+        IF(R459>0.5) IF (R75<0.5) R14 = V11007.5    {carica distanza micro-marca}
+        IF(R459>0.5) L <SNGCNT.CS4>
+        IF(R459>0.5) G861 W0                        {impone quota di zero su marca}
+        IF(R459>0.5) G878 W=R393                    {impone quota desiderata}        
+        IF(R459>0.5) G303 W
+        IF(R459>0.5) G312 OFF W
+        IF(R693<40000) $M49 G1 F10000 W=R393        {asse W su finecorsa negativo}
+        $M48
+
+
+{------------------------------------- Asse X --------------------------------------}
+[ASSEX]
+
+N1600   IF (FTL(R700)&'0001' == 0) JMP [RIFAXMOR]
+
+N1610   $M49                                       {Disattiva i potenziometri
+        IF(R822>0.5) $M262                         {disattiva correzioni asse X
+        IF(R459>0.5) G302 X
+        IF(R459>0.5) G312 ON X
+        IF(R459>0.5) (NSA = 0)
+        IF(R459>0.5) L<SETAL.CS4>                  {esegue riferimento asse X}
+        IF(R459>0.5) G304 FRE
+        IF(R459>0.5) R70 = DIS                     {appoggio la selezione di zero assi simulato
+        IF(R459>0.5) IF (R70<0.5) R10 = (V11007.5) {carica distanza micro-marca}
+        IF(R459>0.5) L <SNGCNT.CS4>
+        IF(R459>0.5) G303 X
+        IF(R459>0.5) G312 OFF X
+        IF(R822>0.5) $M263                         {attiva correzioni asse X
+        $M48                                       {Riattiva i potenziometri
+
+{----------------------------------------------------------------------------------}
+
+[RIFAXMOR]                                {Esegue il riferimento assi/morse
+N2000 L <SNGCNT.CS4>
+N2010 R6029 = 1 {correzioni attivate
+N2015 $M91      {tavola verso operatore
+
+[FINE]        
+N3010 L <SNGCNT.CS4>
+N3020 $M48                  {Attiva i potenziometri
+N3030 $M65                  {Conferma assi riferiti
+
+N3060 R638=0                {inizializza R638
+
+N4000 L <FASTACC.CS4>
+
+N4010 R400=R349                     {Z fuori ingombro : evita crash con la tavola
+N4020 L <CKMOV_Z.CS4>               {verifica se serve muovere l'asse Z}
+
+N4030 R400=R393                     {W fuori ingombro : chiusura asse magazzino su finecorsa negativo
+N4035 L <CKMOV_W.CS4>               {asse W su finecorsa negativo}
+
+N4500 R495=-1           {Assegno un valore di default impossibile per l'appoggio rotazione
+N4510 R496=-1           {Assegno un valore di default impossibile per l'appoggio velocità
+N4520 R623=0            {Resetto memoria f.c. software asse X attivi per pendolare : stiamo ripartendo
+N4560 R533=0            {EMULO il PC : AZZERO la condizione che mi dice che è un riposizionamento multi
+
+N6000 IF (R450==1) JMP [MANUALE]
+
+{----------------------- operazioni SOLO se siamo in automatico -----------------------}
+
+N6010 IF (R674<0.5) L <FINDMORS.CS4>  {SOLO Con trascinatore : NON ci sono gli assi morse
+
+N6100 $M80                  {Inizio ciclo di lavoro
+
+N8000 L<SNGCNT.CS4>
+N8010 R400=R600-R760
+N8020 R401=R601-R761
+N8030 R402=R602-R762
+
+{---- Parte copiata dalla Diamant
+N8400 G54.02                {origini di lavoro in automatico}
+N8410 IF((ABS(R760))>0.01) <ORG:X;(R400)>        {imposta origine asse X}
+N8420 IF((ABS(R761))>0.01) <ORG:Y;(R401)>        {imposta origine asse Y}
+N8430 IF((ABS(R762))>0.01) <ORG:Z;(R402)>        {imposta origine asse Z}
+N8440 L<SNGCNT.CS4>
+
+N8500 R631=0                {disabilita conteggio tempo ciclo zona 1}
+N8520 R1=0                  {azzera conteggio tempo ciclo zona 1}
+
+N8600 R250=0                {inizializza R250}
+
+{---- Parte copiata dalla Diamant
+N8650 R440=0               {Resetta correzione da Probe in X}
+N8660 R441=0               {Resetta correzione da Probe in Y}
+N8670 R442=0               {Resetta correzione da Probe in Z}
+
+{---- Parte copiata dalla Diamant
+N8680 <AN3 = 0>            {preset valore per rotazione figura su asse}
+
+{---- Reset correzioni pezzo -----}
+R270=0 R271=0 R272=0 R273=0 R274=0
+R275=0 R276=0 R277=0 R278=0 R279=0
+R280=0 R281=0 R282=0 R283=0 R284=0
+R285=0 R286=0 R287=0 R288=0 R289=0
+R290=0 R291=0 R292=0 R293=0 R294=0
+R295=0 R296=0 R297=0 R298=0 R299=0
+
+{---- Reset correzioni pezzo da battuta di precisione -----}
+R2155=0 
+R2101=0 R2102=0 R2103=0 R2104=0
+R2105=0 R2106=0 R2107=0 R2108=0
+R2109=0 R2110=0 R2111=0 R2112=0
+R2113=0 R2114=0 R2115=0 R2116=0
+R2117=0 R2118=0 R2119=0 R2120=0
+R2160=0
+
+N8700 G90                 {ristabiliamo i movimenti assoluti - mai sbagliato
+
+{----------------------- Fine operazioni in automatico -----------------------}
+N10010 L <SH_OFF_W.CS4>    {libera W da CH0
+
+N10020 L <SNGCNT.CS4>
+N10030 R6866=2             {libera attesa su CH1 (dopo CH1 può prender la gestione di W)}
+  {N10040 R6865=1+2+0      {Sincronizza canale 0,1}
+  {N10050 L <SYNCNC1.CS4>
+
+N10070 L <SNGCNT.CS4>
+
+N10100 L <RES_CAUSALE_MC.CS4>   {reset causale multicanale}
+N10110 R6866=0 R6867=0          {reset variabili di sincronizzazione da CH0      verso CH1, CH2}
+N10120 R6869=0 R6870=0          {reset variabili di sincronizzazione da CH1, CH2 verso CH0}
+N10130 L <SNGCNT.CS4>
+N10200 RET
+
+{----------------------- Fine operazioni in manuale -----------------------}
+[MANUALE]                {Operazioni eseguite solo in manuale 
+N9200 G90                {ristabiliamo i movimenti assoluti - mai sbagliato
+N9500 $M02               {Solo in manuale
+N9600 RET

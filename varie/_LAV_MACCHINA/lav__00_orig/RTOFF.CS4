@@ -1,0 +1,6 @@
+
+{------------------------- DISABILITAZIONE RTCP ----------------------------}
+
+N05  $M256              {riabilita filtri su X,Y,Z}
+N10  RTCOFF             {disabilito RTCP}
+N20  RET

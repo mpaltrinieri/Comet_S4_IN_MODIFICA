@@ -1,0 +1,8 @@
+{ATTESA PER RESET CAUSALE MULTICANALE R6970}
+{R6970 = nuova causale richiesta da ISOMG del canale CH0
+
+N100 L <SNGCNT.CS4>
+N102 R6970=0      {reset causale multicanale}
+N110 G4 F=0.2
+N120 L <SNGCNT.CS4>
+N130 RET

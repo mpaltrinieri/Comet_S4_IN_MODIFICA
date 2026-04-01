@@ -1,0 +1,20 @@
+{ATTESA ASSE W DISPONIBILE PER IL CANALE CH1}
+{R6884 = Canale che ha liberato l'asse W puo' assumere i valori 0,1,2,3,999 a seconda del canale a cui e' al momento attribuito (999=nessuno)}
+{R6876 = Canale attribuito all'asse W puo' assumere i valori 0,1,2,3,999 a seconda del canale a cui e' al momento attribuito (999=nessuno)}
+
+[WAIT]
+N10 IF(R6884 == 999) IF(R6876 == 1) JMP [END]  {se asse impegnato dallo stesso canale }
+N20 IF(R6884 >= 0) IF(R6884 <= 3) JMP [GO]     {se asse libero}
+N30 G04 F=0.1			                         {Attesa}
+N40 L <SNGCNT_CH1.CS4>
+N50 JMP [WAIT]
+
+[GO]
+N100 G04 F=0.1
+N110 L <SH_ON_W_CH1.CS4>   {Asse attribuito al canale}
+
+N120 G04 F=0.5
+N130 L <SNGCNT_CH1.CS4>
+
+[END]
+N1000 RET

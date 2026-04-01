@@ -1,0 +1,51 @@
+
+{------------------- ESECUZIONE MAPPATURA ASSE X ---------------}
+ 
+N10 R473=1
+
+N20 $M59                        {chiusura riparo 
+
+N22 $M202               {Disinserzione trascinatore morse asse X}
+
+N27 $M129               {Disinserzione Battute di carico fisse delle zone SX/DX e mobili 
+N28 $M27                {Disinserzione, Salita Battuta di precisione
+
+N30 D0
+
+N31 IF(R822>0.5) $M262          {disattiva correzioni asse X
+N32 IF(R822>0.5) G4 F2
+N33 IF(R822>0.5) L <SNGCNT.CS4>
+N34 IF(R822>0.5) $M263          {attiva correzioni asse X
+N35 IF(R822>0.5) G4 F2
+N36 IF(R822>0.5) L <SNGCNT.CS4>
+
+N40 L<SLOWACC.CS4>
+
+{--------- Inserisci Parametri Mappatura Laser  ---------}
+
+N100 R400 = 7324		{finecorsa positivo asse X}
+N110 R401 = -150		{finecorsa negativo asse X}
+N120 R402 = 38.275		{7694 -> 38.47 step mappatura}
+N130 R403 =	300     	{quota ottica in Y}
+N140 R404 =	425 		{250  quota ottica in Z}
+N150 R405 = 4		{tempo d'attesa fra uno step e l'altro}
+
+
+{------------ Movimenti -------------}
+N200 G0 G53 A=90 C=90
+N210 Y=R403		   {quota ottica in Y}
+N220 Z=R404		   {quota ottica in Z}
+
+
+
+{--------- Continuo Ciclica ---------}
+[CONTINUA]
+N300 G01 F10000 G53 X=R400
+
+N310 G4 F=R405
+N320 R400 = R400 - R402
+N330 IF (R400 >= R401) [CONTINUA]
+N335 G0 X=R401
+N340 RET
+
+

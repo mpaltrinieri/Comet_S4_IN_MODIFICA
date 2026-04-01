@@ -1,0 +1,153 @@
+{***** CARICO PEZZO A SX *****}
+{R483 = Attesa posizionamento morse e battute a SX in pendolare}
+{R484 = Attesa caricamento pezzo a SX in pendolare}
+{R463 = Rotazione pezzo in corso (1=sx, 2=dx)}
+{R671 = Pezzo in carico con asse P (0=nessuno,1-6=numero pezzo)}
+{R673 = Appoggio Assi P/H presenti per facile controllo}
+{R561 = Posizione battuta SX per carico pezzo (0=bassa, 1=alta)}
+{R120 = Quota_P per carico con battuta_P del pezzo 1 SX  (-1 se fissa, -2 se non usata)
+{R121 = Quota_P per carico con battuta_P del pezzo 2 SX  (-1 se fissa, -2 se non usata)
+{R122 = Quota_P per carico con battuta_P del pezzo 3 SX  (-1 se fissa, -2 se non usata)
+{R123 = Quota_P per carico con battuta_P del pezzo 4 SX  (-1 se fissa, -2 se non usata)
+{R124 = Quota_P per carico con battuta_P del pezzo 5 SX  (-1 se fissa, -2 se non usata)
+{R125 = Quota_P per carico con battuta_P del pezzo 6 SX  (-1 se fissa, -2 se non usata)
+{R137 = Gestione a Bit - Indicazione se l'asse P Appoggia contro la testa/coda del pezzo
+{                      Bit0 : pezzo 1 - ininfluente sempre su battuta fissa
+{                      Bit1 : pezzo 2 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit2 : pezzo 3 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit3 : pezzo 4 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit4 : pezzo 5 - 0=appoggiato in testa 1=appoggiato in coda
+{                      Bit5 : pezzo 6 - 0=appoggiato in testa 1=appoggiato in coda
+{R518 = Attendere conferma di scarico pezzo prima di abbassare la battuta dell'asse P (zona SX)
+{R784 = Abilitazione Attesa conferma di scarico pezzo prima della discesa battute degli assi P/H se quote di carico diverse da precedenti
+{R6206 = indice delle morse chiuse in bassa forza}
+{R6207 = indice delle morse chiuse in alta forza}
+{R521 = Riposizionamento Morse a SX in pendolare}
+{R533 = Riposizionamento Morse con Pezzo sopra in multipezzo}
+{R6957 = Appoggio indici morse controllate a SX}
+{R6958 = Appoggio indici morse controllate a DX}
+
+
+N10  L <SNGCNT_CH2.CR6>
+N20  R400=0                   {reset appoggio}
+N30  R401=0                   {reset appoggio}
+N40  R402=0                   {reset appoggio}
+N50  R403=0                   {reset appoggio}
+N60  R404=0                   {reset appoggio}
+N100 R483=0                   {reset Attesa posizionamento morse e battute a SX in pendolare}
+N110 $M149                    {resetta M157 attesa partenza asse H insieme all'asse P}
+
+N120 IF(R484<0.5) JMP [FINE]  {se nessun carico da fare}
+N130 R671=0                   {azzero il carico che sto eseguendo }
+N140 $M91                     {avanti tavola SX per carico}
+N150 IF(R561>0.5) $M116       {salita/inserimento battuta SX1}
+N160 IF(R561<0.5) $M117       {discesa/disinserimento battuta SX1}
+
+N170 IF(R673<0.5) JMP [NO_CAR_P]
+N180 IF(R120<0) IF(R121<0) IF(R122<0) IF(R123<0) IF(R124<0) IF(R125<0) R403=1  {nessun carico con asse P}
+N185 IF(R120<0) IF(R121<0) IF(R122<0) IF(R123<0) IF(R124<0) IF(R125<0) JMP [NO_CAR_P]
+N190 IF(R120>0) R671=1        {Carico in corso partendo dal primo pezzo}
+N200 IF(R120<0) R671=2        {Carico in corso partendo dal secondo pezzo (il primo con battuta fissa)}
+
+{***** ESEGUE CARICO SEQUENZIALE CON ASSE P ******}
+N300 $M155                                                 {Controllo il valore delle posizioni battute con asse P}
+
+[REPEAT]                                                   {Ripeti fino a terminare pezzi da caricare}
+N310 $M61                                                  {Chiusura riparo SX}
+N320 $M221                                                 {disinserzione battuta su asse P per conferma}
+N330 R400=(120+R671-1)                                     {indice della R di posizione battuta da raggiungere}
+N340 IF((FTL(R137) & '0001')>0.5) IF(R671==1) R401=R401+1  {Pezzo 1 appoggiato in coda}
+N350 IF((FTL(R137) & '0002')>0.5) IF(R671==2) R401=R401+2  {Pezzo 2 appoggiato in coda}
+N360 IF((FTL(R137) & '0004')>0.5) IF(R671==3) R401=R401+4  {Pezzo 3 appoggiato in coda}
+N370 IF((FTL(R137) & '0008')>0.5) IF(R671==4) R401=R401+8  {Pezzo 4 appoggiato in coda}
+N380 IF((FTL(R137) & '0010')>0.5) IF(R671==5) R401=R401+16 {Pezzo 5 appoggiato in coda}
+N390 IF((FTL(R137) & '0020')>0.5) IF(R671==6) R401=R401+32 {Pezzo 6 appoggiato in coda}
+N400 R402=R(FTI(R400))                                     {posizione a cui portare la battuta su asse P}
+N410 IF(R401>0.5) G1 G53 F=R755 P=R402+1                   {posiziona P per inserire la battuta distante 1 mm per non graffiare il pezzo}
+N420 IF(R401<0.5) G1 G53 F=R755 P=R402-1                   {posiziona P per inserire la battuta distante 1 mm per non graffiare il pezzo}
+N500 IF(R518>0.5) IF(R784>0.5) JMP [POSBAT_P]
+N510 $M220                                                 {inserisci battuta su asse P}
+N520 R404=1                                                {battuta inserita}
+
+[POSBAT_P]
+N520 G1 G53 F=R755 P=R402                                  {porta la battuta in posizione}
+
+{***** nessun carico da fare con l'asse P: CASE 3100 *****}
+[NO_CAR_P]                    
+N600 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0001')>0.5) $M291  {disattiva chiusura in alta forza morsa 7
+N610 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0002')>0.5) $M292  {disattiva chiusura in alta forza morsa 8
+N620 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0004')>0.5) $M293  {disattiva chiusura in alta forza morsa 9
+N630 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0008')>0.5) $M294  {disattiva chiusura in alta forza morsa 10
+N640 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0010')>0.5) $M295  {disattiva chiusura in alta forza morsa 11
+N650 IF(R521<0.5) IF(R533<0.5) IF((FTL(R6207)&'0020')>0.5) $M296  {disattiva chiusura in alta forza morsa 12
+
+N680 IF(R509<0.5) IF(R520<0.5) IF(R671<3) IF(R463<0.5) $M243      {apri tutte le morse di SX}
+N690 IF(R509<0.5) IF(R520<0.5) IF(R671<3) IF(R463>1.5) $M243      {apri tutte le morse di SX}
+N700 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0001')>0.5) $M231  {apertura morsa morsa 7
+N710 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0002')>0.5) $M232  {apertura morsa morsa 8
+N720 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0004')>0.5) $M233  {apertura morsa morsa 9
+N730 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0008')>0.5) $M234  {apertura morsa morsa 10
+N740 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0010')>0.5) $M235  {apertura morsa morsa 11
+N750 IF(R509<0.5) IF(R520<0.5) IF((FTL(R6957)&'0020')>0.5) $M236  {apertura morsa morsa 12
+
+N800 $M60                           {apertura riparo SX}
+N810 IF(R403>0.5) JMP [NOWAIT_P]    {se nessun carico con asse P}
+N820 IF(R784<0.5) JMP [NOWAIT_P]    {Se non abilitata Attesa conferma di scarico pezzo prima della discesa battuta P}
+
+N830 IF(R518>0.5) JMP [WAITCONF]    {attesa conferma}
+
+[OK_CONF]
+N840 $M220                          {inserisci battuta asse P}
+N850 R404=1                         {battuta inserita}
+
+
+[NOWAIT_P]
+N900 R505=1                         {=1 Per attesa carico pezzo}
+N910 IF(R737<0.5) $M86              {Macchina pronta al lavoro zona SX}
+M920 $M61                           {chiusura riparo SX}
+
+N940 IF(R404>0.5) IF(R673>0.5) IF(R401>0.5) G1 G53 F=R755 P=R402+1  {posiziona P per togliere la battuta distante 1 mm per non graffiare il pezzo}
+N950 IF(R404>0.5) IF(R673>0.5) IF(R401<0.5) G1 G53 F=R755 P=R402-1  {posiziona P per togliere la battuta distante 1 mm per non graffiare il pezzo}
+
+N1000 IF(R404<0.5) IF(R673>0.5) JMP [FC_AX_P]                       {manda P al finecorsa negativo}
+N1010 IF(R673<0.5) JMP [NO_AX_P]
+
+N1100 $M221                          {disinserisce battuta asse P}
+N1110 $M117                          {disinserisce battuta SX1}
+
+N1120 R400=(120+R671)                {indice della R di posizione battuta da raggiungere}
+N1130 R402=R(FTI(R400))              {posizione a cui portare la battuta su asse P}
+N1140 IF(R402>0) R671=R671+1         {R402 indica se ci sono altri pezzi da caricare}
+N1150 IF(R402>0) JMP [REPEAT]        {torna indietro e carica gli altri pezzi}
+N1160 L <SNGCNT_CH2.CR6>
+N1170 R671=0
+N1180 JMP [FC_AX_P]
+
+
+[FC_AX_P]    {****** CASE 3600 *******}
+N2000 G1 G53 F=R755 P=R380 $M117     {Riporta P al finecorsa negativo e disinserisci battuta SX1}
+N2010 R671=0
+
+[NO_AX_P]    {****** CASE 4000 *******}
+N3000 R483=R484=R487=R482=0
+N3010 $M149                               {resetta M157 attesa partenza asse H insieme all'asse P}
+N3020 $M61                                {chiusura riparo SX}
+N3030 IF((FTL(R6206)&'0001') > 0.5) $M271 {Chiusura morsa 7 in alta forza
+N3040 IF((FTL(R6206)&'0002') > 0.5) $M272 {Chiusura morsa 8 in alta forza
+N3050 IF((FTL(R6206)&'0004') > 0.5) $M273 {Chiusura morsa 9 in alta forza
+N3060 IF((FTL(R6206)&'0008') > 0.5) $M274 {Chiusura morsa 10 in alta forza
+N3070 IF((FTL(R6206)&'0010') > 0.5) $M275 {Chiusura morsa 11 in alta forza
+N3080 IF((FTL(R6206)&'0020') > 0.5) $M276 {Chiusura morsa 12 in alta forza
+N3090 $M221                               {disinserzione battuta su asse P}
+N3100 $M117                               {disinserzione battuta SX1}
+N3110 JMP [FINE]
+
+[WAITCONF]
+N4000 IF(R518<0) JMP [OK_CONF]      {conferma ottenuta}
+N4000 L <SNGCNT_CH2.CR6>
+N4010 G4 F0.1
+N4020 JMP [WAITCONF]
+
+
+[FINE]
+N5000 RET

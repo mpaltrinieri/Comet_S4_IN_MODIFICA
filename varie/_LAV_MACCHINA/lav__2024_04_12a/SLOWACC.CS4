@@ -1,0 +1,20 @@
+{IMPOSIZIONE ACCELERAZIONE E JERK PER ASSI X Y Z}
+
+N10  G66
+N20  (%V6082.3=(FTI(R748)))  { Definizione curve ad S: 2=standard; 16=curve ad S; 32=cubiche}
+
+N30  IF (R748 < 20) JMP [CURVE_S]
+N40  IF (R748 > 20) JMP [CURVE_C]
+
+[CURVE_S]
+N110 (V4055/0=R715)  {asse X}
+N120 (V4055/1=R715)  {asse Y}
+N130 (V4055/2=R715)  {asse Z}
+N140 RET
+
+[CURVE_C]
+N210 IF(R98<0.5) (V4055/0=R712)  {asse X}
+N220 IF(R98<0.5) (V4055/1=R713)  {asse Y}
+N230 IF(R98<0.5) (V4055/2=R714)  {asse Z}
+N240 (V1004=R788)    {usa jerk per SLOWACC}
+N250 RET

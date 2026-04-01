@@ -1,0 +1,15 @@
+{------------------------------ RESET CUSTOMIZZATO ------------------------------}
+
+N05 S0               {arresta mandrino}
+N10 $M05             {attesa arresto mandrino}
+
+N20 L MIDACC.CS4
+
+N40 G40
+N70 G90				{ripristinare il funz.assoluto non è mai sbagliato
+
+N100 IF (R623 == 1) G25 X
+N110 IF (R623 == 2) G26 X
+N120 R623=0
+
+N200 RET

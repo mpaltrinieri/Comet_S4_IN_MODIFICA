@@ -1,0 +1,24 @@
+{R5926 = MORSA MASTER (Hdrill passa R5926 = da 1 a 12)
+{R5923 = Array morse associate al pezzo da spostare (morse dalla 10 alla 12)}
+{R5924 = Array morse associate al pezzo da spostare (morse dalla 13 alla 15)}
+
+{ HDRILL passa R5923 come se tutte le morse fossero dalla 1 alla 12,
+{ passa sempre R5924=0 e come morsa master R5926 sempre dalla 1 alla 12
+
+N10 R400=0
+N20 IF( (FTL(R5923) & '0008') > 0.5) R400=R400+(2**9)      {morsa 10
+N30 IF( (FTL(R5923) & '0010') > 0.5) R400=R400+(2**10)     {morsa 11
+N40 IF( (FTL(R5923) & '0020') > 0.5) R400=R400+(2**11)     {morsa 12
+N50 R400=(RND(R400)+0.2)
+
+N60 R5924=0
+N70 IF( (FTL(R5923) & '0040') > 0.5) R5924=R5924+(2**0)    {morsa 13
+N80 IF( (FTL(R5923) & '0080') > 0.5) R5924=R5924+(2**1)    {morsa 14
+N90 IF( (FTL(R5923) & '0100') > 0.5) R5924=R5924+(2**2)    {morsa 15
+N95 R5924=(RND(R5924)+0.2)
+
+N140 L SNGCNT.CS4
+N150 R5923=R400
+N160 R5926=(R5926+6)
+N170 L SNGCNT.CS4
+N180 RET

@@ -1,0 +1,13 @@
+{*********** DISABILITAZIONE PARAMETRI RTCP ************}
+
+N100 IF(R7991>0.5) JMP [FINE]{ SIMUX OFFLINE
+
+N200 (V1003=0)  {azzero limite accelerazioni}
+
+{****** Ripristina default accelerazione  per asse *******}
+N300 G317 X ; GEN.ACC; ((R712 / (V4065*V4065)) * 60)
+
+N500 L <SPECIAL\RTCP_PAR_OFF.ISO>
+
+[FINE]
+N5000 RET

@@ -1,0 +1,55 @@
+{*** PREPARAZIONE AL RIPOSIZIONAMENTO MORSE IN PENDOLARE ***}
+{R6207 = indice delle morse chiuse in alta forza}
+{R6951 = morse a SX da muovere al giro di riposizionamento 1}
+{R6952 = morse a SX da muovere al giro di riposizionamento 2}
+{R6961= Appoggio flag primo giro di posizionamento morse a SX}
+{R6962= Appoggio flag secondo giro di posizionamento morse a SX}
+
+{*** CASE 1200 in Multi_SX.c ***}
+N100 $M346          {FATM SU CH2: esegue calcoli per il riposizionamento a SX}
+
+N110 IF((FTL(R6207)&'0001') > 0.5) $M291 {disattiva chiusura in alta forza morsa 7
+N120 IF((FTL(R6207)&'0002') > 0.5) $M292 {disattiva chiusura in alta forza morsa 8
+N130 IF((FTL(R6207)&'0004') > 0.5) $M293 {disattiva chiusura in alta forza morsa 9
+N140 IF((FTL(R6207)&'0008') > 0.5) $M294 {disattiva chiusura in alta forza morsa 10
+N150 IF((FTL(R6207)&'0010') > 0.5) $M295 {disattiva chiusura in alta forza morsa 11
+N160 IF((FTL(R6207)&'0020') > 0.5) $M296 {disattiva chiusura in alta forza morsa 12
+
+N170 R6961=R6962=0    {appoggio flag del multiprocesso PRIMO_GIRO_SX, SECONDO_GIRO_SX}
+
+{salvo le posizioni morse richieste dal DRILL}
+N200 R408 = R540
+N210 R409 = R541
+N220 R410 = R542
+N230 R411 = R543
+N240 R412 = R544
+N250 R413 = R545
+
+N300 IF(R6951>0.5) IF(R6952<0.5) R403=1     {un solo giro di riposizionamento}
+N310 IF(R6951>0.5) IF(R6952>0.5) R403=2     {due giri di riposizionamento}
+
+{*** CASE 1205 in Multi_SX.c ***}
+N1000 R6951 = 1          {PRIMO_GIRO_SX}
+
+N1010 IF((FTL(R6951)&'0001') > 0.5) $M231 {Apri morsa 7 in alta forza
+N1020 IF((FTL(R6951)&'0002') > 0.5) $M232 {Apri morsa 8 in alta forza
+N1030 IF((FTL(R6951)&'0004') > 0.5) $M233 {Apri morsa 9 in alta forza
+N1040 IF((FTL(R6951)&'0008') > 0.5) $M234 {Apri morsa 10 in alta forza
+N1050 IF((FTL(R6951)&'0010') > 0.5) $M235 {Apri morsa 11 in alta forza
+N1060 IF((FTL(R6951)&'0020') > 0.5) $M236 {Apri morsa 12 in alta forza
+
+N1110 IF((FTL(R6951)&'0001') < 0.5) $M131 {Chiusura morsa 7 in bassa forza
+N1120 IF((FTL(R6951)&'0002') < 0.5) $M132 {Chiusura morsa 8 in bassa forza
+N1130 IF((FTL(R6951)&'0004') < 0.5) $M133 {Chiusura morsa 9 in bassa forza
+N1140 IF((FTL(R6951)&'0008') < 0.5) $M134 {Chiusura morsa 10 in bassa forza
+N1150 IF((FTL(R6951)&'0010') < 0.5) $M135 {Chiusura morsa 11 in bassa forza
+N1160 IF((FTL(R6951)&'0020') < 0.5) $M136 {Chiusura morsa 12 in bassa forza
+
+N1210 IF((FTL(R6951)&'0001') < 0.5) R540=R650 {appoggio la posizione attuale morsa sulla posizione richiesta
+N1220 IF((FTL(R6951)&'0002') < 0.5) R541=R651 {appoggio la posizione attuale morsa sulla posizione richiesta
+N1230 IF((FTL(R6951)&'0004') < 0.5) R542=R652 {appoggio la posizione attuale morsa sulla posizione richiesta
+N1240 IF((FTL(R6951)&'0008') < 0.5) R543=R653 {appoggio la posizione attuale morsa sulla posizione richiesta
+N1250 IF((FTL(R6951)&'0010') < 0.5) R544=R654 {appoggio la posizione attuale morsa sulla posizione richiesta
+N1260 IF((FTL(R6951)&'0020') < 0.5) R545=R655 {appoggio la posizione attuale morsa sulla posizione richiesta
+
+N5000 RET

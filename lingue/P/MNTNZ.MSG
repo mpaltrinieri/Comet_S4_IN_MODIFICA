@@ -1,0 +1,5 @@
+[SERV0]
+TEXT=Cabeça angular
+R=466
+TIME=100
+

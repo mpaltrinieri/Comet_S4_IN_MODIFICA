@@ -1,0 +1,21 @@
+{------- SETTA ASSE W INDIPENDENTE PER MOVIMENTI CONTEMPORANEI  -------}
+
+   {{{N100 G302 W            {setta asse indipendente}
+   {{{N120 FF W=R720         {setta velocità asse indipendente}
+   {{{N130 G90 W=R68         {metti magazzino in posizione di cambio utensile}
+
+N100 IF(R450<0.5) JMP [AUTO]
+N110 R6865=1+2            {sincronizza canale 0,1}
+N120 L <SYNCNC_CH1.CS4>   {Sincronizzazione livello 0 ***************************}
+N130 JMP [FINE]
+
+[AUTO]
+N200 L <WAIT_CH0_CH1.CS4>      {attesa che il CH0 liberi il CH1}
+
+[FINE]
+N320 FF W=R66                                    {W: settaggio velocita
+N330 IF(R67<1.5) G91 G53 G885 W=R65              {W: tipo di interruzione movimento:  1=G885(ritorna su micro)  2=G887(rilascia micro)
+N340 IF(R67>1.5) G91 G53 G887 W=R65              {W: tipo di interruzione movimento:  1=G885(ritorna su micro)  2=G887(rilascia micro)
+N350 G90
+
+N910 RET

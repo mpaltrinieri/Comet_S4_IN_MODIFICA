@@ -1,0 +1,7 @@
+
+{---------------------- ROTAZIONE MANDRINO IN MANUALE --------------------------}
+
+
+N10  $M71       {ciclo rotazione mandrino in corso}
+N20  $M03 S1000 {comando rotazione mandrino}
+N30  RET

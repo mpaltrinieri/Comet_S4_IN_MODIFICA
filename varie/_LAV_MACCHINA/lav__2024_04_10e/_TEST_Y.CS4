@@ -1,0 +1,43 @@
+%
+
+R473=1
+N120 L FASTACC.CS4
+
+R400=60000  {vel    85000 = 3000rpm
+R401=500    {3000   R347  // Quota di finecorsa positivo dell'asse Y
+R402=-400   {1000   R348  // Quota di finecorsa negativo dell'asse Y
+R403=0      {0=ciclo infinito,   1 = 1 movimento
+
+R406=1.0    {PAUSA 
+$M72        {per disabilitare l'hold da collisione con magazzino}
+
+[START]
+N310 G00 G53 Y=R401
+N315 G04 F=R406
+N320 L SNGCNT.CS4
+
+N410 G00 G53 Y=R402
+N415 G04 F=R406
+N420 L SNGCNT.CS4
+
+N430 IF(R403>0.5) $M00
+
+N490 JMP [START]
+
+N500 RET
+
+
+{ [START]
+{ N310 G01 F=R400 Y=R401
+{ N312 G304 CNC
+{ N315 G04 F=R406
+{ N320 L SNGCNT.CS4
+{ 
+{ N410 G01 F=R400 Y=R402
+{ N312 G304 CNC
+{ N415 G04 F=R406
+{ N420 L SNGCNT.CS4
+{ 
+{ N430 IF(R403>0.5) $M00
+{ 
+{ N490 JMP [START]

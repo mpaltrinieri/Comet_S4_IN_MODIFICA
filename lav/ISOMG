@@ -1,0 +1,499 @@
+%
+{ ------------------------------------------------------------------------------------------------
+{ Mac file                       : d:\comets4\cam\lda\testina2.lda}
+{ Drill version                  : 2.9.3.4418}
+{ Date                           : 09/04/2024 10:11:26 AM}
+{ Execution type                 : Singolo/Multipezzo}
+{ Repetitions                    : 100}
+{ Target CN                      : COMET_S4_MORSEMOTORIZZATE}
+
+{ ------------------------------------------------------------------------------------------------
+{ MACHINE LIMITS}
+{ ------------------------------------------------------------------------------------------------
+{ X MIN                          : -272.000}
+{ X MAX                          : 3479.000}
+{ Y MIN                          : -270.000}
+{ Y MAX                          : 468.000}
+{ Z MIN                          : 108.000}
+{ Z MAX                          : 584.000}
+{ SX CAM                         : 0.000}
+{ DX CAM                         : 0.000}
+{ SPESS DIAFRAMMA PEND           : 0.000}
+{ Z BARRIER                      : -15.000}
+{ Z BASEMENT                     : 20.000}
+{ P/H FEEDER DISTANCE            : 0.000}
+{ FRONT STRUCT Z                 : 20.000}
+{ FRONT STRUCT Y                 : 560.000}
+{ REAR  STRUCT Z                 : 5.000}
+{ REAR  STRUCT Y                 : -145.000}
+{ XMIN CLAMPS LF PEND DYN        : 90.000}
+{ XMAX CLAMPS LF PEND DYN        : 3200.000}
+{ XMIN CLAMPS RH PEND DYN        : 3990.000}
+{ XMAX CLAMPS RH PEND DYN        : 7024.000}
+{ XMIN CLAMPS LF SINGLE MULTI    : 90.000}
+{ XMAX CLAMPS LF SINGLE MULTI    : 90.000}
+{ XMIN CLAMPS RH SINGLE MULTI    : 5000.000}
+{ XMAX CLAMPS RH SINGLE MULTI    : 5000.000}
+
+{ ------------------------------------------------------------------------------------------------
+{ REFERENCES}
+{ ------------------------------------------------------------------------------------------------
+{ LEFT SX_EXT                    : 57.900}
+{ LEFT SX_INT                    : -99999.000}
+{ RIGHT DX INT                   : -99999.000}
+{ RIGHT DX EXT                   : 3342.150}
+{ LEFT AREA DIM                  : 3284.250}
+{ RIGHT AREA DIM                 : 3284.250}
+{ Y L1 LEFT                      : -51.000}
+{ Y L1 RIGHT                     : -51.000}
+
+{ ------------------------------------------------------------------------------------------------
+{ CLAMPS SX}
+{ ------------------------------------------------------------------------------------------------
+{ NAME                           : STANDARD}
+{ NUM CLAMPS                     : 6}
+{ NUM CLAMPS_LF                  : 6}
+{ NUM CLAMPS_RH                  : 0}
+{ HEIGHT                         : 240.000}
+{ WIDTH                          : 110.000}
+{ BLOCK DEEPTH                   : 400.000}
+{ REF DEEPTH                     : 400.000}
+{ MIN DISTANCE                   : 115.000}
+{ OFFPOSMORSE                    : 0.000}
+{ ADDDISTBAR                     : 30.000}
+{ TOLLPOS                        : 0.500}
+
+{ ------------------------------------------------------------------------------------------------
+{ CLAMPS DX}
+{ ------------------------------------------------------------------------------------------------
+{ NAME                           : STANDARD}
+{ NUM CLAMPS                     : 6}
+{ NUM CLAMPS_LF                  : 6}
+{ NUM CLAMPS_RH                  : 0}
+{ HEIGHT                         : 240.000}
+{ WIDTH                          : 110.000}
+{ BLOCK DEEPTH                   : 400.000}
+{ REF DEEPTH                     : 400.000}
+{ MIN DISTANCE                   : 115.000}
+{ OFFPOSMORSE                    : 0.000}
+{ ADDDISTBAR                     : 30.000}
+{ TOLLPOS                        : 0.500}
+
+{ ------------------------------------------------------------------------------------------------
+{ PIECES}
+{ ------------------------------------------------------------------------------------------------
+{ PIECE #1  ID: #1  SERIE: VARIE  CODE: Q50  L+SX+DX: 950 90 90 LATOVETRO: 0=LOW}
+{ LINE: 01}
+{ SIDE: SX}
+{ SPECIFIC OFFSET: NO}
+
+
+N1 R599=27044.000  		{ ISO CODE}
+N2 R482=0.000  		{ TYPE_WAIT RESET}
+N3 R492=0.000  		{ TYPE_WAIT RESET}
+N4 R592=0.000  		{ R_SHOW_TIME}
+N5 R590=0.000  		{ R_CONT_PEZZI}
+N6 R597=-1.000  		{ R_ID_LAV_ATTUALE}
+N7 R598=-1.000  		{ R_ID_LAV_PROSSIMA}
+N8 R596=0.000  		{ ID MACRO FOR HMI RESET}
+N9 R509=0.000  		{ R_GESTMORS_OPER}
+N10 R532=6.000  		{ R_NUM_MORSE}
+N11 R525=6.000  		{ R_NUM_MORSE_SX}
+N12 R526=0.000  		{ R_NUM_MORSE_DX}
+N13 R523=115.000  		{ R_INTERAX_MORSE_SX: Dist. Min Morse Sx}
+N14 R524=115.000  		{ R_INTERAX_MORSE_DX: Dist. Min Morse Dx}
+N15 R570=0.000  		{ R_OFF_TRASC_MOR_X}
+N16 R555=145.400  		{ R_MIN_SX_ZONA_MORSE}
+N17 R556=3254.650  		{ R_MAX_SX_ZONA_MORSE}
+N18 R557=5000.000  		{ R_MIN_DX_ZONA_MORSE}
+N19 R558=3254.650  		{ R_MAX_DX_ZONA_MORSE}
+N20 R588=2998.000  		{ R_XMAX_AREASX - X Max Candela Pendol Sx}
+N21 R589=3840.000  		{ R_XMIN_AREADX - X Min Candela Pendol Dx}
+N22 R240=584.000  		{ Z fuori ingombro}
+N23 R251=584.000  		{ Z scavalcamento morse}
+N24 R5000=300.000  		{ Lunghezza struttura mandrino}
+N25 R5001=90.000  		{ Larghezza parte bassa struttura mandrino}
+N26 R5982=0.000  		{ R_TIPO_ISO_MANUTENZ}
+N27 R520=0.000  		{ = 1 mantiene le morse chiuse a fine ciclo}
+N28 R569=0.000  		{ R_DOUBLE}
+N29 R517=0.000  		{ R_CONFERMA_DIRETTA: ERGO: 1=conferma per esecuzione breve  0=conferma per esecuzione > 2 sec. }
+N30 R512=0.000  		{ R_FORZA_CHECKMORS}
+N31 R596=17.000  		{ ID MACRO FOR HMI START}
+N32  L<RIFASSI.CS4>
+N33 R596=0.000  		{ ID MACRO FOR HMI END}
+N34 R5958=1.000  		{ R_POS_BATT_SX1_REQ}
+N35 R5959=1.000  		{ R_POS_BATT_DX4_REQ}
+N36 R505=0.000  		{ R_END_SX 0=apertura morse  1=attesa carico  2=attesa scarico}
+N37 R596=7.000  		{ ID MACRO FOR HMI START}
+N38  L<WAIT.CS4>
+N39 R596=0.000  		{ ID MACRO FOR HMI END}
+N40 R596=1.000  		{ ID MACRO FOR HMI START}
+N41  L<SNGCNT.CS4>
+N42 R596=0.000  		{ ID MACRO FOR HMI END}
+N43 R561=0.000  		{ R_POSBAT_VERT_SX_EXT}
+N44 R562=0.000  		{ R_POSBAT_VERT_SX_INT}
+N45 R565=0.000  		{ R_POSBAT_VERT_DX_INT}
+N46 R566=0.000  		{ R_POSBAT_VERT_DX_EXT}
+N47 R552=1.000  		{ R_SPOSTA_BATTUTE_SX}
+N48 R553=1.000  		{ R_SPOSTA_BATTUTE_DX}
+
+{ Morse al passo 1 scorrimento 1}
+N49 R510=0.000  		{ R_POS_MORS_SX_DX}
+N50 R533=0.000  		{ R_RIPOS_MORSE_MULTI}
+N51 R528=56.000  		{ R_GRUPPO_MORSE_SX_EXT}
+N52 R529=0.000  		{ R_GRUPPO_MORSE_SX_INT}
+N53 R530=0.000  		{ R_GRUPPO_MORSE_DX_INT}
+N54 R531=0.000  		{ R_GRUPPO_MORSE_DX_EXT}
+N55 R543=202.819  		{ CLAMP #1}
+N56 R544=518.015  		{ CLAMP #2}
+N57 R545=882.294  		{ CLAMP #3}
+N58 R546=2512.712  		{ CLAMP #4}
+N59 R547=2866.567  		{ CLAMP #5}
+N60 R548=3220.410  		{ CLAMP #6}
+N61 R140=0.000
+N62 R141=0.000
+N63 R142=0.000
+N64 R143=0.000
+N65 R144=0.000
+N66 R145=0.000
+N67 R151=0.000
+N68 R150=0.000
+N69 R149=0.000
+N70 R148=0.000
+N71 R147=0.000
+N72 R146=0.000
+N73 R596=6.000  		{ ID MACRO FOR HMI START}
+N74  L<POSMORS.CS4>
+N75 R596=0.000  		{ ID MACRO FOR HMI END}
+N76 R596=1.000  		{ ID MACRO FOR HMI START}
+N77  L<SNGCNT.CS4>
+N78 R596=0.000  		{ ID MACRO FOR HMI END}
+
+N79 R594=0.000  		{ R_APPOGGIO_CICLO_SX}
+N80 R560=1.000  		{ R_CAUSALE_CARICO: 0=carro_SX  1=carro_DX  2=fermo dove'}
+N81 R561=1.000  		{ R_POSBAT_VERT_SX_EXT}
+N82 R562=0.000  		{ R_POSBAT_VERT_SX_INT}
+N83 R563=0.000  		{ R_POSBAT_ORIZ_SX_EXT}
+N84 R564=0.000  		{ R_POSBAT_ORIZ_SX_INT}
+N85 R565=0.000  		{ R_POSBAT_VERT_DX_INT}
+N86 R566=0.000  		{ R_POSBAT_VERT_DX_EXT}
+N87 R567=0.000  		{ R_POSBAT_ORIZ_DX_INT}
+N88 R568=0.000  		{ R_POSBAT_ORIZ_DX_EXT}
+N89 R120=-1.000  		{ R_POSCARICO_AX_P_P1}
+N90 R121=-2.000  		{ R_POSCARICO_AX_P_P1}
+N91 R122=-2.000  		{ R_POSCARICO_AX_P_P1}
+N92 R123=-2.000  		{ R_POSCARICO_AX_P_P1}
+N93 R124=-2.000  		{ R_POSCARICO_AX_P_P1}
+N94 R125=-2.000  		{ R_POSCARICO_AX_P_P1}
+N95 R135=1.000  		{ R_NUM_PEZZI_CAR_SX}
+N96 R137=0.000  		{ R_APPOGGIO_PEZZI_SX}
+N97 R131=-2.000  		{ R_POSCARICO_AX_H_P1}
+N98 R130=-2.000  		{ R_POSCARICO_AX_H_P1}
+N99 R129=-2.000  		{ R_POSCARICO_AX_H_P1}
+N100 R128=-2.000  		{ R_POSCARICO_AX_H_P1}
+N101 R127=-2.000  		{ R_POSCARICO_AX_H_P1}
+N102 R126=-2.000  		{ R_POSCARICO_AX_H_P1}
+N103 R136=0.000  		{ R_NUM_PEZZI_CAR_DX}
+N104 R138=0.000  		{ R_APPOGGIO_PEZZI_DX}
+N105 R482=11.000  		{ TYPE_WAIT blocca il pezzo}
+N106 R505=1.000  		{ R_END_SX: 0=apertura morse  1=attesa carico  2=attesa scarico}
+N107 R559=0.000  		{ R_SOLBAT_OPER}
+N108 R596=7.000  		{ ID MACRO FOR HMI START}
+N109  L<WAIT.CS4>
+N110 R596=0.000  		{ ID MACRO FOR HMI END}
+N111 R596=8.000  		{ ID MACRO FOR HMI START}
+N112  L<CLOSEALL.CS4>
+N113 R596=0.000  		{ ID MACRO FOR HMI END}
+N114 R596=1.000  		{ ID MACRO FOR HMI START}
+N115  L<SNGCNT.CS4>
+N116 R596=0.000  		{ ID MACRO FOR HMI END}
+N117 R482=0.000  		{ TYPE_WAIT RESET}
+{ Info barra}
+N118 R501=240.000  		{ R_MAX_HEIGH}
+N119 R200=950.000  		{ Lunghezza pezzo}
+N120 R201=50.000  		{ Larghezza pezzo}
+N121 R202=50.000  		{ Altezza pezzo}
+N122 R593=1.000  		{ R_BARRIERA_APPOGGIO}
+N123 R559=0.000  		{ R_SOLBAT_OPER}
+N124 JMP N300
+
+{ Morse al passo 1 scorrimento 1}
+N125 R510=0.000  		{ R_POS_MORS_SX_DX}
+N126 R533=1.000  		{ R_RIPOS_MORSE_MULTI}
+N127 R528=56.000  		{ R_GRUPPO_MORSE_SX_EXT}
+N128 R529=0.000  		{ R_GRUPPO_MORSE_SX_INT}
+N129 R530=0.000  		{ R_GRUPPO_MORSE_DX_INT}
+N130 R531=0.000  		{ R_GRUPPO_MORSE_DX_EXT}
+N131 R543=202.819  		{ CLAMP #1}
+N132 R544=518.015  		{ CLAMP #2}
+N133 R545=882.294  		{ CLAMP #3}
+N134 R546=2512.712  		{ CLAMP #4}
+N135 R547=2866.567  		{ CLAMP #5}
+N136 R548=3220.410  		{ CLAMP #6}
+N137 R140=0.000
+N138 R141=0.000
+N139 R142=0.000
+N140 R143=0.000
+N141 R144=0.000
+N142 R145=0.000
+N143 R151=0.000
+N144 R150=0.000
+N145 R149=0.000
+N146 R148=0.000
+N147 R147=0.000
+N148 R146=0.000
+N149 R596=6.000  		{ ID MACRO FOR HMI START}
+N150  L<POSMORS.CS4>
+N151 R596=0.000  		{ ID MACRO FOR HMI END}
+
+N152 R596=1.000  		{ ID MACRO FOR HMI START}
+N153  L<SNGCNT.CS4>
+N154 R596=0.000  		{ ID MACRO FOR HMI END}
+N155 R534=0.000
+N156 R505=0.000  		{ R_END_SX: 0=apertura morse  1=attesa carico  2=attesa scarico}
+N157 R596=7.000  		{ ID MACRO FOR HMI START}
+N158  L<WAIT.CS4>
+N159 R596=0.000  		{ ID MACRO FOR HMI END}
+N160 R594=0.000  		{ R_APPOGGIO_CICLO_SX}
+N161 R560=1.000  		{ R_CAUSALE_CARICO: 0=carro_SX  1=carro_DX  2=fermo dove'}
+N162 R561=1.000  		{ R_POSBAT_VERT_SX_EXT}
+N163 R562=0.000  		{ R_POSBAT_VERT_SX_INT}
+N164 R563=0.000  		{ R_POSBAT_ORIZ_SX_EXT}
+N165 R564=0.000  		{ R_POSBAT_ORIZ_SX_INT}
+N166 R565=0.000  		{ R_POSBAT_VERT_DX_INT}
+N167 R566=0.000  		{ R_POSBAT_VERT_DX_EXT}
+N168 R567=0.000  		{ R_POSBAT_ORIZ_DX_INT}
+N169 R568=0.000  		{ R_POSBAT_ORIZ_DX_EXT}
+N170 R120=-1.000  		{ R_POSCARICO_AX_P_P1}
+N171 R121=-2.000  		{ R_POSCARICO_AX_P_P1}
+N172 R122=-2.000  		{ R_POSCARICO_AX_P_P1}
+N173 R123=-2.000  		{ R_POSCARICO_AX_P_P1}
+N174 R124=-2.000  		{ R_POSCARICO_AX_P_P1}
+N175 R125=-2.000  		{ R_POSCARICO_AX_P_P1}
+N176 R135=1.000  		{ R_NUM_PEZZI_CAR_SX}
+N177 R137=0.000  		{ R_APPOGGIO_PEZZI_SX}
+N178 R131=-2.000  		{ R_POSCARICO_AX_H_P1}
+N179 R130=-2.000  		{ R_POSCARICO_AX_H_P1}
+N180 R129=-2.000  		{ R_POSCARICO_AX_H_P1}
+N181 R128=-2.000  		{ R_POSCARICO_AX_H_P1}
+N182 R127=-2.000  		{ R_POSCARICO_AX_H_P1}
+N183 R126=-2.000  		{ R_POSCARICO_AX_H_P1}
+N184 R136=0.000  		{ R_NUM_PEZZI_CAR_DX}
+N185 R138=0.000  		{ R_APPOGGIO_PEZZI_DX}
+N186 R482=11.000  		{ TYPE_WAIT blocca il pezzo}
+N187 R505=1.000  		{ R_END_SX: 0=apertura morse  1=attesa carico  2=attesa scarico}
+N188 R559=0.000  		{ R_SOLBAT_OPER}
+N189 R596=7.000  		{ ID MACRO FOR HMI START}
+N190  L<WAIT.CS4>
+N191 R596=0.000  		{ ID MACRO FOR HMI END}
+N192 R596=8.000  		{ ID MACRO FOR HMI START}
+N193  L<CLOSEALL.CS4>
+N194 R596=0.000  		{ ID MACRO FOR HMI END}
+N195 R596=1.000  		{ ID MACRO FOR HMI START}
+N196  L<SNGCNT.CS4>
+N197 R596=0.000  		{ ID MACRO FOR HMI END}
+N198 R482=0.000  		{ TYPE_WAIT RESET}
+N300 R5921=128.000  		{ Utensili in uso da T1 a T16 nell'isomg in gestione utensili avanzata }
+N301 R5922=0.000  		{ Utensili in uso da T17 a T32 nell'isomg in gestione utensili avanzata }
+N302 R596=28.000  		{ ID MACRO FOR HMI START}
+N303  L<VER_TOOL.CS4>
+N304 R596=0.000  		{ ID MACRO FOR HMI END}
+{ Utensile : T8B posizione in magazzino : 8}
+N305 R611=8.000  		{ R_NEXT_TOOL}
+N306 R508=4.000  		{ R_RADIUS_NEXTOOL}
+N307 R507=44.800  		{ R_LENGTH_NEXTOOL}
+N308 R765=65.000  		{ R_OFFSET_X_MAND}
+N309 R763=-0.050  		{ R_OFFSET_Y_MAND}
+N310 R764=226.780  		{ R_OFFSET_Z_MAND}
+N311 R554=150.000  		{ R_DIM_TOOL (testina)}
+N312 R5015=116.500  		{ R_OFFSET_Y_TESTINA}
+N313 R5016=65.000  		{ R_OFFSET_Z_TESTINA}
+N314 R5017=0.000  		{ R_ANGOLO_UT_SU_TEST}
+N315 R13000=0.000  		{ Voilap connect - Tipo utensile}
+N316 R596=4.000  		{ ID MACRO FOR HMI START}
+N317  L<CAMBIOUT.CS4>
+N318 R596=0.000  		{ ID MACRO FOR HMI END}
+N319 R574=0.000  		{ R_CHECK_TOOL}
+N320 R597=0.000  		{ R_ID_LAV_ATTUALE}
+N321 R598=1.000  		{ R_ID_LAV_PROSSIMA}
+N322 R596=1.000  		{ ID MACRO FOR HMI START}
+N323  L<SNGCNT.CS4>
+N324 R596=0.000  		{ ID MACRO FOR HMI END}
+
+{ ***** ID_LAV_DRILL = 0}
+{ ***** NOME_LDT_CAM = testina2}
+{ ****** ID_LAV_CAM   = 1}
+{ ****** ID_ING_CAM   = 0}
+{ ****** ID_BEFORE_AFTER_CAM = 0}
+{ ****** ID_PEZZO = 0}
+{ ****** FIGURA       = ASOLA (T8B)}
+{ ****** STEP_SFOND = 1}
+N325 R201=50.000  		{ Larghezza pezzo lavorazione}
+N326 R202=50.000  		{ Altezza pezzo lavorazione}
+N327 R203=4.000  		{ NumFaccia}
+N328 R585=1.000  		{ Work compound}
+N329 R501=240.000  		{ R_MAX_HEIGHT}
+N330 R204=1.000  		{ 1=utensile con testina}
+N331 R213=90.000  		{ angolo B}
+N332 R214=90.000  		{ angolo C}
+N333 R527=0.000  		{ R_ZONA_LAVORO : 0=multipezzo 1=pend.SX  2=pend.DX}
+N334 R535=0.000  		{ R_POS_TAVOLA_SX : 0=macchina 1=operatore 2=non usata }
+N335 R536=2.000  		{ R_POS_TAVOLA_DX : 0=macchina 1=operatore 2=non usata}
+N336 R210=54.900  		{ quota X}
+N337 R211=-9.000  		{ quota Y}
+N338 R212=145.230  		{ quota Z}
+N339 R5004=1010.900  		{ quota prossima lav X}
+N340 R5005=-9.000  		{ quota prossima lav Y}
+N341 R5006=145.230  		{ quota prossima lav Z}
+N342 R5002=90.000  		{ quota prossima lav B}
+N343 R5003=90.000  		{ quota prossima lav C}
+N344 R5007=7.000  		{ quota prossima lav disimpegno di CAM (R330)}
+N345 R241=0.000  		{ SensoRotazione}
+N346 R5965=0.000  		{ morsa master}
+N347 R242=8888.889  		{ velocita' di rotazione}
+N348 R500=60.000  		{ frequenza di refigerazione}
+N349 R502=0.000  		{ refrigerante speciale}
+N350 R310=100.000  		{ velocita' di sfondamento}
+N351 R311=177.778  		{ velocita' di lavorazione}
+N352 R504=4.000  		{ R_TIPO_LUBRICA}
+N353 R503=15.000  		{ R_SPESS_DISCO}
+N354 R3499=0.000  		{ tipo tastatura}
+N355 R340=0.000  		{ ID tastatura1 X}
+N356 R341=0.000  		{ ID tastatura1 Y}
+N357 R342=0.000  		{ ID tastatura1 Z}
+N358 R3500=0.000  		{ ID tastatura2 X}
+N359 R3501=0.000  		{ ID tastatura2 Y}
+N360 R3502=0.000  		{ ID tastatura2 Z}
+N361 R322=1.000  		{ Senso di esecuzione figura:  0=orario  1=antiorario}
+N362 R320=0.000  		{ flag svuotamento}
+N363 R321=0.000  		{ flag elicoidale}
+N364 R323=1.000  		{ flag veloce}
+N365 R300=20.000
+N366 R301=8.000
+N367 R309=0.000  		{ angolo figura}
+N368 R330=7.000  		{ Z disimpegno }
+N369 R331=0.000  		{ Z inizial}
+N370 R332=-8.000  		{ Z di sfondamento}
+N371 R324=1.000  		{ numero di passi sfondamento}
+N372 R538=0.000  		{ R_CORREZ_MARPOSS}
+N373 R537=0.000  		{ R_SELECT_MARPOSS}
+N374 R539=0.000  		{ R_NUM_PEZZO nel multipezzo}
+N375 R596=103.000  		{ ID MACRO FOR HMI START}
+N376  L<3.CS4>
+N377 R596=0.000  		{ ID MACRO FOR HMI END}
+N378 R250=1.000  		{ FlagExit: 0=fuori ingombro  1=scavalca morse  2=disimpegno  3=nessun spostam.Z}
+N379 R596=5.000  		{ ID MACRO FOR HMI START}
+N380  L<EXIT_MAN.CS4>
+N381 R596=0.000  		{ ID MACRO FOR HMI END}
+{ Utensile : T8A posizione in magazzino : 8}
+N382 R611=8.000  		{ R_NEXT_TOOL}
+N383 R508=4.000  		{ R_RADIUS_NEXTOOL}
+N384 R507=47.800  		{ R_LENGTH_NEXTOOL}
+N385 R765=65.000  		{ R_OFFSET_X_MAND}
+N386 R763=-0.050  		{ R_OFFSET_Y_MAND}
+N387 R764=226.280  		{ R_OFFSET_Z_MAND}
+N388 R554=150.000  		{ R_DIM_TOOL (testina)}
+N389 R5015=116.000  		{ R_OFFSET_Y_TESTINA}
+N390 R5016=65.000  		{ R_OFFSET_Z_TESTINA}
+N391 R5017=180.000  		{ R_ANGOLO_UT_SU_TEST}
+N392 R13000=0.000  		{ Voilap connect - Tipo utensile}
+N393 R596=4.000  		{ ID MACRO FOR HMI START}
+N394  L<CAMBIOUT.CS4>
+N395 R596=0.000  		{ ID MACRO FOR HMI END}
+N396 R574=0.000  		{ R_CHECK_TOOL}
+N397 R597=1.000  		{ R_ID_LAV_ATTUALE}
+N398 R598=-1.000  		{ R_ID_LAV_PROSSIMA}
+N399 R596=1.000  		{ ID MACRO FOR HMI START}
+N400  L<SNGCNT.CS4>
+N401 R596=0.000  		{ ID MACRO FOR HMI END}
+
+{ ***** ID_LAV_DRILL = 1}
+{ ***** NOME_LDT_CAM = testina2}
+{ ****** ID_LAV_CAM   = 2}
+{ ****** ID_ING_CAM   = 0}
+{ ****** ID_BEFORE_AFTER_CAM = 0}
+{ ****** ID_PEZZO = 0}
+{ ****** FIGURA       = ASOLA (T8A)}
+{ ****** STEP_SFOND = 1}
+N402 R201=50.000  		{ Larghezza pezzo lavorazione}
+N403 R202=50.000  		{ Altezza pezzo lavorazione}
+N404 R203=4.000  		{ NumFaccia}
+N405 R585=1.000  		{ Work compound}
+N406 R501=240.000  		{ R_MAX_HEIGHT}
+N407 R204=1.000  		{ 1=utensile con testina}
+N408 R213=90.000  		{ angolo B}
+N409 R214=90.000  		{ angolo C}
+N410 R527=0.000  		{ R_ZONA_LAVORO : 0=multipezzo 1=pend.SX  2=pend.DX}
+N411 R535=0.000  		{ R_POS_TAVOLA_SX : 0=macchina 1=operatore 2=non usata }
+N412 R536=2.000  		{ R_POS_TAVOLA_DX : 0=macchina 1=operatore 2=non usata}
+N413 R210=1010.900  		{ quota X}
+N414 R211=-9.000  		{ quota Y}
+N415 R212=145.230  		{ quota Z}
+N416 R5004=0.000  		{ quota prossima lav X}
+N417 R5005=0.000  		{ quota prossima lav Y}
+N418 R5006=0.000  		{ quota prossima lav Z}
+N419 R5002=0.000  		{ quota prossima lav B}
+N420 R5003=0.000  		{ quota prossima lav C}
+N421 R5007=0.000  		{ quota prossima lav disimpegno di CAM (R330)}
+N422 R241=1.000  		{ SensoRotazione}
+N423 R5965=0.000  		{ morsa master}
+N424 R242=8888.889  		{ velocita' di rotazione}
+N425 R500=60.000  		{ frequenza di refigerazione}
+N426 R502=0.000  		{ refrigerante speciale}
+N427 R310=100.000  		{ velocita' di sfondamento}
+N428 R311=177.778  		{ velocita' di lavorazione}
+N429 R504=8.000  		{ R_TIPO_LUBRICA}
+N430 R503=15.000  		{ R_SPESS_DISCO}
+N431 R3499=0.000  		{ tipo tastatura}
+N432 R340=0.000  		{ ID tastatura1 X}
+N433 R341=0.000  		{ ID tastatura1 Y}
+N434 R342=0.000  		{ ID tastatura1 Z}
+N435 R3500=0.000  		{ ID tastatura2 X}
+N436 R3501=0.000  		{ ID tastatura2 Y}
+N437 R3502=0.000  		{ ID tastatura2 Z}
+N438 R322=1.000  		{ Senso di esecuzione figura:  0=orario  1=antiorario}
+N439 R320=0.000  		{ flag svuotamento}
+N440 R321=0.000  		{ flag elicoidale}
+N441 R323=1.000  		{ flag veloce}
+N442 R300=20.000
+N443 R301=8.000
+N444 R309=0.000  		{ angolo figura}
+N445 R330=7.000  		{ Z disimpegno }
+N446 R331=0.000  		{ Z inizial}
+N447 R332=-8.000  		{ Z di sfondamento}
+N448 R324=1.000  		{ numero di passi sfondamento}
+N449 R538=0.000  		{ R_CORREZ_MARPOSS}
+N450 R537=0.000  		{ R_SELECT_MARPOSS}
+N451 R539=0.000  		{ R_NUM_PEZZO nel multipezzo}
+N452 R596=103.000  		{ ID MACRO FOR HMI START}
+N453  L<3.CS4>
+N454 R596=0.000  		{ ID MACRO FOR HMI END}
+N455 R250=0.000  		{ FlagExit: 0=fuori ingombro  1=scavalca morse  2=disimpegno  3=nessun spostam.Z}
+N456 R596=5.000  		{ ID MACRO FOR HMI START}
+N457  L<EXIT_MAN.CS4>
+N458 R596=0.000  		{ ID MACRO FOR HMI END}
+N459 R596=1.000  		{ ID MACRO FOR HMI START}
+N460  L<SNGCNT.CS4>
+N461 R596=0.000  		{ ID MACRO FOR HMI END}
+N462 R592=1.000  		{ R_SHOW_TIME}
+N463 R590=R590+1
+N464 R534=0.000  		{ R_ROTAZ_MULTI}
+N465 R596=9.000  		{ ID MACRO FOR HMI START}
+N466  L<END.CS4>
+N467 R596=0.000  		{ ID MACRO FOR HMI END}
+N468 <RPT:N125;N467;99>
+N469 R482=12.000  		{ TYPE_WAIT togli il pezzo}
+N470 R505=2.000  		{ R_END_SX: 0=apertura morse  1=attesa carico  2=attesa scarico}
+N471 R597=-1.000  		{ R_ID_LAV_ATTUALE}
+N472 R598=-1.000  		{ R_ID_LAV_PROSSIMA}
+N473 R596=7.000  		{ ID MACRO FOR HMI START}
+N474  L<WAIT.CS4>
+N475 R596=0.000  		{ ID MACRO FOR HMI END}
+N476 R596=1.000  		{ ID MACRO FOR HMI START}
+N477  L<SNGCNT.CS4>
+N478 R596=0.000  		{ ID MACRO FOR HMI END}
+N479 R482=0.000  		{ TYPE_WAIT RESET}
+N480 R596=16.000  		{ ID MACRO FOR HMI START}
+N481  L<FINEALL.CS4>
+N482 R596=0.000  		{ ID MACRO FOR HMI END}
+N483 JMP N1

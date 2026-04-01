@@ -1,0 +1,22 @@
+{------------------ GESTIONE RIFERIMENTO ASSI IN AUTOMATICO E MANUALE -----------------}
+
+N10  L <SH_OFF_W_CH1.CS4>
+
+N9000 IF(R450<0.5) JMP [FINE2]  {se macchina non in manuale}
+
+[MANUALE]                  {Operazioni eseguite solo in manuale 
+N9500 $M02                 {Solo in manuale
+N9600 RET
+
+[FINE2]
+  {N10000 G4 F1
+N10010 L <SNGCNT_CH1.CS4>
+N10015 L <WAIT_CH0_CH1.CS4>
+N10020 L <WAIT_W_AVAILABLE_CH1.CS4>
+   {N10040 R6865=1+2+0      {Sincronizza canale 0,1}
+   {N10050 L <SYNCNC1_CH1.CS4>
+   
+N10030 L <SNGCNT_CH1.CS4>
+N10040 R6869=2           {Libera attesa sul CH0
+
+N10060 RET

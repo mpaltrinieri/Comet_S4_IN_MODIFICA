@@ -1,0 +1,10 @@
+A         B START 
+A AUF     B ZU 
+A JOG -   B JOG + 
+A ABLEGEN B LADEN 
+A AB      B AUF 
+A ZURUCK  B VOR 
+A UZS     B GZS 
+A ENDE    B START 
+A BLOCK   B ENTBLCK 
+A LH      B RH 

@@ -1,0 +1,56 @@
+{GESTIONE CAMBIO UTENSILE IN AUTOMATICO}
+
+N200  IF (R610 == R611) JMP [FINE]      {se utensile successivo = all'utensile attuale => fine}
+
+N210  L SNGCNT_CH1.CS4
+
+N280  L <WAIT_W_AVAILABLE_CH1.CS4>
+
+{[NOFUOING]
+
+N1010  R400=0
+N1020  IF (R610<0.5) R400=1                   {memoria nessun deposito da fare
+N1030  IF (R610<0.5) JMP [PRELIEVO]           {verifica se utensile presente su mandrino
+
+{***** deposito utensile ******}
+N1150  L MOVIND_W_CH1.CS4                         {muove W a quota di verifica utensile}
+N1170  L WAIT_W_CH1.CS4                           {attesa fine movimento asse W indipendente}
+N1220  L MOVIND_W_CH1.CS4                         {muove W a quota di cambio utensile}
+N1240  IF(R610>R6501) JMP [F_D_SUP]
+N1250  IF(R610<R6501) JMP [F_D_INF]
+
+[F_D_SUP]
+N2000  L WAIT_W_CH1.CS4                           {attesa fine movimento asse indipendente}
+N2090  JMP [PRELIEVO]
+
+[F_D_INF]
+N2520  L WAIT_W_CH1.CS4                           {attesa fine movimento asse indipendente}
+N2600  JMP [PRELIEVO]
+
+[PRELIEVO]
+N5050  IF(R400>0.5) L MOVIND_W_CH1.CS4            {muove W a quota di verifica utensile: solo se prelievo senza deposito}
+N5060  IF(R400>0.5) L WAIT_W_CH1.CS4              {attesa fine movimento asse W indipendente: solo se prelievo senza deposito}
+N5110  L MOVIND_W_CH1.CS4                         {muove W a quota di cambio utensile}
+N5150  IF(R611>R6501) JMP [F_P_SUP]
+N5160  IF(R611<R6501) JMP [F_P_INF]
+
+[F_P_SUP]
+N5530  L WAIT_W_CH1.CS4                           {attesa fine movimento asse indipendente}
+N5660  L MOVIND_W_CH1.CS4                         {muove W a finecorsa negativo}
+N5670  L WAIT_W_CH1.CS4                           {attesa fine movimento asse indipendente}
+N5690  JMP [FINE]
+
+[F_P_INF]
+N6005  IF(R400>0.5) L WAIT_W_CH1.CS4              {attesa fine movimento asse indipendente}
+N6030  IF(R400<0.5) L WAIT_W_CH1.CS4              {attesa fine movimento asse indipendente}
+N6140  L MOVIND_W_CH1.CS4                         {muove W al finecorsa negativo}
+N6160  L WAIT_W_CH1.CS4                           {attesa fine movimento asse indipendente}
+N6180  JMP [FINE]
+
+[FINE]
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////
+
+{***** Sincronizzazione tra PLC e CNC *****}
+
+N11310 RET

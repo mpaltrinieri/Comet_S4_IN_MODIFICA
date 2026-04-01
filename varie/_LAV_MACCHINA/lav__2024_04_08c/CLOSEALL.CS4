@@ -1,0 +1,41 @@
+{------------------------------- CHIUSURA MORSE ----------------------------------}
+{R6206 = appoggio morse chiuse in bassa pressione (non usato qui)
+
+N20 R400=0
+
+N60 R400=(R6528+R6531)                   {Morse associate alle battute dal Drill
+
+N100 IF(R509>0.5) JMP [GEST_OP]        {gestione morse da operatore  DA VERIFICARE!!!
+
+N304 IF(FTL(R400)&'0008'==0) $M294     {Disat_chius_in_AF_Morsa_10   se NON deve chiudersi
+N305 IF(FTL(R400)&'0010'==0) $M295     {Disat_chius_in_AF_Morsa_11   se NON deve chiudersi
+N306 IF(FTL(R400)&'0020'==0) $M296     {Disat_chius_in_AF_Morsa_12   se NON deve chiudersi
+N307 IF(FTL(R400)&'0040'==0) $M297     {Disat_chius_in_AF_Morsa_13   se NON deve chiudersi
+N308 IF(FTL(R400)&'0080'==0) $M298     {Disat_chius_in_AF_Morsa_14   se NON deve chiudersi
+N309 IF(FTL(R400)&'0100'==0) $M299     {Disat_chius_in_AF_Morsa_15   se NON deve chiudersi
+
+N404 IF(FTL(R400)&'0008'==0) $M234     {Mantiene aperta Morsa 10 (in alta forza) se NON deve chiudersi
+N405 IF(FTL(R400)&'0010'==0) $M235     {Mantiene aperta Morsa 11 (in alta forza) se NON deve chiudersi
+N406 IF(FTL(R400)&'0020'==0) $M236     {Mantiene aperta Morsa 12 (in alta forza) se NON deve chiudersi
+N407 IF(FTL(R400)&'0040'==0) $M237     {Mantiene aperta Morsa 13 (in alta forza) se NON deve chiudersi
+N408 IF(FTL(R400)&'0080'==0) $M238     {Mantiene aperta Morsa 14 (in alta forza) se NON deve chiudersi
+N409 IF(FTL(R400)&'0100'==0) $M239     {Mantiene aperta Morsa 15 (in alta forza) se NON deve chiudersi
+
+N504 IF(FTL(R400)&'0008')    $M134     {Chiudi Morsa 10 in bassa forza se deve chiudersi
+N505 IF(FTL(R400)&'0010')    $M135     {Chiudi Morsa 11 in bassa forza se deve chiudersi
+N506 IF(FTL(R400)&'0020')    $M136     {Chiudi Morsa 12 in bassa forza se deve chiudersi
+N507 IF(FTL(R400)&'0040')    $M137     {Chiudi Morsa 13 in bassa forza se deve chiudersi
+N508 IF(FTL(R400)&'0080')    $M138     {Chiudi Morsa 14 in bassa forza se deve chiudersi
+N509 IF(FTL(R400)&'0100')    $M139     {Chiudi Morsa 15 in bassa forza se deve chiudersi
+
+[GEST_OP]
+N1004 IF(FTL(R400)&'0008')   $M274     {Chiudi Morsa 10 in alta forza se deve chiudersi
+N1005 IF(FTL(R400)&'0010')   $M275     {Chiudi Morsa 11 in alta forza se deve chiudersi
+N1006 IF(FTL(R400)&'0020')   $M276     {Chiudi Morsa 12 in alta forza se deve chiudersi
+N1007 IF(FTL(R400)&'0040')   $M277     {Chiudi Morsa 13 in alta forza se deve chiudersi
+N1008 IF(FTL(R400)&'0080')   $M278     {Chiudi Morsa 14 in alta forza se deve chiudersi
+N1009 IF(FTL(R400)&'0100')   $M279     {Chiudi Morsa 15 in alta forza se deve chiudersi
+
+[FINE]
+N2010 L <SNGCNT.CS4>
+N2020 RET

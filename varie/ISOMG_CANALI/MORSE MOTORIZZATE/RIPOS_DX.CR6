@@ -1,0 +1,69 @@
+{---------------------------------------------------------------------------------------------}
+{---------------------- Riposizionamento morse a DX in PENDOLARE DINAMICO --------------------}
+{---------------------------------------------------------------------------------------------}
+
+{---- Azzero la posizione da PC delle morse che non esistono
+N100 IF( (FTL(R700)&'0800') < 0.5)   IF( (FTL(R702)&'0040') < 0.5)  R546=0
+N101 IF( (FTL(R700)&'1000') < 0.5)   IF( (FTL(R702)&'0080') < 0.5)  R547=0
+N102 IF( (FTL(R700)&'2000') < 0.5)   IF( (FTL(R702)&'0100') < 0.5)  R548=0
+N103 IF( (FTL(R700)&'4000') < 0.5)   IF( (FTL(R702)&'0200') < 0.5)  R549=0
+N104 IF( (FTL(R700)&'8000') < 0.5)   IF( (FTL(R702)&'0400') < 0.5)  R550=0
+N105 IF( (FTL(R700)&'10000') < 0.5)  IF( (FTL(R702)&'0800') < 0.5)  R551=0
+
+
+N200 $M159                  {controllo posizione morse inviata da PC zona DX
+N210 IF (R674==1) R522=1    {EMULO il PC : scrivo la condizione che mi dice che è un riposizionamento 
+
+N220 IF (R674==0) R485=0    {Iinibisci il multiprocesso se muovo con X a scanso d'equivoci
+N230 IF (R674==1) R485=1    {Emulo il PC chiamo il multiprocesso, valido solo per le morse motorizzate 
+
+N300 $M63                   {chiudi riparo SX e basta
+
+N320 $M297                  {disattiva chiusura in alta forza morsa 7
+N321 $M298                  {disattiva chiusura in alta forza morsa 8
+N322 $M299                  {disattiva chiusura in alta forza morsa 9
+N323 $M300                  {disattiva chiusura in alta forza morsa 10
+N324 $M301                  {disattiva chiusura in alta forza morsa 11
+N325 $M302                  {disattiva chiusura in alta forza morsa 12
+
+N510 L <FASTACC.CR6>       {accelerazione veloce asse X}
+N520 G0 G53 Z=R349
+
+N530 G0 G53 B90            {posiziona assi fuori ingombro 
+N540 IF (R674==1) G0 G53 Y=(R7182-1)       {MORSE MOT.: posiziona asse Y tutto dentro solo con morse mot.
+N550 IF (R674==0) G0 G53 Y=(R7182-1) $M93  {MORSE TRASC.X.: Y fuori ingombro e Tavola avanti in lavoro
+
+N640 $M127                 {discesa barriere DX 
+
+
+[MUOVILE]
+N1000 S0                    {RIPOS.MORSE:in entrambi i casi ferma il mandrino
+N1010 R495=-1               {Assegno un valore di default impossibile per l'appoggio rotazione
+N1030 R496=-1               {Assegno un valore di default impossibile per l'appoggio velocità
+
+N1100 IF (R673==1) L <RIP_DX_X.CR6>     {Chiamo SR iso che ripos. le morse con l'asse X
+N1110 IF (R674==1) JMP [MORSEMOT]       {Salto alla sequenza ripos fatta col multiprocesso
+N1120 JMP [END]
+
+
+[MORSEMOT]                      {ripos.morse mot. con multiprocesso in pendolare
+N2000 R6970=30                  {causale per eseguire il posizionamento morse a SX}
+N2010 $M165                     {abilitazione posizionamento morse a DX
+N2020 L <SNGCNT.CR6>            {blocca aggiornam. variabili R
+N2030 G4 F1
+N2040 $M163                     {attesa fine multiprocesso DX}
+N2050 JMP [END]
+
+
+[END]
+{RIPOS_DX.CR6 macro richiamata da Drill solo per riposizionamento DX, quindi ripristino alta pressione DX
+N9000 IF(FTL(R6206) & '0040') $M277     {Chiudi Morsa 7 in alta pressione
+N9010 IF(FTL(R6206) & '0080') $M278     {Chiudi Morsa 8 in alta pressione
+N9010 IF(FTL(R6206) & '0100') $M279     {Chiudi Morsa 9 in alta pressione
+N9010 IF(FTL(R6206) & '0200') $M280     {Chiudi Morsa 10 in alta pressione
+N9010 IF(FTL(R6206) & '0400') $M281     {Chiudi Morsa 11 in alta pressione
+N9010 IF(FTL(R6206) & '0800') $M282     {Chiudi Morsa 12 in alta pressione
+N9110 L <SNGCNT.CR6>                    {blocca aggiornam. variabili R
+N9120 R522=0                            {EMULO il PC : AZZERO la condizione che mi dice che è un riposizionamento 
+N9130 R6970=0                           {reset causale per eseguire il posizionamento morse a SX}
+N9140 RET

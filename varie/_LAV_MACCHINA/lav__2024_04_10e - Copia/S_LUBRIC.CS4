@@ -1,0 +1,52 @@
+%
+{----------------- FUNZIONE DI RIEMPIMENTO LUBRICA ---------------}
+
+{ *********Mettere R470=1 prima di lanciare questo file ********* }
+
+{---------- Definizione parametri di caricamento FISSI -----------}
+N110 R473=1					{abilita ciclo automatico}
+N111 R500=100				{frequenza impostata}
+N112 $M59					{chiusura riparo 
+
+N210 $M202                  {Disinserzione trascinamento morse X
+
+N240 $M129                  {Disinserzione Battute di carico fisse delle zone SX/DX e mobili degli assi P/H
+N250 $M27                   {Disinserzione, Salita Battuta di precisione
+
+N313 G0 G53 Z=R349			
+
+{------------ Definizione parametri MODIFICABILI -----------------}
+N420 L <SNGCNT.CS4>
+N421 R504=16				{Numero Lubriche Attive
+N422 R502=0					{0=lubrica normale, 1=lubrica speciale
+
+N540 R400=30				{posizione X dove effettuare la carica lubriche}
+N541 R401=-150				{posizione Y dove effettuare la carica lubriche}
+N542 R402=R349				{posizione Z dove effettuare la carica lubriche}
+N543 R403=90				{posizione A dove effettuare la carica lubriche}
+
+N646 R409=800				{Numero di cicli impostati}
+N647 R410=0					{Numero di cicli eseguiti}
+
+{------------------- Operazioni Preparatorie --------------------}
+N730 X=R400
+N740 Y=R401
+N750 Z=R402
+N760 A=R403
+
+{------------------------- Ciclo di carico ----------------------}
+[LUBRICA]
+N800 $M07
+N810 G4 F0.5
+N840 R410=R410+1
+N850 L <SNGCNT.CS4>
+N860 IF (R410>R409) [END]	{Cicli finiti}
+N870 JMP [LUBRICA]
+
+{------------------------- Fine operazioni ----------------------}
+[END]
+N1000 $M09					{fine lubrica
+N1010 L <SNGCNT.CS4>
+N1020 R470=0				{inibisco lo start ciclo automatico} 
+
+N1030 RET

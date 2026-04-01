@@ -1,0 +1,22 @@
+{Attesa conferma proseguimento esecuzione se R3950=2
+{R3950       {R3950=2 abilita pausa di test 
+{R3951       {restart dopo pausa di test 
+{R3952       {contatore 
+
+
+[ASP]
+N1910 IF (R3950<1.5) JMP [OK]
+N1910 IF (R3950>2.5) JMP [OK]
+
+N1920 IF (R3951>0.5) JMP [OK]
+N1930 G4 F0.5
+N1940 L <SNGCNT.CS4>
+N1950 JMP [ASP]
+
+[OK]
+N2010 L <SNGCNT.CS4>
+N2020 R3951=0
+N2030 R3952=R3952+1
+
+[RET]
+N2040 RET

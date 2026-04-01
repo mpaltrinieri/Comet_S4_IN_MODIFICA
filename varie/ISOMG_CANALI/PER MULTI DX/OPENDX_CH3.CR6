@@ -1,0 +1,19 @@
+
+{---------------------------------- APERTURA MORSE DX -------------------------
+
+N10 $M297                       {disattiva chiusura in alta forza morsa 13
+N11 $M298                       {disattiva chiusura in alta forza morsa 14
+N12 $M299                       {disattiva chiusura in alta forza morsa 15
+N13 $M300                       {disattiva chiusura in alta forza morsa 16
+N14 $M301                       {disattiva chiusura in alta forza morsa 17
+N15 $M302                       {disattiva chiusura in alta forza morsa 18
+
+N20  IF (R509>0.5) JMP [FINE]	{gestione morse da operatore
+N25  IF (R520>0.5) JMP [FINE]   {apertura morse disabilitata da param.profilo
+
+N30  R639=0                     {memoria morse da aprire DX
+N40  $M244                      {apertura totale morse DX
+
+[FINE]
+N50  RET
+

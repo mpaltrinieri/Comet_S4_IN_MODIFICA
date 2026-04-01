@@ -1,0 +1,73 @@
+{***********************************************************************************}
+{***** RICALCOLO LA TRASLAZIONE DOVUTA A LUNGHEZZA UTENSILE E OFFSET MANDRINO ******}
+{***** VALORI DA SOTTRARRE ALLA QUOTA ASSOLUTA LETTA IN TASTATURA OBLIQUA **********}
+{***********************************************************************************}
+{R3171 = componente X del punto teorico di tastatura nel sistema ruotato e traslato}
+{R3172 = componente Y del punto teorico di tastatura nel sistema ruotato e traslato}
+{R3173 = componente Z del punto teorico di tastatura nel sistema ruotato e traslato}
+
+{R3164: Appoggio calcolo traslazione X dovuta a Offset mandrino e lunghezza utensile in tastatura obliqua}
+{R3165: Appoggio calcolo traslazione Y dovuta a Offset mandrino e lunghezza utensile in tastatura obliqua}
+{R3166: Appoggio calcolo traslazione Z dovuta a Offset mandrino e lunghezza utensile in tastatura obliqua}
+
+{PARAMETRI IN INGRESSO}
+{POSIZIONE COMANDATA ASSE A R213: appoggiata su R689 ed event. modificata in POS_AXES.CS4}
+{POSIZIONE COMANDATA ASSE C R214: appoggiata su R699 ed event. modificata in POS_AXES.CS4}
+
+N50  R216=ATN(R763/(R764+R619))  {calcolo angolo generato asse A}
+N60  R217=(R764+R619)/COS(R216)  {calcolo ipotenusa generata asse A}
+
+N200 R218=R217*COS(R689+R216)                  {raggio generato da asse A}     
+N210 R3166=(R217*SIN(R689+R216))               {traslazione asse Z}
+N220 R219=ATN(R765/(R218-R819))                {angolo generato asse C}  
+N230 R215=(R218-R819)/COS(R219)                {calcolo ipotenusa generata da C} 
+N240 R3165=(R215*SIN(R219-R699))               {traslazione asse Y}
+N250 R3164=0-(R215*COS(R219-R699))             {traslazione asse X}
+
+{ ************************* INVERSA DELLA MATRICE DI ROTAZIONA DRTZYX ***********************************
+{ ************************ CON SEQUENZA ASSI <DMX:X;Y;Z> ************************************************
+{                |                                                                                       |
+{                | COS(AN2) COS(AN3)           -COS(ANR) SIN(AN3)+             SIN(ANR) SIN(AN3)+        |
+{                |                              SIN(ANR) SIN(AN2) COS(AN3)     COS(ANR) SIN(AN2) COS(AN3)|
+{                |                                                                                       |
+{ (DRZXY)^(-1) = | COS(AN2) SIN(AN3)            COS(ANR) COS(AN3)+            -SIN(ANR) COS(AN3)+        |
+{                |                              SIN(ANR) SIN(AN2) SIN(AN3)     COS(ANR) SIN(AN2) SIN(AN3)|
+{                |                                                                                       |
+{                | -SIN(AN2)                    SIN(ANR) COS(AN2)              COS(ANR) COS(AN2)         |
+{                |                                                                                       |
+{                |                                                                                       |
+{
+{  A TALE MATRICE DOPO DEVE ESSERE APPLICATA L'INVERSA DELLA MATRICE DI ROTAZIONE INTORNO A Z DI R309
+{
+{             | COS(R309)  -SIN(R309)  0|
+{ (Rz)^(-1) = | SIN(R309)   COS(R309)  0|
+{             | 0           0          1|
+
+{***** LE COORDINATE DEL PUNTO DI INIZIO TASTATURA NEL NUOVO SISTEMA RUOTATO EQUIVALGONO ALLE SEGUENTI NEL VECCHIO SISTEMA ****}
+{    [x,y,z] = (DRZXY)^(-1) *(Rz)^(-1) * [x',y',z']
+{    [x',y',z'] = [R3171, R3172, R3173]
+{***********************************************************************************************
+
+N510   R4541=R4542=R4543=R4544=R4545=R4546=R4547=R4548=R4549=R4551=R4552=R4553=0 {reset variabili di appoggio}
+
+N520   R4541=( COS(R3168)*COS(R3169)*COS(R309)+SIN(R309)*(SIN(R3167)*SIN(R3168)*COS(R3169)-COS(R3167)*SIN(R3169)) )*R3171
+N521   R4542=( -COS(R3168)*COS(R3169)*SIN(R309)+COS(R309)*(SIN(R3167)*SIN(R3168)*COS(R3169)-COS(R3167)*SIN(R3169)) )*R3172
+N522   R4543=( COS(R3167)*SIN(R3168)*COS(R3169)+SIN(R3167)*SIN(R3169))*R3173
+
+N530   R4544=( COS(R3168)*SIN(R3169)*COS(R309)+SIN(R309)*(COS(R3167)*COS(R3169)+SIN(R3167)*SIN(R3168)*SIN(R3169)) )*R3171
+N531   R4545=( -COS(R3168)*SIN(R3169)*SIN(R309)+COS(R309)*(COS(R3167)*COS(R3169)+SIN(R3167)*SIN(R3168)*SIN(R3169)) )*R3172
+N532   R4546=( COS(R3167)*SIN(R3168)*SIN(R3169)-SIN(R3167)*COS(R3169))*R3173
+
+N540   R4547=( -SIN(R3168)*COS(R309)+SIN(R3167)*COS(R3168)*SIN(R309) )*R3171
+N541   R4548=( SIN(R3168)*SIN(R309)+SIN(R3167)*COS(R3168)*COS(R309) )*R3172
+N542   R4549=( COS(R3167)*COS(R3168) )*R3173
+
+N550   R4551=R4541+R4542+R4543     {componente X del punto teorico di tastatura nel sistema non ruotato}
+N551   R4552=R4544+R4545+R4546     {componente Y del punto teorico di tastatura nel sistema non ruotato}
+N552   R4553=R4547+R4548+R4549     {componente Z del punto teorico di tastatura nel sistema non ruotato}
+
+N600   R3164=R3164+R4551  {traslazione X dovuta a Offset mandrino e lunghezza utensile e punto teorico di tastatura se non (0,0,0)
+N610   R3165=R3165+R4552  {traslazione X dovuta a Offset mandrino e lunghezza utensile e punto teorico di tastatura se non (0,0,0)
+N630   R3166=R3166+R4553  {traslazione X dovuta a Offset mandrino e lunghezza utensile e punto teorico di tastatura se non (0,0,0)
+
+N1000 RET

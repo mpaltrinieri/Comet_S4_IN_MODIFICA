@@ -1,0 +1,81 @@
+{***** MUOVI MORSE MOTORIZZATE *****}
+
+N10 $M00  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+N20 $M02  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+
+{asse A = morsa numero 10}
+{asse B = morsa numero 11}
+{asse C = morsa numero 12}
+{asse U = morsa numero 13}
+{asse V = morsa numero 14}
+{asse P = morsa numero 15}
+
+{R700 = morsa motorizzata presente}
+
+{R5926 = MORSA MASTER 
+{R5923 = Array morse associate al pezzo da spostare (morse dalla 10 alla 12)}
+{R5924 = Array morse associate al pezzo da spostare (morse dalla 13 alla 15)}
+
+{R4500 = appoggio indici assi morse slave nel canale (morse fino alla 12)}
+{R4510 = appoggio indici assi morse slave nel canale (morse dalla 13)}
+{R4501 = appoggio indice asse morsa master}
+{R4521 = appoggio quota asse morsa master}
+{R4522 = settata a 1 indica se la morsa master appartiene a questo canale (serve solo su CR6)}
+
+{R2310-R2315 = errore di inseguimento morse dalla 10 alla 15}
+{R2340-R2345 = forzatura abilitazione morse dalla 10 alla 15}
+
+{Gli assi slave vanno settati indipendenti prima di agganciarli in gantry}
+
+N50  L <SNGCNT_CH2.CS4>
+
+N80  R4500=R4501=R4521=R4522=R4510=0
+N100 R4550=R4551=R4552=R4553=R4554=R4555=0
+N120 R2340=R2341=R2342=R2343=R2344=R2345=0
+
+N200 R4500=R5923
+N240 IF(R5926 == 10) R4500=R4500-1*(2**9)  R4501=0 R4521=R543 R4522=1
+N250 IF(R5926 == 11) R4500=R4500-1*(2**10) R4501=1 R4521=R544 R4522=1
+N260 IF(R5926 == 12) R4500=R4500-1*(2**11) R4501=2 R4521=R545 R4522=1
+
+N265 R4510=R5924
+N270 IF(R5926 == 13) R4510=R4510-1*(2**0)  R4501=3 R4521=R546 R4522=1
+N280 IF(R5926 == 14) R4510=R4510-1*(2**1)  R4501=4 R4521=R547 R4522=1
+N290 IF(R5926 == 15) R4510=R4510-1*(2**2)  R4501=5 R4521=R548 R4522=1
+
+
+N340 IF((FTL(R5923) & '0200')>0.5) R2340=1   {Asse morsa 10 da forzare l'abilitazione
+N341 IF((FTL(R5923) & '0400')>0.5) R2341=1   {Asse morsa 11 da forzare l'abilitazione
+N342 IF((FTL(R5923) & '0800')>0.5) R2342=1   {Asse morsa 12 da forzare l'abilitazione
+N351 IF((FTL(R5924) & '0001')>0.5) R2343=1   {Asse morsa 13 da forzare l'abilitazione
+N352 IF((FTL(R5924) & '0002')>0.5) R2344=1   {Asse morsa 14 da forzare l'abilitazione
+N353 IF((FTL(R5924) & '0004')>0.5) R2345=1   {Asse morsa 15 da forzare l'abilitazione
+
+N400 L <WAIT_CH0_CH2.CS4>
+
+N700 $M210          {forza abilitazione morse di SX e DX indicizzata (del trenino): per azzerare l'errore di inseguimento}
+N710 L <SNGCNT_CH2.CS4>
+
+N720 $M108   {aggancia le morse in gantry}
+N735 $M105   {verifica gli indici delle morse agganciate in gantry}
+
+N740 IF((FTL(R5923) & '0200')>0.5) R4550=R2310    {appoggio errore di inseguimento morsa 10 per verificare che sia andato praticamente a zero
+N751 IF((FTL(R5923) & '0400')>0.5) R4551=R2311    {appoggio errore di inseguimento morsa 11 per verificare che sia andato praticamente a zero
+N752 IF((FTL(R5923) & '0800')>0.5) R4552=R2312    {appoggio errore di inseguimento morsa 12 per verificare che sia andato praticamente a zero
+
+N761 IF((FTL(R5924) & '0001')>0.5) R4553=R2313    {appoggio errore di inseguimento morsa 13 per verificare che sia andato praticamente a zero
+N762 IF((FTL(R5924) & '0002')>0.5) R4554=R2314    {appoggio errore di inseguimento morsa 14 per verificare che sia andato praticamente a zero
+N763 IF((FTL(R5924) & '0004')>0.5) R4555=R2315    {appoggio errore di inseguimento morsa 15 per verificare che sia andato praticamente a zero
+N780 L <SNGCNT_CH2.CS4>
+
+{Posiziona morsa master (e le altre agganciate in gantry)
+N800 FF(FTI(R4501)) (R721)
+N805 G90 G315(FTI(R4501)) (R4521)
+N810 G304 FRE
+N815 $M211           {reset forzatura abilitazione morse di SX e DX (del trenino)}
+
+N910 $M109   {sgancia le morse agganciate in gantry}
+
+N2500 L <SNGCNT_CH2.CS4>
+N2600 R6870=4        {libera l'attesa sul CH0 dal CH2}
+N5000 RET

@@ -1,0 +1,11 @@
+
+{----------------------- ROTAZIONE MANDRINO IN MANUALE ---------------------}
+
+
+[ROTMAND]
+N10  $M71						{ciclo rotazione mandrino in corso
+N20  IF (R640==1) $M03 S4000	{comando rotazione oraria     mandrino  (puls.A)
+N30  IF (R640==2) $M04 S4000	{comando rotazione antioraria mandrino  (puls.B)
+N40  JMP [ROTMAND]				{continua fino a che non molla il pulsante
+
+N50  M02

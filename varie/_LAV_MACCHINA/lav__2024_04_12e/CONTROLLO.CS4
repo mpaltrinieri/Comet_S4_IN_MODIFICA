@@ -1,0 +1,18 @@
+
+
+{-------------------- Operazioni di Controllo sulle posizioni morse ---------------------}
+
+{--------- Questa SR viene chiamata nell'ISOMG in ERGONOMICO e dopo la INITERGO ---------}
+
+
+N100 $M154			{Controllo se le morse sono in posizione a scanso d'errori
+
+
+
+
+[FINE]
+N1000 RET
+
+
+
+

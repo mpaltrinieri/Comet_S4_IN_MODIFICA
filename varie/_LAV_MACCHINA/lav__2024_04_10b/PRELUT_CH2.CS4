@@ -1,0 +1,26 @@
+{CICLO PRELIEVO UTENSILE IN MANUALE}
+
+N277   R6865=0+0+0                                      {sincronizza canale 0,1}
+N278   L <SYNCNC1_CH2.CS4>                              {Sincronizzazione livello 1 ***************************}
+
+
+{[NOMOV_P]
+
+{[FUOING]
+
+[NOFUOING]
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////}
+
+{prelievo utensile}
+
+
+{[FILA_SUP]
+
+{[FILA_INF]
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////}
+
+{[FINE]
+N5030  $M02
+N5040  RET

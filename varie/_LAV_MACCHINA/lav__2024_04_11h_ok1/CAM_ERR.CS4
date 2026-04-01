@@ -1,0 +1,16 @@
+{*********** SOTTOPROGRAMMA DI CALCOLO ERRORE POSIZIONE MORSA MASTER IN MOVPIECE.CS4: *********}
+{*********** VIENE RICHIAMATO PER PROGRAMMI IN ISO DRILL_CAMAELON ******************************}
+
+{R1146 = numero morsa master generica scritta da CAMAELON
+{R5926 = numero morsa master reale
+{R1571-R1594 = errore di posizionamento residuo morsa master
+{R1541-R1564 = errore di posizionamento residuo morsa master per Camaelon
+
+N100  IF((FTL(R701)&'40000') < 0.5) JMP [FINE]    {macchina non in ISO} 
+N110  IF(R5960 < 0.5) JMP [FINE]                  {macchina in ISO ma non con nuova gestione DRILL_CAMAELON}
+
+N200 L SNGCNT.CS4
+N210 R(1541+FTI(R1146-1))=R(1571+FTI(R5926-1))
+
+[FINE]
+N1000 RET

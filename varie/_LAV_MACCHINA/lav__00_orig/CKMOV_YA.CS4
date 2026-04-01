@@ -1,0 +1,23 @@
+
+{----- VERIFICA NECESSITA' DI MOVIMENTARE l'asse Y e gli assi A e C (se non serve non chiudo i ripari) -----}
+
+N10 IF (R627 > (R400+0.01)) JMP [MOVE]
+N20 IF (R627 < (R400-0.01)) JMP [MOVE]
+
+N30 IF (R624 < (90-0.01)) JMP [MOVE]
+N40 IF (R624 > (90+0.01)) JMP [MOVE]
+
+N50 IF (R625 < (180-0.01)) JMP [MOVE]
+N60 IF (R625 > (180+0.01)) JMP [MOVE]
+
+N70  JMP [FINE]
+
+[MOVE]
+N40  $M59					{chiusura riparo anteriore
+
+N1550 G0 G53 Y=R400 
+N1560 G0 G53 A=90 C=180
+
+[FINE]
+N2000  L SNGCNT.CS4
+N2010  RET

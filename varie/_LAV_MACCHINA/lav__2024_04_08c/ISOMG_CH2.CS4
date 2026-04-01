@@ -1,0 +1,67 @@
+{*** ISOMG_CH2: iso del canale posizionamento morse ***}
+{R6970 = causale scritta da ISOMG del canale CH0 all'interno dei singoli part-program}
+{R6972 = copia della causale dal canale CH0 al canale CH2}
+{R6970 deve essere resettata nel RES_CAUSALE_MC.CS4 del canale principale}
+{R6970 = 5   causale per eseguire il riferimento assi}
+{R6970 = 10  causale per eseguire il cambio utensili}
+{R6970 = 20  causale per eseguire il posizionamento morse a SX, da GO TODX.CS4}
+{R6970 = 30  causale per eseguire il posizionamento morse a DX, da GO TOSX.CS4}
+{R6970 = 40  causale per posizionamento morse in multipezzo con P e H, da OLD POSM_PH.CS4}
+{R6970 = 50  causale per posizionamento morse motorizzate in singolo / multipezzo}
+{R6970 = 60  causale per posizionamento morse in MOVPIECE.CS4 in singolo / multipezzo}
+{R6970 = 70  causale per posizionamento morse in MOVPIECE.CS4 in pendolare a SX : NON USATO}
+{R6970 = 80  causale per posizionamento morse in MOVPIECE.CS4 in pendolare a DX : NON USATO}
+{R6970 = 100  causale per riposizionamento morse motorizzate dopo tagli di separazione in singolo / multipezzo}
+{R6970 = 110  causale per riposizionamento morse motorizzate dopo tagli di separazione in pendolare a SX : NON USATO}
+{R6970 = 120  causale per riposizionamento morse motorizzate dopo tagli di separazione in pendolare a DX : NON USATO}
+{R6970 = 9999  causale per eseguire uscita dagli iso}
+
+N100 R6972=0                              {reset iniziale copia causale da CH0 a CH2}
+
+[RIFASSI]
+N10  L <SNGCNT_CH2.CS4>
+N100 R4452=R4452+1                        {contatore di debug
+N110 L <RIFASSI_CH2.CS4>
+N120 JMP [WAIT_END_CAUSALE]
+
+[CAMBUT]
+N210 L <SNGCNT_CH2.CS4>
+N220 JMP [WAIT_END_CAUSALE]
+
+[POSM_MOT]
+N910 L <MOVEMORS_CH2.CS4>
+N920 JMP [WAIT_END_CAUSALE]
+
+[MOVPIECE_SINGOLO]
+N1110 L <MOVPIECE_CH2.CS4>
+N1120 JMP [WAIT_END_CAUSALE]
+
+[RIP_MOT_SINGOLO]
+N1410 L <RIPOS_MOT_SING_CH2.CS4>
+N1420 JMP [WAIT_END_CAUSALE]
+
+[WAIT_CAUSALE]
+N5000 R6972=R6970                         {copia causale da CH0 a CH2}
+N5010 L <SNGCNT_CH2.CS4>
+N5020 IF(R6972==5)  JMP [RIFASSI]
+N5030 IF(R6972==10) JMP [CAMBUT]
+N5070 IF(R6972==50) JMP [POSM_MOT]
+N5080 IF(R6972==60) JMP [MOVPIECE_SINGOLO]
+N5110 IF(R6972==100) JMP [RIP_MOT_SINGOLO]
+N5190 IF(R6972==9999) JMP [FINE]
+N5200 L <SNGCNT_CH2.CS4>
+N5210 G4 F0.1
+N5220 JMP [WAIT_CAUSALE]
+
+[WAIT_END_CAUSALE]
+N6000 L <SNGCNT_CH2.CS4>
+N6010 R6972=0                             {reset copia causale da CH0 a CH2}
+N6020 L <SNGCNT_CH2.CS4>
+N6030 IF(R6970<0.5) JMP [WAIT_CAUSALE]
+N6100 L <SNGCNT_CH2.CS4>
+N6110 G4 F0.1
+N6120 JMP [WAIT_END_CAUSALE]
+
+[FINE]
+N10000 $M02
+N10010 RET

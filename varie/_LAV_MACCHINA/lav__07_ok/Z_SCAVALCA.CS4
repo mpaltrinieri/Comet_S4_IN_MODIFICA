@@ -1,0 +1,65 @@
+{***** APPLICA LA QUOTA DI SCAVALCAMENTO R6116 OPPURE LA R_ZOUT=R254 *****}
+
+{R7989 = Abilita scavalcamento morse ottimizzato (serve versione HDRILL che anticipa R330 della lavorazione successiva in R5007)
+{R345 = finecorsa positivo asse X}
+{R346 = finecorsa negativo asse X}
+{R348 = finecorsa negativo asse Y}
+{R7182 = Quota asse Y fuori ingombro magazzino utensili}
+{R5002 = Posizione asse A prossima lavorazione}
+{R5003 = Posizione asse C prossima lavorazione}
+{R5004 = Posizione asse X prossima lavorazione}
+{R5005 = Posizione asse Y prossima lavorazione}
+{R5006 = Posizione asse Z prossima lavorazione}
+{R5007 = anticipo quota di approccio R330 prossima lavorazione}
+{R6116 = quota calcolata di scavalcamento morse in centro di rotazione struttura mandrino}
+{(V6003/0)= posizione attuale asse X}
+{(V6003/1)= posizione attuale asse Y}
+{(V6003/3) = posizione attuale asse A}
+{(V6003/4) = posizione attuale asse C}
+
+N100 IF(R7989<0.5) JMP [MOV_Z_SCAVAL]   {scavalcamento non ottimizzato: serve HDRILL che anticipa la R330 in R5007
+
+N110 IF((V6003/3)<=90) R4510=(V6003/3)
+N120 IF((V6003/3)>90)  R4510=(180-(V6003/3))
+
+{******** DEVO CALCOLARE LA POSIZIONE ATTUALE DELLA PUNTA UTENSILE: }
+{******** CALCOLO LA TRASLAZIONE DOVUTA AGLI OFFSET MANDRINO E UTENSILE CON LE POSIZIONI ATTUALI DI A E C *****}
+N1905 R216=ATN(R763/(R764+R619))  {calcolo angolo generato asse A}
+N1910 R217=(R764+R619)/COS(R216)  {calcolo ipotenusa generata asse A}
+
+N1920 R218=R217*COS(R4510+R216)             {raggio generato da asse A}     
+N1930 R3166=(R217*SIN(R4510+R216))          {traslazione asse Z}
+N1940 R219=ATN(R765/(R218-R819))                {angolo generato asse C}  
+N1950 R215=(R218-R819)/COS(R219)                {calcolo ipotenusa generata da C} 
+N1960 R3165=(R215*SIN(R219-(V6003/4)))          {traslazione asse Y}
+N1970 R3164=0-(R215*COS(R219-(V6003/4)))        {traslazione asse X}
+{********************************************************************************}
+{R6091= Diagonale calcolata usando gli offset mandrino e lunghezza utensile}
+{((V6003/0)-R3164) --> posizione attuale della punta utensile in X}
+{((V6003/1)-R3165) --> posizione attuale della punta utensile in Y}
+{R5004 = posizione richiesta per la punta utensile in X}
+{R5005 = posizione richiesta per la punta utensile in Y, il suo segno va invertito}
+
+N2000 IF((((V6003/0)-R3164)-R6091)<(R346+15))    JMP [MOVE_Z_OUT]  {X vicino al fcsw-
+N2010 IF((((V6003/0)-R3164)+R6091)>(R345-15))    JMP [MOVE_Z_OUT]  {X vicino al fcsw+
+N2020 IF((R5004-R5007-R6091)<(R346+15))          JMP [MOVE_Z_OUT]  {X vicino al fcsw-
+N2030 IF((R5004+R5007+R6091)>(R345-15))          JMP [MOVE_Z_OUT]  {X vicino al fcsw+
+N2080 IF( (((V6003/1)-R3165)-R6091)<(R348+15))   JMP [MOVE_Z_OUT]  {Y vicino al fcsw-
+N2085 IF( (((V6003/1)-R3165)+R6091)>(R7182-15))  JMP [MOVE_Z_OUT]  {Y vicino al Y.mag
+N2090 IF( (0-R5005-R5007-R6091)<(R348+15))       JMP [MOVE_Z_OUT]  {Y vicino al fcsw-
+N2095 IF( (0-R5005+R5007+R6091)>(R7182-15))      JMP [MOVE_Z_OUT]  {Y vicino al Y.mag
+N2100 JMP [MOV_Z_SCAVAL]
+
+[MOVE_Z_OUT]
+N2200 IF(R204<0.5) R400=R254        {Z out calcolata con utensile diretto}
+N2205 IF(R204>0.5) R400=R6267       {Appoggio Z out calcolata con utensile testina}
+N2210 IF(R6116>R400) R400=R6116     {tra R6116 e R254 mando Z a quella piu' grande}
+N2220 IF((V6003/2)<R400) G0 G53 Z=R400   {porta asse Z fuori ingombro}
+N2230 JMP [FINE]
+
+[MOV_Z_SCAVAL]
+N2500 G0 G53 Z=R6116                {posizione a cui deve andare Z come centro di rotazione}   
+N2510 JMP [FINE]
+
+[FINE]
+N3000 RET

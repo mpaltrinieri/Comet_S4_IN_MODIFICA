@@ -1,0 +1,16 @@
+
+{------- Azzero Presenza Utensile da memoria CN se tolgono l'utensile a mano -------}
+
+
+N10	$M06 T0
+N20	R618=0
+
+
+
+
+
+N30 RET
+
+
+
+

@@ -1,0 +1,283 @@
+
+{ARCO}
+
+
+{variabili utilizzate:}
+{R620: raggio utensile utilizzato}
+{R300: raggio interno}
+{R301: angolo estensione}
+{R302: larghezza}
+{R309: angolo rotazione figura}
+{R310: velocita di sfondamento}
+{R311: velocita di lavorazione}
+{R320: 0=normale 1=svuotamento}
+{R321: 0=normale 1=elicoidale}
+{R322: 0=orario 1=antiorario}
+{R323: 0=normale 1=veloce}
+{R324: numero step}
+{R330: quota di fuori ingombro per Z}
+{R331: quota di approccio pezzo per Z}
+{R332: quota di fine lavoro per Z}
+
+N1     R697=R330
+
+N10    {calcolo valori per posizionamento}
+       R400 = R302/2                  {larghezza/2}
+       R401 = R400-R620               {larghezza/2 - raggio utensile}
+       R402 = R401-R620               {inizio cerchio attacco in tangenza}
+       R403 = R402-R620               {posizionamento per sfondamento}
+       R404 = R403-R620               {punto di arrivo per uscita in tangenza}
+       R405 = R300+R400               {centro asola punto iniziale}
+       R406 = R400+R300+R400
+       R407 = R401+R300+R400
+       R408 = R402+R300+R400
+       R409 = R403+R300+R400
+       R410 = R404+R300+R400
+       R411 = R405*COS(R301)          {X centro fine asola}
+       R412 = R405*SIN(R301)          {Y centro fine asola}
+       R413 = R300*COS(R301)          {X fine cerchio interno}
+       R414 = R300*SIN(R301)          {Y fine cerchio interno}
+       R415 = R406*COS(R301)          {X fine cerchio esterno}
+       R416 = R406*SIN(R301)          {Y fine cerchio esterno}
+
+       R418 = (R331-R332)/R324 {sfondamento per ogni step}
+       R419 = R331             {appoggio quota inizio lavorazione}
+
+       <IFF <R401>: N100; N200; N300>
+
+N100   {diametro utensile > larghezza arco: errore}
+
+
+N200   {diametro utensile = larghezza arco}
+       R629 = R405
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R405 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+  N210 L <SNGCNT.CS4>
+       R419=R419-R418
+       IF (R419+R418-R331) N215
+       JMP N216
+  N215 G2 F10000 X=R405 Y0 I0 J0
+  N216 M7 G1 F=R310 Z=R419
+  N220 G3 F=R311 X=R411 Y=R412 I0 J0
+  N230 RPT N210 N220;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+N300   {confronto tra 3 X raggio utensile e larghezza/2}
+       <IFF <R403>: N1100; N1100; N1200>
+
+N1100  {larghezza/2 =< 3 X raggio utensile}
+       R408 = ((R400-R620)/2)+R300+R400
+       R409 = R300+R400
+       R410 = -R620+R300+R400
+       JMP [TEST_SVU]
+
+N1200  {larghezza/2 > 3 X raggio utensile}
+
+[TEST_SVU]
+       IF (R320) [SVUOTAM]
+
+{test esecuzione elicoidale}
+       IF (R321) [ELICOID]
+
+{test esecuzione oraria}
+       IF (R322) [NS_NE_AN]
+
+{test esecuzione veloce}
+       IF (R323) [FAST_OR]
+
+       {esecuzione figura non in svuotamento, non elicoidale, verso orario, attacco in tangenza}
+       R629 = R409
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R409 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2010 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G1 F=R310 Z=R419
+       G42 X=R410 Y0 F=R311
+       G2 X=R406 Y0 I=R408 J0
+       G2 X=R300 Y0 I=R405 J0
+       G3 X=R413 Y=R414 I0 J0
+       G2 X=R415 Y=R416 I=R411 J=R412
+       G2 X=R406 Y0 I0 J0
+       G2 X=R410 Y0 I=R408 J0
+ N2020 G1 G40 X=R409 Y0
+ N2030 RPT N2010 N2020;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+       [FAST_OR]
+       {esecuzione figura non in svuotamento, non elicoidale, verso orario, modo veloce}
+       R629 = R407
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R407 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2110 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G1 F=R310 Z=R419
+       G42 X=R406 Y0 F=R311
+       G2 X=R300 Y0 I=R405 J0
+       G3 X=R413 Y=R414 I0 J0
+       G2 X=R415 Y=R416 I=R411 J=R412
+       G2 X=R406 Y0 I0 J0
+ N2120 G1 G40 X=R407 Y0
+ N2130 RPT N2110 N2120;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+[NS_NE_AN]
+{test esecuzione veloce}
+       IF (R323) [FAST_AN]
+
+       {esecuzione figura non in svuotamento, non elicoidale, verso antiorario, attacco in tangenza}
+       R629 = R409
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R409 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2210 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G1 F=R310 Z=R419
+       G41 X=R410 Y0 F=R311
+       G3 X=R406 Y0 I=R408 J0
+       G3 X=R415 Y=R416 I0 J0
+       G3 X=R413 Y=R414 I=R411 J=R412
+       G2 X=R300 Y0 I0 J0
+       G3 X=R406 Y0 I=R405 J0
+       G3 X=R410 Y0 I=R408 J0
+ N2220 G1 G40 X=R409 Y0
+ N2230 RPT N2210 N2220;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+       [FAST_AN]
+       {esecuzione figura non in svuotamento, non elicoidale, verso antiorario, attacco in tangenza}
+       R629 = R407
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R407 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2310 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G1 F=R310 Z=R419
+       G41 X=R406 Y0 F=R311
+       G3 X=R415 Y=R416 I0 J0
+       G3 X=R413 Y=R414 I=R411 J=R412
+       G2 X=R300 Y0 I0 J0
+       G3 X=R406 Y0 I=R405 J0
+ N2320 G1 G40 X=R407 Y0
+ N2330 RPT N2310 N2320;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+[ELICOID]
+{test esecuzione oraria}
+       IF (R322) [NS_EL_AN]
+
+       {esecuzione figura non in svuotamento, elicoidale, verso orario}
+       R629 = R407
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R407 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2410 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G2 F=R311 X=R407 Y0 Z=R419 I=R405 J0 e1
+       G1 G42 X=R406 Y0 F=R311
+       G2 X=R300 Y0 I=R405 J0
+       G3 X=R413 Y=R414 I0 J0
+       G2 X=R415 Y=R416 I=R411 J=R412
+       G2 X=R406 Y0 I0 J0
+ N2420 G1 G40 X=R407 Y0
+ N2430 RPT N2410 N2420;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+[NS_EL_AN]
+       {esecuzione figura non in svuotamento, elicoidale, verso antiorario}
+       R629 = R407
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R407 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2510 L <SNGCNT.CS4>
+       R419=R419-R418
+       M7 G3 F=R311 X=R407 Y0 Z=R419 I=R405 J0 e1
+       G1 G41 X=R406 Y0 F=R311
+       G3 X=R415 Y=R416 I0 J0
+       G3 X=R413 Y=R414 I=R411 J=R412
+       G2 X=R300 Y0 I0 J0
+       G3 X=R406 Y0 I=R405 J0
+ N2520 G1 G40 X=R407 Y0
+ N2530 RPT N2510 N2520;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+
+[SVUOTAM]
+{test esecuzione oraria}
+       IF (R322) [SV_NE_AN]
+       {esecuzione figura in svuotamento, non elicoidale, verso orario}
+       R629 = R405
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R405 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2610 L <SNGCNT.CS4>
+       R419=R419-R418
+       G0 X=R405 Y0
+       M7 G1 F=R310 Z=R419
+       F=R311
+ N2620 G1 G40 X=R405 Y0
+ N2630 RPT N2610 N2620;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+
+[SV_NE_AN]
+       {esecuzione figura in svuotamento, non elicoidale, verso antiorario}
+       R629 = R405
+       R630 = 0
+       L<POS_AXES.CS4>
+
+       G0 X=R405 Y0 Z=R330
+       L ASP2.CS4
+       Z=R331
+       L<SLOWACC.CS4>
+ N2710 L <SNGCNT.CS4>
+       R419=R419-R418
+       G0 X=R405 Y0
+       M7 G1 F=R310 Z=R419
+       F=R311
+ N2720 G1 G40 X=R405 Y0
+ N2730 RPT N2710 N2720;(FTI(R324-1))
+       L<FASTACC.CS4>
+       <RET>
+

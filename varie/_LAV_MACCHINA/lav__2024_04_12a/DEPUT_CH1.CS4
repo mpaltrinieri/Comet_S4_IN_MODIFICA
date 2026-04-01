@@ -1,0 +1,41 @@
+{CICLO DEPOSITO UTENSILE IN MANUALE}
+
+N272   L <WAIT_W_AVAILABLE_CH1.CS4> 
+
+N277   R6865=1+2+0                                      {sincronizza canale 0,1}
+N278   L <SYNCNC1_CH1.CS4>                              {Sincronizzazione livello 1 ***************************}
+
+
+
+[NOFUOING]
+N430   L MOVIND_W_CH1.CS4                              {muove W a quota di verifica utensile}
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////}
+
+{deposito utensile}
+N500   L WAIT_W_CH1.CS4                                {attesa fine movimento asse W indipendente}
+
+N540   L MOVIND_W_CH1.CS4                              {muove W a quota di cambio utensile}
+
+N1000  IF(R610>R6501) JMP [FILA_SUP]
+N1010  IF(R610<R6501) JMP [FILA_INF]
+
+[FILA_SUP]
+N2000  L WAIT_W_CH1.CS4                                {attesa fine movimento asse indipendente}
+N2100  L MOVIND_W_CH1.CS4                              {muove W al finecorsa negativo}
+
+N2150  L WAIT_W_CH1.CS4                                {attesa fine movimento asse indipendente}
+N2160  JMP [FINE]
+
+[FILA_INF]
+N3020  L WAIT_W_CH1.CS4                                {attesa fine movimento asse indipendente}
+N3120  L MOVIND_W_CH1.CS4                              {muove W al finecorsa negativo}
+
+N3170  L WAIT_W_CH1.CS4                                {attesa fine movimento asse indipendente}
+N3180  JMP [FINE]
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////}
+
+[FINE]
+N5030  $M02
+N5040  RET

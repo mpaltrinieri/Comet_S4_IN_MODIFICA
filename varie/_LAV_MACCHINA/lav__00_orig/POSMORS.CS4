@@ -1,0 +1,22 @@
+{-----------------------------------------------------------------------------------------------------------}
+{ Gestisce posizionamenti morse nelle varie configurazioni di Comet S4 in SINGOLO/MULTIPEZZO                }
+{-----------------------------------------------------------------------------------------------------------}
+
+
+{******************************* ATTENZIONE ***********************************}
+{******** Non usare i parametri R400-R404 : riservati alla MOVEMORS.CS4 *******}
+{                   Ovviamente solo per le morse motorizzate                   }
+{******************************************************************************}
+
+
+N10 IF(R509 > 0.5) JMP [FINE]         {gestione morse da operatore
+
+N50 IF(R674 < 0.5)  L<POSM_X.CS4>     {con asse X  (singolo / multipezzo )
+
+N60 IF(R674 > 0.5)  L<POSM_MOT.CS4>   {con morse motorizzate (singolo / multipezzo)
+
+
+[FINE]
+N2000  L SNGCNT.CS4
+N2010  RET
+

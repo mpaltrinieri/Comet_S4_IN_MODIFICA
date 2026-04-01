@@ -1,0 +1,84 @@
+	(RAS = 0)		{ NO Righe HEIDENHAIN
+	(MRK = 1)		{ Per default marca presente
+	JMP [INIZIO]		{ Salta a inizio programma
+{--------------------------------------------------------------
+	{ Routine ce esegue il SET dell' asse indicato in R111
+[SETAS] IF ( R111 == 99 ) RET
+	G312 ON (FTI(R111))
+	(DMV=0)			{ Reset quota default per ricerca micro
+
+	L SETAL."111
+N1	IF (RAS) N10		{Se righe assolutizzate N10
+	L SETGEN.CS4
+
+N5	G312 OFF (FTI(R111))
+	(FAT = FAT + 1)
+	RETURN
+
+N10	L SETABS
+N15	JMP N5
+
+{--------------------------------------------------------------
+	
+
+        { NSA = R110 : FAT =  contatore 	}
+[INIZIO]IF ( NSA < 0 ) N100
+N20	(R111 = NSA )
+	(FAT = 0)
+	GOSUB [SETAS]
+	RETURN
+
+{ set ordine esecuzione set assi	}
+N100 	L SETORD
+
+	(FAT = 0)
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N101 	(R111 = SE1 )
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N102 	(R111 = SE2)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N103	(R111 = SE3)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N104	(R111 = SE4)
+	GOSUB [SETAS]
+	
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N105	(R111 = SE5)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N106	(R111 = SE6)
+	GOSUB [SETAS]
+	
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N107	(R111 = SE7)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N108	(R111 = SE8)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N109	(R111 = SE9)
+	GOSUB [SETAS]
+
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N110	(R111 = SS0)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N111	(R111 = SS1)
+	GOSUB [SETAS]
+
+	IF ( (NSA + FAT ) >= 0 ) RETURN
+N112	(R111 = SS2)
+	GOSUB [SETAS]
+	RETURN

@@ -1,0 +1,32 @@
+{SOSTA PROGRAMMATA}
+
+{variabili utilizzate:}
+{R620: raggio utensile utilizzato}
+{R310: velocita di sfondamento}
+{R311: velocita di lavorazione}
+{R324: numero step}
+{R330: quota di fuori ingombro per Z}
+{R331: quota di approccio pezzo per Z}
+{R332: quota di fine lavoro per Z}
+
+{R400: primo parametro libero}
+{R419: ultimo parametro libero}
+
+
+N1    R629 = 0
+N2    R630 = 0
+N3    L<POS_AXES.CS4>
+
+N10   G0 X0 Y0 Z=R330
+
+{inizio percorso utensile}
+
+N100  S0
+N110  R687=-1                      {per memoria senso di rotazione mandrino in posax_ta e posax_ts}
+N120  R688=-1                      {per memoria velocita di rotazione mandrino in posax_ta e posax_ts}
+
+N110  M0
+
+{fine percorso utensile}
+
+N1010 RET

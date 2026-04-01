@@ -1,0 +1,33 @@
+{***** MUOVI MORSE MOTORIZZATE DI ZONA DX *****}
+{A = asse morsa numero 18}
+{B = asse morsa numero 17}
+{C = asse morsa numero 16}
+{U = asse morsa numero 15}
+{V = asse morsa numero 14}
+{H = asse morsa numero 13}
+{R700 = morsa motorizzata presente}
+
+N100 R418=0
+
+N110 IF((FTL(R700) & '0800')>0.5)  R418=R418+1  $M327 {morsa 13 presente, sblocca lo Zimmer}
+N120 IF((FTL(R700) & '1000')>0.5)  R418=R418+2  $M328 {morsa 14 presente, sblocca lo Zimmer}
+N130 IF((FTL(R700) & '2000')>0.5)  R418=R418+4  $M329 {morsa 15 presente, sblocca lo Zimmer}
+N140 IF((FTL(R700) & '4000')>0.5)  R418=R418+8  $M330 {morsa 16 presente, sblocca lo Zimmer}
+N150 IF((FTL(R700) & '8000')>0.5)  R418=R418+16 $M331 {morsa 17 presente, sblocca lo Zimmer}
+N160 IF((FTL(R700) & '10000')>0.5) R418=R418+32 $M332 {morsa 18 presente, sblocca lo Zimmer}
+
+N200 IF((FTL(R418) & '003F')>0.5) G1 G53 F=R721 H=R546 V=R547 U=R548 C=R549 B=R550 A=R551
+N210 IF((FTL(R418) & '003E')>0.5) G1 G53 F=R721 H=R546 V=R547 U=R548 C=R549 B=R550
+N220 IF((FTL(R418) & '003C')>0.5) G1 G53 F=R721 H=R546 V=R547 U=R548 C=R549
+N230 IF((FTL(R418) & '0038')>0.5) G1 G53 F=R721 H=R546 V=R547 U=R548
+N240 IF((FTL(R418) & '0030')>0.5) G1 G53 F=R721 H=R546 V=R547
+N250 IF((FTL(R418) & '0020')>0.5) G1 G53 F=R721 H=R546
+
+N300 IF((FTL(R418) & '0001') $M340    {blocca lo Zimmer morsa}
+N310 IF((FTL(R418) & '0002') $M341    {blocca lo Zimmer morsa}
+N320 IF((FTL(R418) & '0004') $M342    {blocca lo Zimmer morsa}
+N330 IF((FTL(R418) & '0008') $M343    {blocca lo Zimmer morsa}
+N340 IF((FTL(R418) & '0010') $M344    {blocca lo Zimmer morsa}
+N350 IF((FTL(R418) & '0020') $M345    {blocca lo Zimmer morsa}
+
+N1000 RET

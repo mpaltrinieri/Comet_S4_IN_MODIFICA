@@ -1,0 +1,81 @@
+{****** CALCOLO DELLO Zmin A CUI PORTARE L'ASSE Z OLTRE LA QUOTA DI SCAVALCAMENTO (IN PUNTA UTENSILE) *****} 
+{ R5000 = Lunghezza struttura mandrino (ingombro massimo)}
+{ R5001 = Larghezza parte bassa struttura mandrino sino al centro utensile}
+{ (V6003/3) = posizione attuale asse A}
+{ R5002 = posizione futura asse A}
+{ R620 = raggio utensile attuale}
+{ R619 = lunghezza utensile attuale}
+{ R6090 = Zmin a cui portare l'asse Z oltre la quota di scavalcamento morse }
+{ R204 =  1 testina su mandrino, 0 utensile diretto su mandrino}
+{ R6268 = appoggio lunghezza mandrino a cui sommo eventualmente la dimensione testina}
+{ R5015 = Offset Y testina}
+{ R5016 = Offset Z testina}
+
+N05 IF((V6003/3)<=90) R4510=(V6003/3)
+N07 IF((V6003/3)>90)  R4510=(180-(V6003/3))
+
+N10  IF(R204>0.5)  JMP [TESTINA]
+
+N90  L <SNGCNT.CS4>
+N100 R6076=R620
+N110 IF(R6076<35) R6076=35        {per sicurezza considero come raggio almeno il portautensile che è 63 mm} 
+
+N120 R6268=R5000+R619  {senza la testina considero solo la lunghezza mandrino + lunghezza utensile}
+
+N200 R6071=ABS(R6076*COS(R4510))   {proiezione raggio utensile / porta utensile}
+N205 R6072=ABS(R5001*COS(R4510))   {proiezione larghezza parte bassa struttura mandrino}
+N210 IF(R4510<=0) R6073=ABS(R6268*SIN(R4510))+ABS(R5001*COS(R4510)) {proiezione lunghezza struttura mandrino + lunghezza utensile}
+N215 IF(R4510<=0) IF(R6073<R6071) R6073=R6071 {ingombro dato dalla proiezione del raggio utensile}
+N220 IF(R4510>0)  R6073=0
+N225 R6070=ABS(R619*SIN(R4510))    {proiezione lunghezza utensile}
+
+N250 R6081=ABS(R6076*COS(R5002))  {proiezione raggio utensile  / porta utensile}
+N255 R6082=ABS(R5001*COS(R5002))  {proiezione larghezza parte bassa struttura mandrino}
+N260 IF(R5002<=0) R6083=ABS(R6268*SIN(R5002))+ABS(R5001*COS(R5002)) {proiezione lunghezza struttura mandrino + lunghezza utensile}
+N265 IF(R5002<=0) IF(R6083<R6081) R6083=R6081 {ingombro dato dalla proiezione del raggio utensile}
+N270 IF(R5002>0)  R6083=0
+N275 R6080=ABS(R619*SIN(R5002))   {proiezione lunghezza utensile}
+
+N300 IF(R6072>(R6070+R6071)) R6074=R6072
+N310 IF(R6072<=(R6070+R6071)) R6074=R6071
+
+N400 IF(R6082>(R6080+R6081)) R6084=R6082
+N410 IF(R6082<=(R6080+R6081)) R6084=R6081
+
+{Calcola lo Zmin a cui portare l'asse Z oltre la quota di scavalcamento pezzo o morse (in punta utensile)}
+N500 R6090=R6074
+N510 IF(R6073>R6090) R6090=R6073
+N520 IF(R6084>R6090) R6090=R6084
+N530 IF(R6083>R6090) R6090=R6083
+N535 L <SNGCNT.CS4>
+N540 RET
+
+[TESTINA]
+N1100 L <SNGCNT.CS4>
+N1105 R6076=R620
+N1120 R6268=R5000+R5015  {con la testina considero la lunghezza mandrino + l'offset Y della testina}
+
+N1200 R6071=ABS(R6076*SIN(R4510))   {proiezione raggio utensile / porta utensile}
+N1210 R6072=ABS((R619-R5016+R5001)*COS(R4510))+ABS((R554-R5015)*SIN(R4510))  {proiezione lunghezza utensile+off z testina+ingombro parte bassa testina}
+N1220 IF(R4510<=0) R6072=ABS((R619-R5016+R5001)*COS(R4510))
+N1230 IF(R4510<=0) R6073=ABS(R6268*SIN(R4510))                          {proiezione lunghezza struttura mandrino + off y testina}
+N1240 IF(R4510>0)  R6073=0                                             {proiezione lunghezza struttura mandrino + off y testina}
+
+N2200 R6081=ABS(R6076*SIN(R5002))   {proiezione raggio utensile / porta utensile}
+N2210 R6082=ABS((R619-R5016+R5001)*COS(R5002))+ABS((R554-R5015)*SIN(R5002)) {proiezione lunghezza utensile+off z testina+ingombro parte bassa testina}
+N2220 IF(R5002<=0) R6072=ABS((R619-R5016+R5001)*COS(R5002))
+N2230 IF(R5002<=0) R6083=ABS(R6268*SIN(R5002))                         {proiezione lunghezza struttura mandrino + off y testina}
+N2240 IF(R5002>0)  R6083=0                                             {proiezione lunghezza struttura mandrino + off y testina}
+
+{calcolo il contributo predominante per la posizione attuale e per quella futura}
+N2500 IF(R6071>=(R6072+R6073)) R6074=R6071
+N2510 IF(R6071<(R6072+R6073))  R6074=R6072+R6073
+
+N2500 IF(R6081>=(R6082+R6083)) R6084=R6081
+N2510 IF(R6081<(R6082+R6083))  R6084=R6082+R6083
+
+{Calcola lo Zmin a cui portare l'asse Z oltre la quota di scavalcamento pezzo o morse (in punta utensile)}
+N3000 R6090=R6074
+N3010 IF(R6084>R6090) R6090=R6084
+N3015 L <SNGCNT.CS4>
+N3020 RET

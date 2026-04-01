@@ -1,0 +1,110 @@
+{CICLO DI MOVIMENTAZIONE PEZZO}
+
+N10 $M00  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+N20 $M02  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+
+{R5923 = Array morse associate al pezzo da spostare (morse dalla 1 alla 12)}
+{R5924 = Array morse associate al pezzo da spostare (morse dalla 13 alla 24)}
+{R5925 = Delta di spostamento pezzo}
+{R5926 = Numero morsa che comanda (master)}
+
+N05    L CALC_MOVPIECE.CS4                          {assegna correttamente R5923, R5924 ed R5926}
+N10    L CAMPIECE.CS4                               {selezione morse in ISO Drill_Camaelon}
+N20    $M227                                        {fine maschiatura rigida}
+N50    G0 G53 Z=R349                                {asse Z fuori}
+
+
+N1990  R6835=0   {reset contatore di riposizionamenti pezzo}
+N2000  R6840=1   {ciclo di pos. morse in ISO attivo}
+       $M106     {MOVPIECE.CS4 in esecuzione}
+N2040  L SNGCNT.CS4
+
+{salvataggio posizione morsa master prima di muovere il trenino morse}
+N2090 R6836=0   {reset posizione attuale morsa master}      
+
+N2115 IF(R5926 == 10) R6836=R653-R2310     {posizione attuale morsa - errore di insegumento
+N2120 IF(R5926 == 11) R6836=R654-R2311     {posizione attuale morsa - errore di insegumento
+N2125 IF(R5926 == 12) R6836=R655-R2312     {posizione attuale morsa - errore di insegumento
+N2130 IF(R5926 == 13) R6836=R656-R2313     {posizione attuale morsa - errore di insegumento
+N2135 IF(R5926 == 14) R6836=R657-R2314     {posizione attuale morsa - errore di insegumento
+N2140 IF(R5926 == 15) R6836=R658-R2315     {posizione attuale morsa - errore di insegumento
+
+
+[RETRY_PIECE]
+{selezione morse sul pezzo da aprire prima di muovere il trenino (tranne la morsa master)}
+{disattiva chiusura in alta forza e comanda l'apertura morse}
+
+N2345 IF(R7907>0.5) IF ((FTL(R5923) & '0200') > 0.1) R1110=1 R1470=1
+N2350 IF(R7907>0.5) IF ((FTL(R5923) & '0400') > 0.1) R1111=1 R1471=1
+N2355 IF(R7907>0.5) IF ((FTL(R5923) & '0800') > 0.1) R1112=1 R1472=1
+
+N2400 IF(R7907>0.5) IF ((FTL(R5924) & '0001') > 0.1) R1113=1 R1473=1
+N2405 IF(R7907>0.5) IF ((FTL(R5924) & '0002') > 0.1) R1114=1 R1474=1
+N2410 IF(R7907>0.5) IF ((FTL(R5924) & '0004') > 0.1) R1115=1 R1475=1
+
+
+{devo aprire tutte le morse del treno, tranne la morsa master quindi resetto}
+{l'indice di disattivazione chiusura in alta forza e apertura della morsa master}  
+
+N2515 IF(R5926 == 10) R1110=0 R1470=0
+N2520 IF(R5926 == 11) R1111=0 R1471=0
+N2525 IF(R5926 == 12) R1112=0 R1472=0
+N2530 IF(R5926 == 13) R1113=0 R1473=0
+N2535 IF(R5926 == 14) R1114=0 R1474=0
+N2540 IF(R5926 == 15) R1115=0 R1475=0
+
+
+N2700 $M290   {disattiva chiusura in alta forza indicizzata delle morse sul pezzo}
+N2710 $M229   {apertura indicizzata morse}
+
+
+{muovo il trenino delle morse sul pezzo di R5925 = Delta di spostamento pezzo}
+N2800 L <SNGCNT.CS4>
+N2810 R6866=0 R6867=0          {reset variabili di sincronizzazione da CH0 verso CH1, CH2
+N2820 R6869=0 R6870=0          {reset variabili di sincronizzazione da CH1, CH2 verso CH0}
+N2830 R6970=60                 {causale per posizionamento morse motorizzate in MOVPIECE.CS4 in singolo/multipezzo}
+N2860 L <SNGCNT.CS4>
+
+N2910 R6867=4                  {libera l'attesa sul CH2 da CH0}
+N2950 L <WAIT_CH2_CH0.CS4>     {attesa sul CH0 che il CH2 abbia finito}
+
+N2980 L SNGCNT.CS4
+N2985 R6866=0 R6867=0          {reset variabili di sincronizzazione da CH0 verso CH1, CH2 }
+N2990 R6869=0 R6870=0          {reset variabili di sincronizzazione da CH1, CH2  verso CH0}
+N2995 L <RES_CAUSALE_MC.CS4>   {reset causale multicanale}
+
+
+N3015 IF(R7907>0.5) IF ((FTL(R5923) & '0200') > 0.1) R1210=1
+N3020 IF(R7907>0.5) IF ((FTL(R5923) & '0400') > 0.1) R1211=1
+N3025 IF(R7907>0.5) IF ((FTL(R5923) & '0800') > 0.1) R1212=1
+
+N3030 IF(R7907>0.5) IF ((FTL(R5924) & '0001') > 0.1) R1213=1
+N3035 IF(R7907>0.5) IF ((FTL(R5924) & '0002') > 0.1) R1214=1
+N3040 IF(R7907>0.5) IF ((FTL(R5924) & '0004') > 0.1) R1215=1
+
+
+N3100 $M145  {chiusura morse indicizzate in bassa forza}
+N3110 $M270  {chiusura morse indicizzate in alta forza}
+
+N3200 L <POS_MOR_MASTER.CS4>
+
+  {N3460 L<SNGCNT.CS4>
+  {N3465 IF( ABS(ABS(R6837-R6836)-ABS(R5925)) > R7889) R6835=R6835+1      {Incrementa contatore riposizionamenti di retry con asse P}      
+  {N3470 IF( ABS(ABS(R6837-R6836)-ABS(R5925)) > R7889) JMP [RETRY_PIECE]  {ridai comando di spostamento pezzo}
+
+N3680 L<SNGCNT.CS4>
+
+
+N4030 IF(R5926 == 10) R1580=(R6837-R6836-R5925) {Errore residuo posizione morsa 10 a fine MOVPIECE.CS4}
+N4040 IF(R5926 == 11) R1581=(R6837-R6836-R5925) {Errore residuo posizione morsa 11 a fine MOVPIECE.CS4}
+N4050 IF(R5926 == 12) R1582=(R6837-R6836-R5925) {Errore residuo posizione morsa 12 a fine MOVPIECE.CS4}
+N4060 IF(R5926 == 13) R1583=(R6837-R6836-R5925) {Errore residuo posizione morsa 13 a fine MOVPIECE.CS4}
+N4070 IF(R5926 == 14) R1584=(R6837-R6836-R5925) {Errore residuo posizione morsa 14 a fine MOVPIECE.CS4}
+N4080 IF(R5926 == 15) R1585=(R6837-R6836-R5925) {Errore residuo posizione morsa 15 a fine MOVPIECE.CS4}
+
+N4120 L<CAM_ERR.CS4>
+
+N5010 L<SNGCNT.CS4>
+      $M107     {MOVPIECE.CS4 terminata}
+N5020 R6840=0  {fine ciclo di pos. morse in  ISO}
+N5030 RET

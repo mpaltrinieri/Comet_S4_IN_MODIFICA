@@ -1,0 +1,903 @@
+- NUOVA CS4I
+
+- VAR R: HDRILL: quando esistono var R del sing/multi della CR6 usa quelle, altrimenti usa quelle di SX della CR6 non rinominate
+
+CONFRONTI:
+C:\Prodotti\Progetti Cnc 7_0\Comet_T4\lav
+C:\Prodotti\Progetti Cnc 7_0\Comet_T6\lav_rin_CT4
+
+C:\Prodotti\Progetti Cnc 7_0\Comet_R4\lav
+C:\Prodotti\Progetti Cnc 7_0\Comet_T4\lav_rin_CR6
+
+
+- modifica lista IO (solo ethercat)
+- PLC: modifica assi
+- CNC: modifica assi (eliminaz PH, eliminaz associaz X a vari ch, AX_M12_CH2.., 
+- PLC: eliminaz di tutto cio che riguarda SX/DX
+- CNC: eliminaz di tutto cio che riguarda SX/DX
+
+- CANALI: CH0: PRINCIPALE, CH1: CAMBIOUT, CH2: MORSE MOT.		
+
+
+
+ELIMINATI: ********************************************************************************************************
+
+ISOMG_CH3.CR6  
+CARICO_PEZZO_DX_CH3.CR6	
+MULTI_DX_CH3.CR6
+CLOSE_DX_SIMU.CR6
+CLOSE_RIP_DX_CH3.CR6
+CLOSE_SX_SIMU.CR6
+....
+CAMBIOUT_CH2.CR6
+
+
+MODIFICATI: ********************************************************************************************************
+
+CK_LUNG.CR6
+CKMOV_W.CR6
+CKMOV_YA.CR6
+CKMOV_Z.CR6
+CKMOVCAR.CR6
+CKMOVRIF.CR6
+8.CR6
+CAMBIOUT.CR6
+CAMBIOUT_CH1.CR6
+CAMBIOUT_CH2.CR6
+
+DAMODIFICARE:  DEPUT.... ECC ECC 
+
+
+VARIABILI da ELIMINARE/VERIFICARE : ********************************************************************************************************
+	CH3		  
+		R_WAIT_CH2_DA_CH3            R6855 // Sincronizza il CH2 con il CH3 settandola a 4 (settandola a 2 libera il CH2 da attesa lanciata da CH3)
+		R_WAIT_CH3_DA_CH2            R6856 // Sincronizza il CH3 con il CH2 settandola a 8 (settandola a 4 libera il CH3 da attesa lanciata da CH2)
+		R_WAIT_CH3_DA_CH0            R6868 // Sincronizza il CH3 con il CH0 settandola a 8 (settandola a 8 libera il CH3 da attesa lanciata da CH0)
+		R_WAIT_CH0_DA_CH3            R6871 // Sincronizza il CH0 con il CH3 settandola a 8 (settandola a 8 libera il CH0 da attesa lanciata da CH3)
+		R_CODICE_CASUALE_ISO_CH3     R6903 // Codice Casuale ISO CH3
+		R_ISO_STARTED_CH3            R6907 // 1=CH3 ISO in esecuzione, 0=CH3 ISO non in esecuzione
+		R_ASSE_X_ASSEGN_CH2_CH3      R6966 // Assegna l'asse X al canale 2 o al canale 3 (movimento morse con P e H in multipezzo)
+		R_CAUSALE_ISO_MC_CH3         R6973 // Causale ISO multichannel (scritta da CH3 e usata dagli altri canali)
+
+	PH		R673
+N1040 IF (R673==1) G0 G53 P=R380 H=R381		{assi PH fuori ingombro
+
+{identificazione movimento TAVOLA da fare }
+N50 R683=90+R535               {R535: 0=macchina  1=operatore   M90 tavola verso macchina    M91 tavola verso operatore
+
+@@@1	PENDOLARE	R569=0  R527    R588  R589  R510	R518	R519	R521	R522	R525	R526	
+	R606	R607	R608	R609
+	R529	R530	R536	R636	R637	
+	R642	R643	R647	
+			R664	R665	R666	R667	
+			
+da qui!!!!			R669	R670	R671	R672	R675	R676	R	R	R	R	R	R	R
+??			R557	R558
+			
+#define   R_MIN_SX_ZONA_MORSE  555  // Posizione Minima raggiungibile dalle morse a SX (Minimo)  
+#define   R_MAX_SX_ZONA_MORSE  556  // Posizione Massima raggiungibile dalle morse a SX (Massimo) 
+
+#define   R_MIN_DX_ZONA_MORSE  557  // Posizione Minima raggiungibile dalle morse a DX (Minimo)  
+#define   R_MAX_DX_ZONA_MORSE  558  // Posizione Massima raggiungibile dalle morse a DX (Massimo) 
+
+N51 R639=0					{memoria morse da aprire DX}
+
+	CAMME ZONA	R648
+	asse P 	R673	...
+	asse H	R673	...
+	
+#define   R_COMET_LITE   707  // Comet T6 Lite
+////#define   R_MORSE_SX           708  // Numero di morse zona SX 
+////#define   R_MORSE_DX           709  // Numero di morse zona DX
+
+N14 IF (R60==1) IF (R61==0) G0 G53 P=R380					{P fuori da collisioni
+N15 IF (R60==0) IF (R61==1) G0 G53 H=R381					{H fuori da collisioni
+
+N220 IF((%V100.2) == 0) IF(FTL(R700) & '20000')  (R379=V4063/7)     { Carica Finecorsa Positivo Asse P | Load P Axis Positive Limit Switch
+N230 IF((%V100.2) == 0) IF(FTL(R700) & '20000')  (R380=V4064/7)     { Carica Finecorsa Negativo Asse P | Load P Axis Negative Limit Switch
+
+N240 IF((%V100.2) == 0) IF(FTL(R700) & '40000')  (R381=V4063/8)     { Carica Finecorsa Positivo Asse H | Load H Axis Positive Limit Switch
+N250 IF((%V100.2) == 0) IF(FTL(R700) & '40000')  (R382=V4064/8)     { Carica Finecorsa Negativo Asse H | Load H Axis Negative Limit Switch
+
+
+N17 R6030=0                 {flag: 1=> asse X portato a SX da GOTOSX,  2=> asse X portato a DX da GOTODX.
+N4540 R521=0            {EMULO il PC : AZZERO la condizione che mi dice che è un riposizionamento sx pendo
+N4550 R522=0            {EMULO il PC : AZZERO la condizione che mi dice che è un riposizionamento dx pendo 
+
+#define   R_MEM_OPENALLDX      R639	  // Memoria morse da aprire DX 
+
+R510
+
+N2020 $M225			{disinserisci le battute PH
+N111 $M225                  {disinserimento battute assi P-H
+N113 $M204                  {disinserimento trascinatore asse P
+N114 $M206                  {disinserimento trascinatore asse H
+
+
+N80 IF (FTL(R700)&'0020')	R400=R650 JMP [CARICA]
+N81 IF (FTL(R700)&'0040')	R400=R651 JMP [CARICA]
+N82 IF (FTL(R700)&'0080')	R400=R652 JMP [CARICA]
+----------------------------------------------------
+N89 IF (FTL(R700)&'4000')	R400=R659 JMP [CARICA]
+N90 IF (FTL(R700)&'8000')	R400=R660 JMP [CARICA]
+N91 IF (FTL(R700)&'10000')	R400=R661 JMP [CARICA]
+
+
+N100 IF (FTL(R702)&'0001') R400=R650 JMP [CARICA]
+N101 IF (FTL(R702)&'0002') R400=R651 JMP [CARICA]
+N102 IF (FTL(R702)&'0004') R400=R652 JMP [CARICA]
+----------------------------------------------------
+N109 IF (FTL(R702)&'0200') R400=R659 JMP [CARICA]
+N110 IF (FTL(R702)&'0400') R400=R660 JMP [CARICA]
+N110 IF (FTL(R702)&'0800') R400=R661 JMP [CARICA]
+
+
+N1910 IF((FTL(R6967)&'0001') > 0.5) IF(R5929==7)  R4500=1 {morsa da riposizionare sul pezzo}
+N1920 IF((FTL(R6967)&'0002') > 0.5) IF(R5929==8)  R4500=1 {morsa da riposizionare sul pezzo}
+N1930 IF((FTL(R6967)&'0004') > 0.5) IF(R5929==9)  R4500=1 {morsa da riposizionare sul pezzo}
+----------------------------------------------------
+N2040 IF((FTL(R6967)&'0200') > 0.5) IF(R5929==16) R4500=1 {morsa da riposizionare sul pezzo}
+N2050 IF((FTL(R6967)&'0400') > 0.5) IF(R5929==17) R4500=1 {morsa da riposizionare sul pezzo}
+N2060 IF((FTL(R6967)&'0800') > 0.5) IF(R5929==18) R4500=1 {morsa da riposizionare sul pezzo}
+
+
+N9500 IF( (FTL(R6206) & '0001') > 0.5) $M271       {Chiudi Morsa 7 in alta pressione
+N9510 IF( (FTL(R6206) & '0002') > 0.5) $M272       {Chiudi Morsa 8 in alta pressione
+N9520 IF( (FTL(R6206) & '0004') > 0.5) $M273       {Chiudi Morsa 9 in alta pressione
+----------------------------------------------------
+N9630 IF( (FTL(R6206) & '0200') > 0.5) $M280       {Chiudi Morsa 16 in alta pressione
+N9640 IF( (FTL(R6206) & '0400') > 0.5) $M281       {Chiudi Morsa 17 in alta pressione
+N9650 IF( (FTL(R6206) & '0800') > 0.5) $M282       {Chiudi Morsa 18 in alta pressione
+
+
+#define   R_MORSE_IN_ZONA_ERR  663    // =1 Morse motorizzate di SX in Zona DX in pendolare, =2 Morse motorizzate di DX in Zona SX in pendolare
+MANMORSE_CH1.CR6
+MANMORSE_CH2.CR6
+
+
+{N32 R557=4071       { R_MIN_DX_ZONA_MORSE }
+{N33 R558=7507.8     { R_MAX_DX_ZONA_MORSE }
+
+N6200 IF (R569 == 0) IF (R647>0.5) $M191            {devo muovere il diaframma:chiudi ripari prima per sicurezza
+N6250 IF (R569 == 0) $M188                          {diaframma basso
+
+
+N8510 R632=0                {disabilita conteggio tempo ciclo zona 2}
+N8530 R2=0                  {azzera conteggio tempo ciclo zona 2}
+
+#define   R_POSCARICO_AX_P_P1	120 // Quota_P per carico con battuta_P del pezzo 1 SX  (-1 se fissa, -2 se non usata)
+...
+
+
+
+
+
+SX DX
+
+
+********************************************************************************************************
+FUNZIONI M DA VERIFICARE/CAMBIARE/CANCELLARE:
+OLD:
+	N50 $M192			{RIPARI alti e diaframma basso
+	N500 $M58     {apertura ripari sx dx }
+
+NEW2:
+N800 $M58					{apertura riparo
+N220 $M59					{chiusura riparo 
+
+N200 $M90					{Ritorno tavola in lavoro, indietro verso macchina
+N200 $M91					{Avanzamento tavola in carico, avanti verso operatore
+
+
+N10 $M291                              {disattiva chiusura in alta forza morsa 7
+N11 $M292                              {disattiva chiusura in alta forza morsa 8
+N12 $M293                              {disattiva chiusura in alta forza morsa 9
+N13 $M294                              {disattiva chiusura in alta forza morsa 10
+N14 $M295                              {disattiva chiusura in alta forza morsa 11
+N15 $M296                              {disattiva chiusura in alta forza morsa 12
+N20 $M297                              {disattiva chiusura in alta forza morsa 13
+N21 $M298                              {disattiva chiusura in alta forza morsa 14
+N22 $M299                              {disattiva chiusura in alta forza morsa 15
+N23 $M300                              {disattiva chiusura in alta forza morsa 16
+N24 $M301                              {disattiva chiusura in alta forza morsa 17
+N25 $M302                              {disattiva chiusura in alta forza morsa 18
+
+
+
+
+
+
+
+
+
+
+
+
+
+********************************************************************************************************
+
+{R5923 = ARRAY MORSE associate al pezzo da spostare (morse dalla 1 alla 12)}
+{R5924 = Array morse associate al pezzo da spostare (morse dalla 13 alla 24)}
+
+{R4500 = appoggio indici assi morse slave nel canale}
+{R4501 = appoggio indice asse morsa master}
+{R4521 = appoggio quota asse morsa master}
+{R4522 = settata a 1 indica se la morsa master appartiene a questo canale}
+
+
+var da correggere : ********************************************************************************************************
+SINCRONIZZAZIONE di tutti e 4 i canali assieme
++		R_FILT_SYNC0_MC              R6862 // Sincronizzazione livello 0, per esempio: (1+2+4+8) sincronizzazione di tutti e 4 i canali assieme
++		R_FILT_SYNC1_MC              R6863 // Sincronizzazione livello 1, per esempio: (1+2+4+8) sincronizzazione di tutti e 4 i canali assieme
++		R_FILT_FHOLD_MC_SH           R6864 // Filtro associato ad una funzione M che agisce sul FHOLD dei singoli canali (valido solo per quelle funzioni M che lo prevedono) per esempio: con (1+2+4+8) la funzione M mette in FHOLD tutti i canali; 
++		R_FILT_SYNC1_TO_0_MC         R6865 // Sincronizzazione livello 1, filtro dei canali di livello 0 da sincronizzare dopo la sincronizzazione di livello 1, per esempio: (1+2+4+8) sincronizzazione di tutti e 4 i canali assieme
+
+********************************************************************************************************
+
+
+
+eliminato	TS188 = 100   {Ritardo su nuova Funz. M CH3 | Delay on CH3 M function
+		TS192 = 1000  {Timeout comando caricamento ISOMG_CH3.CR6 su CH3 | Loading ISOMG_CH3.CR6 on CH3 alarm timeout
+
+********************************************************************************************************
+
+eliminare: 
+	MULTI_SX_CH2.CR6	
+		WAIT_P_AVAILABLE_CH2.CR6
+		DIS_HF_SX_CH2.CR6			 {disattiva chiusura morse in alta forza e discesa battuta SX}
+		RIPOS_SX_CH2.CR6				{*** PREPARAZIONE AL RIPOSIZIONAMENTO MORSE IN PENDOLARE ***}
+		RIPOS_SX.CR6
+		
+		GIRO_2_MOT_SX_CH2.CR6				{*** PREPARAZIONE AL RIPOSIZIONAMENTO MORSE IN PENDOLARE SECONDO GIRO ***}
+		
+		MUOVI_MOT_SX_CH2.CR6			{***** MUOVI MORSE MOTORIZZATE DI ZONA SX (alle quote del Hdrill) *****}
+		CLOSE_RIP_SX_CH2.CR6
+		MOV_TAV_SX_CH2.CR6    
+		POS_MORSE_SX_CH2.CR6
+		CARICO_PEZZO_SX_CH2.CR6
+			N905 L <CLOSE_SX_SIMU.CR6>          {attivo la chiusura morse in simulazione}
+
+
+	WAIT_X_AVAILABLE_CH0.CR6
+	WAIT_X_AVAILABLE_CH2.CR6
+
+	WAIT_P_AVAILABLE_CH0.CR6
+	WAIT_H_AVAILABLE_CH0.CR6
+
+SPOSTA_X.CR6
+
+D:\ISAC\LAV\LAV\SH_OFF_X.CR6
+D:\ISAC\LAV\LAV\SH_OFF_X_CH2.CR6
+D:\ISAC\LAV\LAV\SH_ON_X.CR6
+D:\ISAC\LAV\LAV\SH_ON_X_CH2.CR6
+
+D:\ISAC\LAV\LAV\SH_OFF_P.CR6
+D:\ISAC\LAV\LAV\SH_OFF_P_CH2.CR6
+D:\ISAC\LAV\LAV\SH_ON_P.CR6
+D:\ISAC\LAV\LAV\SH_ON_P_CH2.CR6
+
+D:\ISAC\LAV\LAV\CKMOV_PH.CR6
+D:\ISAC\LAV\LAV\FINDM_PH.CR6
+
+D:\ISAC\LAV\LAV\POSM_PH.CR6
+	N800 $M164				{abilitazione multiprocesso SX (MULTI_SX_CH2.CR6 ...)
+	N1300 $M165				{abilitazione multiprocesso DX (MULTI_DX_CH3.CR6 ...)
+	N5025 L <RES_CAUSALE_MC.CR6>
+
+
+D:\ISAC\LAV\LAV\WAIT_PH.CR6
+
+D:\ISAC\LAV\LAV\_TEST_P.CR6
+D:\ISAC\LAV\LAV\_TEST_H.CR6
+
+WAITRDX.CR6
+WAITRSX.CR6
+
+WAITDX.CR6
+WAITSX.CR6
+
+POS_MORSE_SX_CH2.CR6
+
+CLOSEDX.CR6
+CLOSESX.CR6
+
+ENDSX.CR6
+ENDDX.CR6
+
+ENDROTSX.CR6
+ENDROTDX.CR6
+
+OPENDX.CR6
+OPENSX.CR6
+
+OPENSX_CH2.CR6
+
+RIP_DX_X.CR6
+RIP_SX_X.CR6
+
+RIPOS_SX.CR6
+RIPOS_DX.CR6
+
+POSMORS.CR6 (1 hit)
+	Line 19: N60 IF(R674 > 0.5)                L<POSM_MOT.CR6>   {con morse motorizzate (singolo / multipezzo)
+
+POSM_MOT.CR6 (1 hit)
+	Line 247: N10000 L <RIPOS_MOT_SING.CR6>
+
+RIPOS_MOT_SING.CR6
+	Line 6: N05 R6970=100                           {causale per riposizionamento morse motorizzate in singolo-multipezzo}
+
+ISOMG_CH2.CR6
+	N5110 IF(R6972==100) JMP [RIPOS_MOT_SINGOLO]
+	[RIPOS_MOT_SINGOLO]
+	N1410 L <RIPOS_MOT_SX_CH2.CR6>
+	N1420 JMP [WAIT_FINE_CAUSALE]
+
+RIPOS_MOT_SX_CH2.CR6	>>>	RINOMINATO:		RIPOS_MOT_SING_CH2.CR6
+
+
+WAITDX.CR6
+WAITRDX.CR6
+
+WAITSX.CR6
+WAITRSX.CR6
+
+-------------------------------------------------------------------------
+
+MOVEMORS_CH2.CR6
+MOVEMORS_CH3.CR6
+
+R740
+R817=0        {Differenza nel rilevamento quote morse fra LATCH asse P e BASIOCAN | Difference in clamp position reading by LATCH P axes or BASIOCAN
+R818=0        {Differenza nel rilevamento quote morse fra LATCH asse H e BASIOCAN | Difference in clamp position reading by LATCH H axes or BASIOCAN
+
+R823=0        {Abilita le correzioni su asse P  |  Enable P axis correction
+R824=0        {Abilita le correzioni su asse H  |  Enable H axis correction
+
+R7006=944     {Distanza minima di non collisione tra asse H e asse X | Minimun non collition distance beetween H-X axes 
+R7007=330     {Distanza minima di non collisione tra asse P e asse X | Minimun non collition distance beetween P-X axes
+
+R7879=15000   { Vel.Ricerca Morse : Assi PH con ingressi latch | Clamps Search Speed: PH Axis with input latch}
+
+R7881=1       { Abilita input latch per ricerca morse con asse P | Enable latch input for find clamp by P axis}
+R7882=1       { Abilita input latch per ricerca morse con asse H | Enable latch input for find clamp by H axis}
+
+R7884=0       { Numero massimo di cicli plc di movimento riparo anteriore per check velocità | Maximum number plc cycles movement front guard for speed check}
+R7886=100     { Numero massimo di transizioni input check velocità lato SX-DX riparo anteriore | Maximum number of transitions input check speed LF-RH front guard}
+
+R7912=1000    {? Posizione minima  morse a SX con funzione manuale di posizionamento verso SX 
+R7913=3000    {? Posizione massima morse a DX con funzione manuale di posizionamento verso DX
+
+A2871=10000    { VEL_ASSE_P_COLLAUDO		    
+A2872=10000    { VEL_ASSE_P_BASSA		 
+A2873=10000    { VEL_ASSE_P_NORMALE		   
+
+A2874=10000    { VEL_ASSE_H_COLLAUDO		    
+A2875=10000    { VEL_ASSE_H_BASSA		 
+A2876=10000    { VEL_ASSE_H_NORMALE		   
+
+
+-------------------------------------------------------------------------
+27 06 19
+
+#define   R_ROT_PIECE          463  // Rotazione pezzo in corso (1=sx, 2=dx) 
+
+rdef dan:
+
+#define   R_INTERAX_MORSE_SX   523  // Interasse morse 
+#define   R_INTERAX_MORSE_DX   524  // Interasse morse 	
+								
+#define   R_NUM_MORSE_SX	   525  // Numero morse SX
+#define   R_NUM_MORSE_DX	   526  // Numero morse DX
+
+#define   R_POS_ATTUALE_P      606    // Posizione attuale asse P 
+#define   R_POS_ATTUALE_H      607    // Posizione attuale asse H 
+
+
+C:\Prodotti\Progetti Cnc 7_0\Comet R4 VARIE\2019_07_01__SW
+
+-------------------------------------------------------------------------
+03/07/19me
+
+RIFASSI.CS4		elim P H
+	N80 G303 X Y Z B C W P H        {assi CNC
+	N82 G312 OFF X Y Z B C W P H    {Abilitazione dei Finecorsa Software
+
+RIFASSI_CH2.CS4	aggiungere altri assi
+
+#define   R_POSTROVATA_MORSA_1	850 // Posizione fisica trovata Morsa 1
+
+N66 R6039=0               {Reset flag disabilita hold da P o H su asse X
+
+#define   R_CNC1_TARGET_M10		873 // Quota da raggiungere (M10/Morsa n.10)		rimettere VAx ?
+
+-------------------------------------------------------------------------
+
+C:\Prodotti\Progetti Cnc 7_0\Comet R6 VARIE\_BAK\COMET_R6_MULTICH\BACKUP_COMET_R6I_26_06_2019
+C:\Prodotti\Progetti Cnc 7_0\Comet R4 VARIE\_BAK\_Comet_R4i\2019_07_09a_bak_CS4_mgs\MASTER
+
+-------------------------------------------------------------------------
+R[R_POS_TARGET_M10] =	R[R_CNC1_TARGET_M10];
+R[R_POS_TARGET_M11] =	R[R_CNC1_TARGET_M11];
+R[R_POS_TARGET_M12] =	R[R_CNC1_TARGET_M12];
+R[R_POS_TARGET_M13] =	R[R_CNC1_TARGET_M13];
+R[R_POS_TARGET_M14] =	R[R_CNC1_TARGET_M14];
+R[R_POS_TARGET_M15] =	R[R_CNC1_TARGET_M15];
+
+-------------------------------------------------------------------------
+02/04/20gi inizio
+			aggiornare CS4 a diff tra:
+				v	C:\Prodotti\Progetti Cnc 7_0\Comet_R6_MC__2019_11_29a__rin_CS4
+				v	C:\Prodotti\Progetti Cnc 7_0\Comet_R6_MC__2020_04_02a__rin_CS4
+
+			@@@ stop.bat           : file aggiunto da mettere nelle tarature "launch operation" per uccidere TTReader_1.bat allo stop del framework
+
+			Riparo_SX.c       : aggiunto filtro su ingresso del bordo sensibile 
+			APP_BORDO_SENSIB_OK = RN_BORDO_SENSIB_OK;		// filtro di BORDO_SENSIB_OK_I  (impulsivo)
+
+			C:\Prodotti\Progetti Cnc 7_0\Comet_S6\plc\plcm\assi.c
+			*	Disab_AXGEN				= Disab_AX_X || ( MGPILOT_F2 && (R[R_TEST_DISAB_AX]>0.5) );
+
+			aggiornato CS4 a plc CR6 del 11-02-2020:        Versione   PLC 21.300   (Formuso) 
+			C:\Prodotti\Progetti Cnc 7_0\Comet_R6_MC__2020_04_02a__rin_CS4\txt\plc.txt
+
+			C:\Prodotti\Progetti Cnc 7_0\Comet_R6_MC__2020_04_02a__rin_CS4\txt\cnc.txt
+
+			CR6	#define TS_RICH_AP_RIP_ANT			15 //todo: Ritardo apertura riparo anteriore (per consentire aspirazione fumi) | Guards opening delay for fume extraction
+
+			#define COLL_MAGUT_CARTER_SX_FMS         A130.bit._10 // 20090 MESSAGGIO OPERATORE - Potenziale collisione tra magazzino utensili e carter laterale SX della macchina
+
+			10=MESSAGGIO OPERATORE - Magazzino in potenziale collisione con carter laterale SX della macchina
+
+			10=OPERATOR MESSAGE - Tool magazine in potential collision with left side cover of the machine  
+			11=OPERATOR MESSAGE - Spindle in potential collision with tool magazine
+			
+			[‎10/‎04/‎2020 09:01]  Denis Zaffignani:   con macchina a finecorsa SX il magazzino si può aprire di c.a. 450mm  ti parlo di dati a cad
+
+			/@@@	CX6	RIPARO_SX_CH_I...			sensori ridondanti ripari da  Comet_X6__2020_04_08b__dopo_allineam_a_Dan
+
+			- CS4 CR6hp CR6i CS4 CS6 CX4 CX6 S+AT_XL    : contatori: aggiornare gestione a quadra         (terminare salvataggio file, x permettere di fare bak con CNC attivo)
+				#define MAX_CB_FILE_RETRIES 4
+				#define MAX_COMMAND_FILE_RETRIES 100
+
+			/aggiornare CS4 a 		C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2020_04_03a						verif varie..
+ 
+02/04/20gi fine
+---------------------------------------------------------------------------------------------------
+26/06/23lu
+
+AP_RIP_ANT_O            MO_2_30 Apertura Riparo Anteriore (old)
+ASPIRATORE_O            MO_2_46 Motore Aspiratore (old)
+
+AP_RIP_ANT2_O           MO_2_60 EV Apertura Riparo Anteriore e Abil.Apertura (new)
+RIP_ASPIRATORE_O        MO_2_61 Motore Aspiratore (OPT)(alimentare soft-start con 24V non peric.)
+
+
+*** NOVITA DA GESTIRE: ***
+	#define   R_PERC_LAV_IN_HDRILL        5981 // Valore percentuale delle lavorazioni eseguite in HDRILL
+
+	R7016=0       {1=> Forzatura chiusura morse non associate ad alcuna battuta | 1=> Forcing closing of vices not associated at any stop
+			R7051=3600    {Pressurizzazione mandrino: Durata(sec) | Spindle pressurization: Duration (sec)
+	
+	R7510=0         {1 = Dispositivo di verifica integrità utensile presente | Tool integrity check device present
+
+	R7883=1       { =1 Gestione abilitazione/disabilitazione filtri assi da PLC attiva per X,Y,Z}
+				  { =2 Gestione abilitazione/disabilitazione filtri assi da PLC attiva per X,Y,Z,B,C (necessari filtri anche su BC nelle tarature)}
+
+			R7987=10000  {Velocità vertice 4 (tratto di uscita) della figura 7.CR4
+	R7988=0      {=0 Abilita il reset delle aree A di tastatura, =1 Disabilita reset delle aree A di tastatura nel nuovo ISOMG
+	R7989=0      {Abilita scavalcamento morse ottimizzato (serve versione HDRILL che anticipa R330 della lavorazione successiva)
+	R7990=0      {Abilita eventi industia 4.0 per collegamento a rete di fornitura | Enable industry 4.0 events for connection to supply network
+	R7991=0      { =0 per la macchina, =1 simulatore SIMUX OFFLINE}
+	R7992=30000  {Jerk per G184ACC con curve cubiche durante la maschiatura rigida
+
+			F_A19880=0    {INVERTER 0: AA BB TT C MM --> AA=canale, BB=indice asse nel canale, TT=tecnologia, C=porta COM, MM=indirizzo MODBUS
+			F_A20200=0    {Asse X:  AA BB C DDDD --> AA=canale, BB=indice asse nel canale, C=tecnologia, DDDD=address
+
+	C:\Prodotti\Progetti Cnc 7_0\Comet_S4\plc\plcm\Volantino.c
+
+	M228 = 1;       // Check congruità posizioni assi morse
+
+C:\Prodotti\Progetti Cnc 7_0\Comet_R4\plc\plcm\Gest_ava_utensili.c
+
+C:\Prodotti\Progetti Cnc 7_0\Comet_R4\plc\plcm\gestione_morse.c
+
+
+versione standard :
+C:\Prodotti\Progetti Cnc 7_0\Comet_S4__20234_02_15b
+
+---------------------------------------------------------------------------------------------------
+02/04/24ma
+	C:\Prodotti\Progetti Cnc 7_0\Comet_S4___VARIE\__2024_03_26
+
+	AGGIUNGERE GESTIONE TESTINA E PRESETTER LASER, aggiornare tutto il progetto alle ultime modifiche fatte su comet RS
+		presetter occupa posto della pinza 6
+		testina occupa posti delle pinze 7,8 (montata una sola pinza in mezzo ai 2 posti):
+		=> + tecnici avevano impostato magazzino da 10ut, che coincide con i 10 utensili presenti,
+		   - occorre solo che hdrill non impedisca prelievo/deposito dell'ut 6
+		=> se in futuro si smontasse la testina per montare 2 utensili occorrerebbe smontare la pinza testina, montare 2 pinze e rilevarne le quote,
+		   ma occorrerebbe anche cambiare impostaz confmac da mag10ut a mag12ut!!! 
+		   
+*** RE IMPOSTATO mag12ut !!!! ****
+*** modificata sequenza utensili in confmac in modo non debban poi variare in futuro se si toglie presetter o testina e si mettono pinze ut al loro posto:
+
+  OLD    NEW1
+  1  >>  1
+  5  >>  5
+         6 rimane vuoto (occupato dal presetter)(se in futuro verrà tolto il presetter e messa un altra pinza bastera inserirvi le quote pinza 6)
+  6  >>  7 (TESTINA)
+         8 rimane vuoto (se in futuro verrà tolta la testina e messa un altra pinza bastera inserirvi le quote pinza 8)
+  7  >>  9   
+  8  >>  10
+  9  >>  11
+  10 >>  12
+
+  lasciati vuoti i posti 6 e 7  (6 con presetter e 7 senza pinza)
+  NEW2
+  1
+  5
+  6* rimane vuoto (occupato dal presetter)(se in futuro verrà tolto il presetter e messa un altra pinza bastera inserirvi le quote pinza 6)
+  7* rimane vuoto (se in futuro verrà tolta la testina e messa un altra pinza bastera inserirvi le quote pinza 8)
+  8* (TESTINA)
+  9 
+  10
+  11
+  12
+
+  *** IMPOSTATE QUOTE NON RAGGIUNGIBILI IN CONFMAC PER I 2 UT NON UTILIZZABILI: ***
+  
+	{******************* Quote di prelievo e deposito Utensile n.6 ********************** (pinza assente, posto attualmente usato per presetter)
+	R7230=(R7190 +99999)        {Quota asse Y per prel./dep. utensile 6       | Y axis position for tool 6 pick/place 
+	R7231=(R7191 +99999)        {Quota asse Z per prel./dep. utensile 6       | Z axis position for tool 6 pick/place 
+	R7232=(R7192 +99999)        {Quota asse A per prel./dep. utensile 6       | A axis position for tool 6 pick/place 
+	R7233=(R7193 +99999)        {Quota asse C per prel./dep. utensile 6       | C axis position for tool 6 pick/place 
+	R7234=(R7194 +99999)        {Quota asse W di verifica presenza utensile 6 | W axis position check presence for tool 6 
+	R7235=(R7196 +99999)        {Quota asse W per prel./dep. utensile 6       | W axis position for tool 6 pick/place 
+
+	{******************* Quote di prelievo e deposito Utensile n.7 **********************
+	R7236=(R7190 +99999)        {Quota asse Y per prel./dep. utensile 7       | Y axis position for tool 7 pick/place 
+	R7237=(R7191 +99999)        {Quota asse Z per prel./dep. utensile 7       | Z axis position for tool 7 pick/place 
+	R7238=(R7192 +99999)        {Quota asse A per prel./dep. utensile 7       | A axis position for tool 7 pick/place 
+	R7239=(R7193 +99999)        {Quota asse C per prel./dep. utensile 7       | C axis position for tool 7 pick/place 
+	R7240=(R7195 +99999)        {Quota asse W di verifica presenza utensile 7 | W axis position check presence for tool 7 
+	R7241=(R7197 +99999)        {Quota asse W per prel./dep. utensile 7       | W axis position for tool 7 pick/place 
+
+
+		- AGGIORNARE CS4 DA CS4_PROTOTIPO
+			C:\Prodotti\Progetti Cnc 7_0\Comet_S4__PROTOTIPO
+			C:\Prodotti\Progetti Cnc 7_0\Comet_S4
+				CLOSEALL.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S4__PROTOTIPO\plc\plcm\definitions.c
+				funz_m_ch2.c
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S4\plc\plcm\mandrino.c
+				?	R_ID1_TAST_OBLIQUA
+
+				?USATO?		
+					#define   R_TIPO_MODULO_SIC            7029 // Tipo modulo di sicurezza:  0:PILZ  1:PIZZATO
+					#define   R_LUBRICA_DUTY_COEFF_ANG 6236 // Lubrica: coeff. angolare della retta del duty cycle
+
+				Riparo.c?		
+					CONDIZ_COM_AP_RIP_VIS = (NO_EMERG_I) && (ALIM_PRES_I) && MANDRINO_FERMO && !MEM_INVERTER_KO && (CONS_AP_CH_RIPARI_DA_ASSI || ???? MEM_BORDO_SENSIB_PREM || AP_RIPARO_DA_BORDO_PREM);
+					cr4 errato, da aggiornare!
+
+
+			- VERIF DIFF SU DIA_E
+				C:\Prodotti\Progetti Cnc 7_0\Diamant_E___Versioni_Precedenti\Diamant_E__2023_11_16a
+				C:\Prodotti\Progetti Cnc 7_0\Diamant_E
+
+			- AGGIORNARE CS4_PROTOTIPO CON DIFF SU DIA_E
+				C:\Prodotti\Progetti Cnc 7_0\Diamant_E_2024_03_29a_rin_cs4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S4__PROTOTIPO
+					CALC_TCP.DIA
+					CALC_ZOUT.DIA
+					CALC_POS_XYBC.CS4
+					CAM_EMMEGI.CS4
+					{
+						DIA_E						
+						#define     R_APP_QUOTA_A_IN_POSAXES     6110   // Appoggio quota asse A usata in POS_AXES.CS4
+						#define     R_APP_PROIEZ_Y_TESTINA       6111   // Appoggio proiezione in Y della parte bassa della struttura testina
+						#define     R_APP_QUOTA_SCAV_LATER_Y     6112   // Appoggio quota di scavalcamento laterale profilo con testina rispetto origine attiva (usata in POS_AXES.CS4)
+						#define     R_APP_R330                   6113   // Appoggio quota di fuori ingombro per asse Z rispetto origine attiva (usata in POS_AXES.CS4)
+						#define     R_APP_XYBC_IN_POS            6114   // Appoggio assi X,Y,B,C già posizionati alle quote di inizio lavorazione
+						#define     R_APP_QUOTA_LAV_Y_SCAV_LATER 6115   // Memoria quota Y di lavorazione per calcolo dello scavalcamento laterale testina
+						#define     R_Z_SCAVALCA_MORSE           6116   // Appoggio quota calcolata di Z scavalcamento morse in centro di rotazione struttura mandrino
+						#define     R_APP_ZOUT_TESTINA           6117   // Appoggio quota asse Z ottimizzata per fuori ingombro con testina
+						#define     R_LUNG_MAND_UT               6120   // Appoggio lunghezza mandrino+lungh. utensile (per utensile diretto), invece per testina lunghezza mandrino+dimensione testina
+
+							CS4
+							#define     R_APP_XYA_IN_POS             6114   // Appoggio assi X,Y,A già posizionati alle quote di inizio lavorazione
+							#define     R_Z_SCAVALCA_MORSE           6116   // Appoggio quota calcolata di Z scavalcamento morse in centro di rotazione struttura mandrino
+							#define     R_APP_QUOTA_A_IN_POSAXES     6260   // Appoggio quota asse A usata in POS_AXES.CS4
+							#define     R_APP_PROIEZ_Y_TESTINA       6261   // Appoggio proiezione in Y della parte bassa della struttura testina
+							#define     R_APP_QUOTA_SCAV_LATER_Y     6262   // Appoggio quota di scavalcamento laterale profilo con testina rispetto origine attiva (usata in POS_AXES.CS4)
+							#define     R_APP_R330                   6263   // Appoggio quota di fuori ingombro per asse Z rispetto origine attiva (usata in POS_AXES.CS4)
+							#define     R_APP_QUOTA_LAV_Y_SCAV_LATER 6265   // Memoria quota Y di lavorazione per calcolo dello scavalcamento laterale testina
+							#define     R_APP_ZOUT_TESTINA           6267   // Appoggio quota asse Z ottimizzata per fuori ingombro con testina
+							#define     R_LUNG_MAND_UT               6268   // Appoggio lunghezza mandrino+lungh. utensile (per utensile diretto), invece per testina lunghezza mandrino+dimensione testina
+					}
+					CAM_ORG.CS4
+					DEPUT.CS4			R6865  >>  R6863	dato che SYNCNC1.CS4:	$M351 {Blocco di questo CNC ed attesa dei CNC indicati nella R6863
+					END.CS4
+					EXIT_MAN.CS4
+					MANMORSE.DIA
+					OPEN_AF.CS4
+					POS_AXES.DIA
+					POS_MOR_MASTER.CS4
+					PRELUT.CS4			R6865  >>  R6863	dato che SYNCNC1.CS4:	$M351 {Blocco di questo CNC ed attesa dei CNC indicati nella R6863
+					PRELUT_CH1.CS4		"
+					RIFASSI.DIA
+					RIFASSI_OFF.DIA
+					RIPOS_MOT_SING.CS4
+					RIP_DX_X.DIA
+					SCAV_LAT_TEST.DIA
+					SNGCNT_CH1.CS4
+					SYNCNC_CH2.CS4
+					TAST_STANDARD.CS4
+					Z_RTCP.DIA
+					Z_SCAVALCA.CS4
+					ZMIN_SP.CS4
+					lubrica.c		R_LUBRICA_DUTY_CYCLE_MIN	R_LUBRICA_DUTY_CYCLE_MAX	R_LUBRICA_DUTY_COEFF_ANG
+					
+- TEST FUNZIONALE, VERIFICA NUOVE GESTIONI SW :
++ verifica lavoraz in testa/coda con testina, a vuoto        : ok  (modif uscita eliminando movim Y)
++ verifica lavoraz in testa/coda con testina, con pezzo reale: fatto dal tecnico di biaggi?
+
++ verifica non interferenza tra testina e riparo anteriore (R7010 R7011): ok
++ verifica carico/scarico automatico utensili dal magazzino tramite mandrino: ok
+
++ verifica Integrità utensili
+
++ verifica rilievo lunghezza utensile (R507 R508)	***** F10=105.67 *****
+	_ISO_RIL_LUNG.txt
+	@ NON PARTE ESECUZ SU CH1, IMPOSTANDO MANUALM R6970=10 POI PARTE!!!
+	* MODIFICATA GESTIONE SINCRONIZZAZIONE IN ISOMG_CH1.CS4, ISOMG_CH2.CS4!!! ORA NON PERDE PIU I NUOVI VALORI DI CAUSALI SE IL SOTTOCH E' IMPEGNATO DURANTE LA VARIAZIONE DI R6970!!!
+		R7511 = quota_Y    + R764 + Lunghezza_utensile = 402.1 + 110,28 + 105.67 = 618.05
+		R7511=618.05    {old:619.3  Quota asse Y per verifica integrità utensile | Y axis position for check tool 
+		R7515=705.0     {old:705.0 Quota asse W per verifica integrità utensile | W axis position for check tool  (R7515= 701,0 - 709,0 /2 => 705.0)
+		F10=105.67	RILEVATO: 105.63  .65  .64  .65  .64  .63
+
+{DIMENSIONI UTENSILI COMPATIBILI COL PRESETTER  (21/09/2022)
+{Lunghezza min: 90mm  }
+{Lunghezza max: 190mm }
+{Raggio    max: 20mm  }
+
+- VERIFICA RILIEVO RAGGIO UTENSILE (R507 R508)
+	_ISO_RIL_DIAM.txt
+	* alzata un po quota Z per poter poi muover W mantenendo ut di 20mm di raggio lontano dall'ut 6, centrando in Z l'ut di 20mm tra presetter e ut.6:
+		R7512=185.0     {old 165 Quota asse Z per verifica integrità utensile | Z axis position for check tool
+	
+	* verificata quota fuori ingombro carter mag.ut:
+		YminCarterMagUt = 354 + 110,28 + 105.67 = *** 570 ***	=>	R7182 = 570 - 110,28 - 200 = 260 
+		R7182=260      {old:270  Quota asse Y fuori ingombro magazzino utensili | Y axis position out of encumbrance tools stock}
+		R7522=160       {Quota Y minima che evita collisione tra morse e culo mandrino a qualsiasi Z (B0 C90) con tavola avanti verso operatore
+
+	@ CH0 NON ASP FINE MOV W E PROSEGUE...  (IL PROBLEMA SI NOTA SE SI PARTE CON GIA A=0, DATO CHE POI IL MOVIM DI Z FINISCE PRIMA DI W PER PORTAR UT6 DAVANTI AL MANDRINO)
+		@ R6869=2 gia nella esecuz di N2470	!!!		prima di:    N2480  L WAIT_W.CS4	{W: attesa fine movimento asse indipendente}
+			* impostata a 2 in:	RIFASSI_CH1.CS4		WAIT_W_CH1.CS4
+			* atteso        in:   WAIT_CH1_CH0.CS4
+			- verif se ora capita anche rilevando lungh ut: si
+			togliendo da RIFASSI_CH1.CS4  N10040 R6869=2  poi esecuz ch0 rimane ferma in attesa di R6869=2  in N4150 IF (R450<0.5) L <WAIT_CH1_CH0.CS4>
+			mettendo  in RIFASSI_CH1.CS4  N10040 R6869=2  poi R6869 rimane a 2 anche dopo uscita da RIFASSI.CS4 dato che RIFASSI_CH1.CS4 viene eseguita 2 volte!!!
+			* modificato ISOMG_CH1.CS4,  ISOMG_CH2.CS4
+			** lav__2024_04_11C
+
+	@ ERRORE CNC 1037 e 7007 E  QUANDO W ESEGUE MOVIM DI RICERCA MICRO...
+		* usata SetMiVel_MC: OK
+		
+	@ asse W invece che in G91 relativo andava in G90 assoluto!!
+		* evitato G53: OK
+		
+	***** F10=4mm *****  rilevato:
+		F10=105.67	RILEVATO: 105.67  .68  .67  .68  
+								  4.058  4.053  .052  .055  .058  .063   .060   .059
+		
+	***** F6 ( L=144.8  R=3.35 ) *****  rilevato:
+		L= 144.84   .84                                                                                                                      
+		R= 3.35     .22                                                                                                                      
+
+
+	P3  *******************************************************************************
+	VEL         *       10      10      10      10       10                                                                                 
+	L   115.02  *      115.15  115.18  115.18  115.19   115.19                                             
+	R   1.61    *        1.8     1.8     1.8     1.8      1.8                                              
+
+
+	F10 *******************************************************************************
+	VEL         *       10      10      10       10      10      10      10      10      10                                                                                
+	L   115.12  *      115.16  115.15  115.16   115.17  115.17  115.16  115.16  115.13  115.13                                                                                                
+	R   4.88    *        4.8     4.8     4.7      4.8     4.8     4.73    4.69    4.82    4.59                                                                                   
+
+
+	P68 *******************************************************************************
+	VEL         *       10      10      10      10                                                     
+	L   144.8   *      144.92  144.95  144.95  144.95                                                          
+	R   3.35    *        3.43    3.43    3.42    3.43                                                         
+
+
+	V16 *******************************************************************************
+	VEL         *       10      10      10                                                        
+	L   170.27  *      170.45  170.45  170.45
+	R     7.92  *        8.32    8.32    8.32
+
+
+	F20 *******************************************************************************
+	VEL         *       10      10      10       10       10      10      10                    
+	L   169.47  *      169.41  169.44  169.43   169.44   169.43                                                           
+	R    10.00  *        9.62    9.44    9.59     9.40     9.49                                                           
+
+	*********************************************************************************************************************************
+	*********************************************************************************************************************************
+	*********************************************************************************************************************************
+
+
+	F20 *******************************************************************************
+														1000     4000
+	VEL         *       10      10      10       10       10       10                
+	L   169.47  *      169.42  169.43  169.43   169.44   169.44   169.32                                        
+	R    10.00 ?*        9.89    9.89    9.89     9.89     9.89     9.39                                       
+
+
+	F10 *******************************************************************************
+	VEL         *       10      10      10       10      10      10      10      10      10                                                                                
+	L   115.12  *      115.15  115.15  115.15   115.15  115.    115.    115.    115.    115.                                                                                                  
+	R   4.90    *        4.82    4.82    4.83     4.83    4.      4.      4.      4.      4.                                                                                     
+
+
+	P68 *******************************************************************************
+	VEL         *       10      10      10      10                                                     
+	L   144.8   *      144.91  144.94  144.94  144.94                                                          
+	R   3.30    *        3.42    3.44    3.42    3.42                                                         
+
+
+	P3  *******************************************************************************
+												1000     2000    2000     4000     4000                    
+	VEL         *       10      10      10      10       10      10       10       10                                         
+	L   115.02  *      115.15   115.17  115.17  115.17   115.17  115.17   115.17   115.17                                   
+	R   1.60    *        1.85    1.84    1.85     1.84     1.81    1.80     1.65     1.65                                   
+
+
+
+- verifica gestione avanzata ut., in caso di ut.rotto rilevato da presetter, esecuz restava ferma su Mxxx di allineamnto con hadrill!!!
+- verifica tastatura obliqua (127.CS4: tastatura obliqua laterale;  128.CS4: tastatura obliqua di punta)
+- verifica abilitazione/disabilitazione filtri anche su asse A  (R7883 > 1.5).
+
+
+=======================================================================================================================================================================================================
+
+	800		COMET_RSX CS4	verifica SNGCNT			C:\Prodotti\Progetti Cnc 7_0\Comet_S4___VARIE\__LINK
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CALC_POS_XYBC.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CALC_YOUT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CALC_ZOUT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CAMBIOUT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CAMBIOUT_CH1.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CAR_UT_ASS.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CK_AX_PEND_DX.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CK_LUNG.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKMOV_W.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKMOV_YA.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKMOV_Z.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKMOVCAR.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKTOOL.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\CKTOOL_CH1.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\DEPUT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\EXIT_MAN.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\FINDMORS.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\MAP_TOOL.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\MAP_TOOL_CH1.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\POSM_MOT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\POSM_X.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\PRELUT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\PREP1.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\SCA_UT_ASS.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\SEQ_C_UT.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\SPOSTA_X.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\Z_RTCP.CS6
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6\lav\ZMIN_SP.CS6
+
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\8.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CALC_MOVPIECE.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CALC_OPEN_AF.CS4
+				
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CALC_POS_XYBC.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CALC_YOUT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CALC_ZOUT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAM_EMMEGI.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAM_ORG.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAMBIOUT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAMBIOUT_CH1.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAMBMAN.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAMBMAN_CH2.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAMPIECE.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CAR_UT_ASS.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CK_BATT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S6__2025_01_21b_rin_CS4\lav\CKMOV_W.CS4
+
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKMOV_YA.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKMOVCAR.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKTOOL.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKTOOL_CH1.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKTOOL2.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\CKTOOL2_CH1.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\DEPUT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\END.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\EXIT_MAN.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\FC_SIMU.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\FINDMORS.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\FINEALL.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\INI_R_MC.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\ISOMG_CH1.CS4		molto meglio quella della CS4 che richiama rifassi solo quando le vien richiesto, altrimenti veniva chiamato 2 volte e in un caso poi si bloccava
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\MOV_TAV.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\MOVEMORS.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\MOVEMORS_CH2.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\MOVIND_W.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\MOVPIECE.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\POS_AXES.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\POSM_MOT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\POSM_X.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\POSMORS.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\PRELUT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\PREP1.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\RESET.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\RIFASSI.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\RIFASSI_OFF.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\RIL_DIM_UT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\RTON.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\SCA_UT_ASS.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\SEQ_C_UT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\SNC.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\TAST_OBLIQUA.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\TAST_STANDARD.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\TAST3.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\TAV_SING_DOUBLE.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\WAIT.CS4
+				C:\Prodotti\Progetti Cnc 7_0\Comet_R4__2025_01_30b_rin_CS4\lav\Z_RTCP.CS4
+				
+				C:\Prodotti\Progetti Cnc 7_0\Comet_S4\lav\
+					127.CS4
+					128.CS4
+					25.CS4
+					27.CS4
+					28.CS4
+					29.CS4
+					CALC_POS_XYBC.CS4
+					CALC_YOUT.CS4
+					CALC_ZOUT.CS4
+					CAM_EMMEGI.CS4
+					CAM_ORG.CS4
+					CAM_PROB.CNC
+					CAMBIOUT.CS4
+					CAMBIOUT_CH1.CS4
+					CAMBMAN.CS4
+					CAR_UT_ASS.CS4
+					CK_LUNG.CS4
+					CKMOV_W.CS4
+					CKMOV_YA.CS4
+					CKMOV_Z.CS4
+					CKMOVCAR.CS4
+					CKTOOL.CS4
+					CKTOOL2.CS4
+					CKTOOL2_CH1.CS4
+					CKTOOL_CH1.CS4
+					DEPUT.CS4
+					EXIT_MAN.CS4
+					FINDMORS.CS4
+					MAP_TOOL.CS4
+					MAP_TOOL_CH1.CS4
+					POSM_MOT.CS4
+					POSM_X.CS4
+					PRELUT.CS4
+					RIFASSI.CS4
+					RIFASSI_OFF.CS4
+					RTCP_END.CS4
+					SCA_UT_ASS.CS4
+					SEQ_C_UT.CS4
+					Z_RTCP.CS4
+					Z_SCAVALCA.CS4
+					ZMIN_SP.CS4
+
+=======================================================================================================================================================================================================
+
+
+
+
+

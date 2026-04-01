@@ -1,0 +1,19 @@
+{Eventuale attesa per debug 
+{R4100  abilita stop
+{R4101  abilita ristart
+{R4102  soglia oltre la quale ciclo aspetta
+{R4103  contatore 
+
+N110 R4103=R4103+1
+[ASP]
+N210 IF(R4100<0.5)    JMP [FINE]
+N220 IF(R4103<R4102)  JMP [FINE]
+N230 IF(R4101>0.5)    JMP [FINE]
+
+N310 L SNGCNT.CS4
+N320 G4 F0.1  {evita di occupare la cpu del pc al 100%
+N330 JMP [ASP]
+
+[FINE]
+N420 R4101=0
+N430 RET

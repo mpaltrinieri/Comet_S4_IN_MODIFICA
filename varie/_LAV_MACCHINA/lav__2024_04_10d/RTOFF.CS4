@@ -1,0 +1,7 @@
+
+{------------------------- DISABILITAZIONE RTCP ----------------------------}
+N03  G49               { disabilito  G43.4
+N04  G05.1Q0           { ripristino standard interpolation
+
+N10  RTCOFF            {disabilito RTCP}
+N20  RET

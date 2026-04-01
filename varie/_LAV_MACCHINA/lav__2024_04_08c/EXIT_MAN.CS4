@@ -1,0 +1,315 @@
+
+{------------------------ GESTIONE USCITA UTENSILE DA LAVORAZIONE ---------------------}
+
+N01 L <CALC_YOUT.CS4>
+N05 IF(R585>0.5) JMP [ASSOLUTO]
+N10 IF (R250 == 0) [CASO1] { Lavorazione successiva su piano o con utensile diverso
+N20 IF (R250 == 1) [CASO2] { Lavorazione successiva su stesso piano con scavalcamento morse
+N30 IF (R250 == 2) [CASO3] { Lavorazione successiva su stessa faccia senza scavalcamento morse (DISIMPEGNO CALCOLATO DA CAMPLUS)
+N40 IF (R250 == 3) [CASO4] { Lavorazione successiva su stessa faccia in stesso punto
+N50 JMP [FINE]
+
+{-------------- Lavorazione successiva su piano o con utensile diverso ------------}
+[CASO1]
+N1000 IF (R203 == 1) [FACE1_C1]
+N1010 IF (R203 == 2) [FACE2_C1]
+N1020 IF (R203 == 3) [FACE3_C1]
+N1030 IF (R203 == 4) [FACE4_C1]
+N1040 IF (R203 == 5) [FACE5_C1]
+N1050 IF (R203 == 6) [FACE6_C1]
+N1060 JMP [FINE]
+
+
+[FACE1_C1]
+N1100 {lavorazione su faccia 1}
+      M9 G0 G40
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253
+      JMP [FINE]
+
+[FACE2_C1]
+N1200 {lavorazione su faccia 2}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE3_C1]
+N1300 {lavorazione su faccia 3}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE4_C1]
+N1400 {lavorazione su faccia 4}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE5_C1]
+N1500 {lavorazione su faccia 5}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE6_C1]
+N1600 {lavorazione su faccia 6 (Lato inferiore con testina)}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      Y=-R335
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+
+{-------------- Lavorazione successiva su stesso piano con scavalcamento morse ----------}
+[CASO2]
+N2000 IF (R203 == 1) [FACE1_C2]
+N2010 IF (R203 == 2) [FACE2_C2]
+N2020 IF (R203 == 3) [FACE3_C2]
+N2030 IF (R203 == 4) [FACE4_C2]
+N2040 IF (R203 == 5) [FACE5_C2]
+N2050 IF (R203 == 6) [FACE6_C2]
+N2060 JMP [FINE]
+
+
+[FACE1_C2]
+N2100 {lavorazione su faccia 1}
+      M9 G0 G40
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE2_C2]
+N2200 {lavorazione su faccia 2}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE3_C2]
+N2300 {lavorazione su faccia 3}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE4_C2]
+N2400 {lavorazione su faccia 4}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE5_C2]
+N2500 {lavorazione su faccia 5}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+[FACE6_C2]
+N2600 {lavorazione su faccia 6 (Lato inferiore con testina)}
+      M9 G0 G40
+      Z=R330
+      <DTC : OFF>
+      R621=0
+      Y=-R335
+      G59 X0 Y0 Z0
+      G0 G53 D0 Z=R254
+      IF (R254 < R349) [FINE]
+      Y=R253 
+      JMP [FINE]
+
+{------ Lavorazione successiva su stessa faccia senza scavalcamento morse -------}
+[CASO3]
+N3000 M9 G0 G40 Z=R330
+N3010 R260=R203             {Memorizzo ultima faccia lavorata per testina}
+      JMP [FINE]
+
+{------- Lavorazione successiva su stessa faccia in stesso punto ------}
+[CASO4]
+N4000 M9 G0 G40
+N4010 R260=R203             {Memorizzo ultima faccia lavorata per testina}
+      JMP [FINE]
+
+[FINE]
+N5020 L <SNGCNT.CS4>
+N5030 RET
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////
+{//////////////////////////////////////////////////////////////////////////////////////////////////
+{//////////////////////////////////////////////////////////////////////////////////////////////////
+
+[ASSOLUTO]   
+{EXIT_MAN per assi orientati con il sistema assoluto}
+{R6090 = Zmin a cui portare l'asse Z oltre la quota di scavalcamento morse}
+
+{Calcola lo Zmin a cui portare l'asse Z oltre la quota di scavalcamento morse}
+N9000  L ZMIN_SP.CS4
+
+N10010 IF (R250 == 0) [CASO_A] { Lavorazione successiva su piano diverso o con utensile diverso (da passare solo se cambio utensile)}
+N10020 IF (R250 == 1) [CASO_B] { Lavorazione successiva su stesso piano con scavalcamento morse}
+N10030 IF (R250 == 2) [CASO_C] { Lavorazione successiva su stessa faccia senza scavalcamento morse}
+N10040 IF (R250 == 3) [CASO_D] { Lavorazione successiva su stessa faccia in stesso punto}
+N10050 JMP [END_ABS]
+
+[CASO_A]
+N11000 M9 G0 G40
+N11005 Z=R330
+N11010 <DTC : OFF>
+N11015 G601 (RAT=1)
+N11020 R621=0
+N11025 IF(R204>0.5) Y=R6262    {con testina prima deve uscire a R6262 quota di scavalcamento laterale profilo appoggiata in POS_AXES.CS4}
+N11030 G59 X0 Y0 Z0
+N11035 D0    {anticipato annulla correttore lunghezza utensile, insieme al movimento di Z sembra non funzionare correttamente}
+N11040 G0 G53 D0 Z=R254
+N11041 L <SNGCNT.CS4>   {attesa sincronizzaz quota asse Y su (V6003/1)
+N11045 IF(R254 < R349) JMP [END_ABS]
+N11050 Y=R253 
+N11055 JMP [END_ABS]
+
+[CASO_B]
+N12005 M9 G0 G40
+N12010 Z=R330
+N12015 <DTC : OFF>
+N12020 G601 (RAT=1)
+N12025 R621=0
+N12030 IF(R204>0.5) Y=R6262    {con testina prima deve uscire a R6262 quota di scavalcamento laterale profilo appoggiata in POS_AXES.CS4}
+N12035 G59 X0 Y0 Z0
+N12036 IF((V6003/3)<=90) R400=(V6003/3)
+N12037 IF((V6003/3)>90)  R400=(180-(V6003/3))
+N12040 IF(R204<0.5) R6116=(R501+R6090+R710)+(R619+R764)*SIN(R400)+R763*COS(R400)   {posizione a cui dovrei portare in Z il centro di rotazione}
+
+N12045 IF(R204>0.5) IF(R5017==0)   R6116=(R501+R6090+R710)+R764*SIN(R400)+R763*COS(R400)          {posizione a cui dovrei portare in Z il centro di rotazione con la testina su mandrino}
+N12046 IF(R204>0.5) IF(R5017==90)  R6116=(R501+R6090+R710)+R764*SIN(R400)+(R763-R619)*COS(R400)   {posizione a cui dovrei portare in Z il centro di rotazione con la testina su mandrino}
+N12047 IF(R204>0.5) IF(R5017==180) R6116=(R501+R6090+R710)+R764*SIN(R400)+R763*COS(R400)          {posizione a cui dovrei portare in Z il centro di rotazione con la testina su mandrino}
+N12048 IF(R204>0.5) IF(R5017==270) R6116=(R501+R6090+R710)+R764*SIN(R400)+(R763-R619)*COS(R400)   {posizione a cui dovrei portare in Z il centro di rotazione con la testina su mandrino}
+
+N12049 L <SNGCNT.CS4>   
+N12050 IF(R6116>=(R349-1)) JMP [NO_RTCP]
+N12060 JMP [SI_RTCP]
+
+[NO_RTCP]
+N12100 D0    {anticipato annulla correttore lunghezza utensile, insieme al movimento di Z sembra non funzionare correttamente}
+N12105 G0 G53 D0 Z=(R349-1)       {asse Z a Zmax}
+N12110 JMP [END_ABS]
+
+[SI_RTCP]
+N12200 IF(R204>0.5) JMP [SI_RTCP_TEST] {scavalcamento morse con utensile testina}
+    {N12210 L <RTON.CS4>
+    {N12220 G0 G53 Z=(R501+R6090+R710)       {asse Z a quota di sorvolo morsa o pezzo}
+    {N12230 L <RTOFF.CS4>
+    {N12230 G0 G53 Z=R6116                   {posizione a cui deve andare Z come centro di rotazione}
+N12230 L <Z_SCAVALCA.CS4>      
+N12240 JMP [END_ABS]
+
+[SI_RTCP_TEST]
+N12300 R4500=R763                             {salvo l'offset Y prima di modificarlo}
+N12310 R4501=R764                             {salvo l'offset Z prima di modificarlo}
+N12320 R4502=R619                             {salvo la lunghezza utensile prima di modificarla}
+N12330 R6267=R256                             {salvo la quota di fuori ingombro con testina prima che venga modificata}
+N12340 L <SNGCNT.CS4>
+N12350 R763=R763-R619                         {Offset Y come se fosse un utensile diretto}
+N12360 R764=R764-R5015                        {Offset Z come se fosse un utensile diretto}
+N12370 TL=(R5015)                             {come lunghezza utensile carico l'offset Y testina}
+N12375 IF(R7991>0.5) R619=R5015               {modifica lunghezza utensile su simulatore offline}
+
+[CKLENGHT_01]                                 {attesa cambiamento lunghezza utensile}
+N12380 IF(ABS(R5015-R619) < 0.001) JMP [UPG_LENGHT_01]
+N12385 L SNGCNT.CS4
+N12390 G4 F0.1 
+N12395 JMP [CKLENGHT_01]
+
+[UPG_LENGHT_01]
+  {N12400 L <RTON.CS4>
+  {N12410 G0 G53 Z=(R501+R6090+R710)       {asse Z a quota di sorvolo morsa o pezzo}
+  {N12420 L <RTOFF.CS4>
+  {N12420 G0 G53 Z=R6116                {posizione a cui deve andare Z come centro di rotazione}
+N12420 L <Z_SCAVALCA.CS4>
+
+N12500 L <SNGCNT.CS4>
+N12510 R763=R4500                   {ricarica l'offset Y salvato prima di modificarlo}
+N12520 R764=R4501                   {ricarica l'offset Z salvato prima di modificarlo}
+N12530 TL=R4502                     {ricarica lunghezza utensile salvata prima di modificarla}
+N12535 IF(R7991>0.5) R619=R4502     {modifica lunghezza utensile su simulatore offline}
+
+[CKLENGHT_02]                                 {attesa cambiamento lunghezza utensile}
+N12580 IF(ABS(R4502-R619) < 0.001) JMP [UPG_LENGHT_02]
+N12585 L SNGCNT.CS4
+N12590 G4 F0.1 
+N12595 JMP [CKLENGHT_02]
+
+[UPG_LENGHT_02]
+N12600 JMP [END_ABS]
+
+{------ Lavorazione successiva su stessa faccia senza scavalcamento morse -------}
+[CASO_C]
+N13000 M9 G0 G40 Z=R330
+N13010 JMP [END_ABS]
+
+{------- Lavorazione successiva su stessa faccia in stesso punto ------}
+[CASO_D]
+N14000 M9 G0 G40
+N14010 JMP [END_ABS]
+
+[END_ABS]
+N15400 L <SNGCNT.CS4>
+N15410 R3090=0         {reset appoggio offset tastatore di punta
+N15420 R13001=10       {OPCUA: stato macchina 10 --> Macchina in Positioning}
+N15500 RET

@@ -1,0 +1,12 @@
+{CH1}
+
+{ Sincronizzazione canale
+{ R6863 = canali con cui sincronizzarsi
+{         b0 = canale 0 Assi Principali
+{         b1 = canale 1 Magazzino utensili
+{         b2 = canale 2 Posizionamento morse 
+
+L<SNGCNT.CS4>
+$M351 {Blocco di questo CNC ed attesa dei CNC indicati nella R6863
+L<SNGCNT.CS4>
+RET

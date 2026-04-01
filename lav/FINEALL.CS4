@@ -1,0 +1,56 @@
+
+
+{---------------------------- FINE PROGRAMMA DI LAVORO -------------------------}
+N9   IF (R649 == 1) $M227       {fine maschiatura rigida}
+N10 $M102						{Stop Trasportatore Trucioli
+N20 IF (R513==1) JMP [ERGO]		{Salta al modo ergonomico
+
+
+{------ Chiusura Ciclo in Modo NORMALE NON Ergonomico ------}
+
+[NORMALE]
+N100  $M05				{arresto mandrino}
+
+N101  R495=-1			{Assegno un valore di default impossibile per l'appoggio rotazione
+N102  R496=-1			{Assegno un valore di default impossibile per l'appoggio velocità
+
+N110  $M83				{fine ciclo di lavoro}
+
+N200  $M91					{Avanzamento tavola in carico, avanti verso operatore
+N205  R12005=R12008         {tavola lato operatore per SIMUX
+N210  $M58					{apertura riparo}
+
+N230  IF (R737 > 0) [CONT_NOR]
+N235  L SNGCNT.CS4
+N237  R6970=9999               {causale per fine programma su tutti i canali}
+N240  $M02                     {fine programma}
+
+[CONT_NOR]
+N500  G4 F5
+N510  RET
+
+
+{------ Chiusura Ciclo in Modo Ergonomico ------}
+
+[ERGO]
+N1000  $M05			{arresto mandrino}
+N1001  R495=-1		{Assegno un valore di default impossibile per l'appoggio rotazione
+N1002  R496=-1		{Assegno un valore di default impossibile per l'appoggio velocità
+
+N1010  $M83			{fine ciclo di lavoro}
+
+
+{----- Condizioni fisiche di fine di tutte le operazioni -----}
+N1210  $M91					{Avanzamento tavola in carico, avanti verso operatore
+N1215  R12005=R12008          {tavola lato operatore per SIMUX
+N1220  $M58					{apertura riparo}
+
+N1300  IF (R737>0) [CONT_ERG]
+N1310  L SNGCNT.CS4
+N1320  R6970=9999                   {causale per fine programma su tutti i canali}
+N1330  $M02                         {fine programma}
+
+
+[CONT_ERG]
+N1500  G4 F5
+N1510  RET

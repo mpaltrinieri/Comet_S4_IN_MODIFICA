@@ -1,0 +1,135 @@
+{TAGLIO PROFILO CON LAMA CON RTCP}
+
+N10 $M00  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+N20 $M02  {TAGLIO E SEPARAZIONE NON GESTITO SU COMET S
+
+{variabili di ingresso}
+
+{R3400: velocità di taglio (traslazione assi in mm/min)
+{R3401: velocità di rotazione della lama (n° giri mandrino/min)
+{R3402: velocità di taglio del 4° vertice (traslazione assi in mm/min)
+
+{R3403: quota A
+{R3404: quota C
+
+{R3410: vertice1: quota X
+{R3411: vertice1: quota Y
+{R3412: vertice1: quota Z
+
+{R3413: vertice2: quota X
+{R3414: vertice2: quota Y
+{R3415: vertice2: quota Z
+
+{R3416: vertice3: quota X
+{R3417: vertice3: quota Y
+{R3418: vertice3: quota Z
+
+{R3419: vertice4: quota X
+{R3420: vertice4: quota Y
+{R3421: vertice4: quota Z
+
+{R683 : Appoggio per calcolo Tavola da muovere
+
+{R5927: mm di scostamento in X della lama
+
+{//////////////////////////////////////////////////////////////////////////////////////////////////}
+
+N80  R13001=11                       {OPCUA: stato macchina 11 --> Macchina in Working}
+N90  L <SNGCNT.CS4>
+
+{identificazione movimento TAVOLA da fare
+N100 L <TAV_SING_DOUBLE.CS4>
+
+[END_TAV]
+N1010  IF (R3400 > 20000) R3400=20000              {limitazione di sicurezza della velocità di taglio
+
+{{VELOCITA NON LIMITATA PER ORA DATO CHE RIGUARDA SOLO IL 4°VERTICE
+N1012  IF (R3402 > 50000) R3402=50000  {limitazione di sicurezza della velocità di taglio del 4° vertice
+
+N1020  IF (R3401 > 5400) R3401=5400              {limitazione di sicurezza della velocità di rotazione
+
+N1122  IF(R241<0.5) $M03 S=R3401                 {attiva rotazione ORARIA     mandrino
+N1124  IF(R241>0.5) $M04 S=R3401                 {attiva rotazione ANTIORARIA mandrino
+
+{appoggio valori posizione lavorazione per calcolo}
+R6450=R3410	{X
+R6451=R3411	{Y
+R6452=R3412	{Z
+R6453=R3403	{A
+IF(R204<0.5) R6454=R3404    {C:
+IF(R204>0.5) R6454=0        {C: 0 gradi nel caso di lama su testina
+
+N1125  L CALC_TCP.CS4                            {calcola punti TCP
+N1127  $M101                                     {Start Trasportatore Trucioli
+
+N1130  G00 X=R6456 Y=R6457 A=R6459 C=R6460 $M=(R683) {preposiziona assi prima di attivare RTCP
+N1140  G00 Z=R254                                    {preposiziona assi prima di attivare RTCP
+N1150  R6838=0                                       {reset variabile scostamento pezzo eseguito
+
+N1200  L RTON.CS4                                         {attiva RTCP, tutte le quote XYZ seguenti dovran esser relative al centro utensile
+
+N1210  G00 A=R3403 C=R3404 X=R3410 Y=-R3411               {1° vertice
+N1220  G00 Z=R3412 $M07                                   {posiziona Z e attiva lubrica
+N1230  L SLOWACC.CS4
+N1250  G304 CNC
+
+N1310  G01 F=R3400  X=R3413 Y=-R3414 Z=R3415             {2° vertice
+N1320  G304 CNC
+
+N1410  G01 F=R3400  X=R3416 Y=-R3417 Z=R3418             {3° vertice
+N1420  G304 CNC
+
+N1430  L<SCOST_PEZZO.CS4>                                {muove le morse per scostare il pezzo, richiama il CH2 per fare l’aggancio gantry}
+
+N1440  G01 F=R3400  X=(R3416+R5927) Y=-R3417 Z=R3418     {scostamento della lama: potrebbe essere fatto anche senza aver scostato il pezzo}
+N1450  G304 CNC
+
+N1470  IF(R5927==0) JMP [NO_ESEG_SCOST]                     {scostamento lama non eseguito}
+N1480  JMP [SCOST_ESEGUITO]
+
+[NO_ESEG_SCOST]
+N1510  IF(R3402<0.5) G01 F=R3400  X=(R3419+R5927) Y=-R3420 Z=R3421  {4° vertice a velocita uguale alle precedenti
+N1512  IF(R3402>0.5) L FASTACC.CS4                                  {4° vertice a accelerazione diversa
+N1512  IF(R3402>0.5) G01 F=R3402  X=(R3419+R5927) Y=-R3420 Z=R3421  {4° vertice a velocita diversa
+N1520  G304 CNC
+N1525  JMP [RITORNO_PEZZO]
+
+[SCOST_ESEGUITO]
+N1530 L FASTACC.CS4                              {4° vertice a accelerazione diversa
+N1540 G00 X=(R3419+R5927) Y=-R3420 Z=R3421       {4° vertice a velocita G0
+N1550 G304 CNC
+
+[RITORNO_PEZZO]
+N1600  L<SCOST_PEZZO.CS4>                        {muove le morse per riportare indietro il pezzo, richiama il CH2 per fare l’aggancio gantry}
+
+N1610  L RTOFF.CS4                               {reset RTCP e ripristino quota asse C
+
+N1620  $M09                                      {Arresto lubrica
+N1630  IF(R3402<0.5) L FASTACC.CS4
+N1640  G0 G53 Z=R254                             {esce fuori ingombro ottimizzato
+
+N1660  IF(R571<0.5) JMP [FINE]                   {esce se non deve effettuare la pausa}
+N1670  IF(R459>0.5) JMP [FINE]                   {esce se simulazione}
+
+{eventuale sosta dopo il taglio per separazione}
+N1710  S0
+N1720  R495=-1                                   {reset memoria senso di rot. mandr. in pos_axes}
+N1730  R496=-1                                   {reset memoria velocita di rot. mandr. in pos_axes}
+N1740  G00 D0 Z=R349
+
+N1800  IF(R5940>0.5) $M58                        {apertura riparo se autofeed a pezzo libero}
+
+N1825  L SNGCNT.CS4
+N1830  IF(R459<0.5) R482=16                      {Hdrill: pausa programmata, premere start per proseguire
+N1860  IF(R459<0.5) $M00                         {Sosta dopo taglio per separazione}
+
+N1900  IF(R5940>0.5) $M59                        {chiusura riparo se autofeed a pezzo libero}
+N1940  IF(R459<0.5) L SNGCNT.CS4
+N1950  IF(R459<0.5) R482=0                       {Hdrill: reset messaggio}
+
+[FINE]       
+N2010  L SNGCNT.CS4
+N2012  R482=0                                    {Hdrill: reset messaggio 
+N2015  R571=0
+N2020  R13001=10                                 {OPCUA: stato macchina 10 --> Macchina in Positioning}
+N2040  RET

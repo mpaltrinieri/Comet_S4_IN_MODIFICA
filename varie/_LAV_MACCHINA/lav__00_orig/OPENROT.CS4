@@ -1,0 +1,30 @@
+{---------------------------- APERTURA MORSE con ROTAZIONE -------------------------------}
+
+N13 $M294                              {disattiva chiusura in alta forza morsa 10
+N14 $M295                              {disattiva chiusura in alta forza morsa 11
+N15 $M296                              {disattiva chiusura in alta forza morsa 12
+N20 $M297                              {disattiva chiusura in alta forza morsa 13
+N21 $M298                              {disattiva chiusura in alta forza morsa 14
+N22 $M299                              {disattiva chiusura in alta forza morsa 15
+
+N30 IF (R509>0.5) JMP [FINEOP]         {gestione morse da operatore
+N40 L <SNGCNT.CS4>
+
+N50 R638=0					{reset memoria morse da aprire}
+
+N62 R678=0
+
+{Controllo le morse da aprire in ergonomico : è il primo giro
+N80 R678=R528+R531
+
+{Apri le morse in ROTAZIONE solo se richieste e usate
+N730 IF (FTL(R678)&'0008')	$M234				{apri morsa 10
+N740 IF (FTL(R678)&'0010')	$M235				{apri morsa 11
+N750 IF (FTL(R678)&'0020')	$M236				{apri morsa 12
+N800 IF (FTL(R678)&'0040')	$M237				{apri morsa 13
+N810 IF (FTL(R678)&'0080')	$M238				{apri morsa 14
+N820 IF (FTL(R678)&'0100')	$M239				{apri morsa 15
+
+[FINEOP]
+N1000 L <SNGCNT.CS4>
+N1030 RET

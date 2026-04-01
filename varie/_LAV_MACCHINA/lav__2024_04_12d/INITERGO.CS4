@@ -1,0 +1,12 @@
+
+
+{------------- Operazioni d'inizializzazione cicli successivi ERGONOMICO --------------}
+
+N10 $M198			{Conferma ciclo in corso per reset richieste
+N20 $M195			{Memoria ciclo in corso
+N30 $M80			{inizio ciclo di lavoro multipezzo (unico possibile)
+
+
+RET
+
+

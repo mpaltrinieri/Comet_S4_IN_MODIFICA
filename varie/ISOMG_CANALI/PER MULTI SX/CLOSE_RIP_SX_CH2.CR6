@@ -1,0 +1,30 @@
+{***** CHIUSURA MORSE DOPO RIPOSIZIONAMENTO *****}
+{R521 = Riposizionamento morse a SX in pendolare}
+{R6206 = indice delle morse chiuse in bassa forza}
+{R6951 = morse a SX da muovere al giro di riposizionamento 1}
+{R6952 = morse a SX da muovere al giro di riposizionamento 2}
+
+{*** CASE 1920 in Multi_SX.c ***}
+N1110 IF((FTL(R6951)&'0001') > 0.5) $M131 {Chiusura morsa 7 in bassa forza
+N1120 IF((FTL(R6951)&'0002') > 0.5) $M132 {Chiusura morsa 8 in bassa forza
+N1130 IF((FTL(R6951)&'0004') > 0.5) $M133 {Chiusura morsa 9 in bassa forza
+N1140 IF((FTL(R6951)&'0008') > 0.5) $M134 {Chiusura morsa 10 in bassa forza
+N1150 IF((FTL(R6951)&'0010') > 0.5) $M135 {Chiusura morsa 11 in bassa forza
+N1160 IF((FTL(R6951)&'0020') > 0.5) $M136 {Chiusura morsa 12 in bassa forza
+
+N1210 IF((FTL(R6952)&'0001') > 0.5) $M131 {Chiusura morsa 7 in bassa forza
+N1220 IF((FTL(R6952)&'0002') > 0.5) $M132 {Chiusura morsa 8 in bassa forza
+N1230 IF((FTL(R6952)&'0004') > 0.5) $M133 {Chiusura morsa 9 in bassa forza
+N1240 IF((FTL(R6952)&'0008') > 0.5) $M134 {Chiusura morsa 10 in bassa forza
+N1250 IF((FTL(R6952)&'0010') > 0.5) $M135 {Chiusura morsa 11 in bassa forza
+N1260 IF((FTL(R6952)&'0020') > 0.5) $M136 {Chiusura morsa 12 in bassa forza
+
+{*** CASE 1920 in Multi_SX.c ***}
+N1310 IF(R521>0.5) IF((FTL(R6206)&'0001') > 0.5) $M271 {Chiusura morsa 7 in alta forza
+N1320 IF(R521>0.5) IF((FTL(R6206)&'0002') > 0.5) $M272 {Chiusura morsa 8 in alta forza
+N1330 IF(R521>0.5) IF((FTL(R6206)&'0004') > 0.5) $M273 {Chiusura morsa 9 in alta forza
+N1340 IF(R521>0.5) IF((FTL(R6206)&'0008') > 0.5) $M274 {Chiusura morsa 10 in alta forza
+N1350 IF(R521>0.5) IF((FTL(R6206)&'0010') > 0.5) $M275 {Chiusura morsa 11 in alta forza
+N1360 IF(R521>0.5) IF((FTL(R6206)&'0020') > 0.5) $M276 {Chiusura morsa 12 in alta forza
+
+N2000 RET

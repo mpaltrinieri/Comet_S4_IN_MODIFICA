@@ -1,0 +1,20 @@
+{***** AVANTI TAVOLE VERSO OPERATORE IN CAMBIO UTENSILE *****}
+{R450 = 0 macchina in automatico, 1= macchina in manuale}
+
+N10 L SNGCNT.CS4
+N20 IF(R401==1) JMP [AVA_TAV]
+N30 IF(R401==2) JMP [WAIT_TAV]
+N40 JMP [FINE]
+
+[AVA_TAV]
+N120 $M168                                          {tavola verso operatore NO FATM}
+N140 JMP [FINE]
+
+[WAIT_TAV]
+N520 $M91                                           {tavola verso operatore con attesa}
+540 JMP [FINE]
+
+[FINE]
+N1000 L SNGCNT.CS4
+N1010 R401=0
+N1020 RET

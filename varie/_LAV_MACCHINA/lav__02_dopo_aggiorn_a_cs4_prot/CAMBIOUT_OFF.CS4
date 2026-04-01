@@ -1,0 +1,55 @@
+
+{*********** CAMBIO UTENSILE SIMU-X **************}
+
+
+
+N10000 IF(LTF(%%V4091)==R611) JMP [NO_TC]             {non simulare cambio utensile}
+ 
+
+N10101 IF(R611==  1)  SETMESSAGE 1; TOOLCHANGE_PLACE_01		{ Messaggio inizio cambioutensili }
+N10102 IF(R611==  2)  SETMESSAGE 1; TOOLCHANGE_PLACE_02		{ Messaggio inizio cambioutensili }		
+N10103 IF(R611==  3)  SETMESSAGE 1; TOOLCHANGE_PLACE_03		{ Messaggio inizio cambioutensili }
+N10104 IF(R611==  4)  SETMESSAGE 1; TOOLCHANGE_PLACE_04		{ Messaggio inizio cambioutensili }
+N10105 IF(R611==  5)  SETMESSAGE 1; TOOLCHANGE_PLACE_05		{ Messaggio inizio cambioutensili }
+N10106 IF(R611==  6)  SETMESSAGE 1; TOOLCHANGE_PLACE_06		{ Messaggio inizio cambioutensili }
+N10107 IF(R611==  7)  SETMESSAGE 1; TOOLCHANGE_PLACE_07		{ Messaggio inizio cambioutensili }
+N10108 IF(R611==  8)  SETMESSAGE 1; TOOLCHANGE_PLACE_08		{ Messaggio inizio cambioutensili }
+N10109 IF(R611==  9)  SETMESSAGE 1; TOOLCHANGE_PLACE_09		{ Messaggio inizio cambioutensili }
+N10110 IF(R611== 10)  SETMESSAGE 1; TOOLCHANGE_PLACE_10		{ Messaggio inizio cambioutensili }
+N10111 IF(R611== 11)  SETMESSAGE 1; TOOLCHANGE_PLACE_11		{ Messaggio inizio cambioutensili }
+N10112 IF(R611== 12)  SETMESSAGE 1; TOOLCHANGE_PLACE_12		{ Messaggio inizio cambioutensili }
+N10113 IF(R611== 13)  SETMESSAGE 1; TOOLCHANGE_PLACE_13		{ Messaggio inizio cambioutensili }
+N10114 IF(R611== 14)  SETMESSAGE 1; TOOLCHANGE_PLACE_14		{ Messaggio inizio cambioutensili }
+N10115 IF(R611== 15)  SETMESSAGE 1; TOOLCHANGE_PLACE_15		{ Messaggio inizio cambioutensili }
+N10116 IF(R611== 16)  SETMESSAGE 1; TOOLCHANGE_PLACE_16		{ Messaggio inizio cambioutensili }
+N10117 IF(R611== 17)  SETMESSAGE 1; TOOLCHANGE_PLACE_17		{ Messaggio inizio cambioutensili }
+N10118 IF(R611== 18)  SETMESSAGE 1; TOOLCHANGE_PLACE_18		{ Messaggio inizio cambioutensili }
+N10119 IF(R611== 19)  SETMESSAGE 1; TOOLCHANGE_PLACE_19		{ Messaggio inizio cambioutensili }
+N10120 IF(R611== 20)  SETMESSAGE 1; TOOLCHANGE_PLACE_20		{ Messaggio inizio cambioutensili }
+N10121 IF(R611== 21)  SETMESSAGE 1; TOOLCHANGE_PLACE_21		{ Messaggio inizio cambioutensili }
+N10122 IF(R611== 22)  SETMESSAGE 1; TOOLCHANGE_PLACE_22		{ Messaggio inizio cambioutensili }
+N10123 IF(R611== 23)  SETMESSAGE 1; TOOLCHANGE_PLACE_23		{ Messaggio inizio cambioutensili }
+N10124 IF(R611== 24)  SETMESSAGE 1; TOOLCHANGE_PLACE_24		{ Messaggio inizio cambioutensili }
+N10125 IF(R611== 25)  SETMESSAGE 1; TOOLCHANGE_PLACE_25		{ Messaggio inizio cambioutensili }
+
+
+N40000 G0 G53 Z=R349      {asse Z fuori ingombro}
+N40010 G4F20              {ritardo per simulare cambio utensile}  
+
+N40020 L <SNC.CS4>    
+       
+N40030 SETMESSAGE 0            {reset  Messaggio fine cambioutensili }
+
+[NO_TC]             
+
+N40120 $M06 T(FTL(R611))  {aggiorna numero utensile su mandrino}
+N40130 TL=R507            {aggiorna var CN di lunghezza utensile}
+N40140 TR=R508            {aggiorna var CN di raggio utensile}
+ 
+N40200 R619=R507          {aggiorna nostra variabile di lunghezza utensile: non puo' farlo il plc su simux offline}
+N40210 R620=R508          {aggiorna nostra variabile di raggio utensile: non puo' farlo il plc su simux offline}
+
+N40220 L <CALC_ZOUT.CS4>  {calcolo delle variabili ZOUT, ZOUT testina di uscita ottimizzata dalle lavorazioni}
+
+
+N40990 RET

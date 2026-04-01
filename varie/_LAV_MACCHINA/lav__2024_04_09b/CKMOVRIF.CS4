@@ -1,0 +1,19 @@
+
+{ -- VERIFICA NECESSITA' DI MOVIMENTARE componenti pre-riferimento -- }
+{----------------- se non serve non chiudo i ripari ------------------}
+
+N110 IF (R646==1) [MOVE]		{Trascinatore NON in posizione bassa ? 
+
+N300 RET
+
+
+[MOVE]
+N500 $M59					{chiusura riparo anteriore
+N510 $M202 					{disinserzione trascinamento morse
+
+N600 RET
+
+
+
+
+

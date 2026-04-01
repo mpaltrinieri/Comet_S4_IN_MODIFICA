@@ -1,0 +1,70 @@
+
+
+{****** CALCOLO DZ PER CAPIRE SE IN RTCP ANDIAMO IN OLTRECORSA ASSE Z ******}
+{R6087= calcolo il DZ tra punto iniziale e punto finale in RTCP}
+{R6088= calcolo la Z del punto finale}
+{R624= posizone attuale asse A}
+{R689= posizione successiva asse A}
+{R628= posizione attuale asse Z}
+{R349= finecorsa positivo asse Z}
+{R689  appoggio angolo    lavorazione in A  impostato in POS_AXES.CS4
+{R699  appoggio angolo    lavorazione in C  "
+{R626= posizione attuale asse X}
+{R627= posizione attuale asse Y}
+{R7182= Quota asse Y fuori ingombro magazzino utensili}
+{R345= finecorsa positivo asse X}
+{R346= finecorsa negativo asse X}
+{R348= finecorsa negativo asse Y}
+{R6091= Diagonale calcolata usando gli offset mandrino e lunghezza utensile}
+
+
+N100 R4360=ATN(R763/(R764+R619))           {calcolo angolo generato asse A}
+N110 R4361=(R764+R619)/COS(R4360)          {calcolo ipotenusa generata asse A}
+
+{Calcolo Posizione punta utensile in Z piu ipotenusa generata asse A per poter ruotare in RTCP}
+N120 R4362=(R628-R4361*SIN(R624+R4360))   {Posizione attuale punta utensile in Z}
+N130 R4363=R4362+R4361                    {Posizione attuale punta utensile piu ipotenusa generata da asse A}
+
+N140 R6087=R4361*(SIN(R689+R4360)-SIN(R624+R4360))   {DZ tra punto iniziale e finale (attualmente non usata)}
+N150 R6088=(R628+R6087)                              {posizione finale in Z (attualmente non usata}
+
+N120 IF(R4363>(R349-1)) JMP [POS_NORM]
+N130 JMP [POS_RTCP]
+
+[POS_NORM]
+N1000 IF(R628<R254) G0 G53 Z=R254   {porta asse Z fuori ingombro}
+N1010 G0 G53 A=R689 C=R699          {porta A e C alle quote di lavoro}
+N1020 L <RTON.CS4>
+N1030 G0 X=R633 Y=R634 A=R689 C=R699 $M=(R683)
+N1040 L <RTOFF.CS4>
+N1050 JMP [FINE] 
+
+[POS_RTCP]
+{*** Vicino ai finecorsa e, in pendolare, vicino ai limiti delle camme evito il pos. in RTCP ***}
+{*** per evitare di mandare X in oltrecorsa durante il movimento RTCP ***}
+{*** Controllo che non vada in oltrecorsa l'asse Y durante movimento in RTCP ***}
+
+N1900 IF(R628>(R349-1)) G0 G53 Z=(R349-1)
+
+N2000 IF(R626<(R346+150)) JMP [MOVE_Z_UP]  {X vicino al fcsw-
+N2010 IF(R626>(R345-150)) JMP [MOVE_Z_UP]  {X vicino al fcsw+
+N2020 IF(R690<(R346+150)) JMP [MOVE_Z_UP]  {X vicino al fcsw-
+N2030 IF(R690>(R345-150)) JMP [MOVE_Z_UP]  {X vicino al fcsw+
+
+N2080 IF((R627-R6091)<(R348+1))  JMP [MOVE_Z_UP]  {Y < fcsw-
+N2090 IF((R627+R6091)>(R7182-1)) JMP [MOVE_Z_UP]  {Y > Y.mag
+
+N2100 JMP [MOV_RTCP]
+
+[MOVE_Z_UP]
+N2200 IF(R628<R254) G0 G53 Z=R254   {porta asse Z fuori ingombro}
+N2210 G0 G53 A=R689 C=R699          {porta A e C alle quote di lavoro}
+
+[MOV_RTCP]
+N2310 L <RTON.CS4>
+N2320 G0 X=R633 Y=R634 A=R689 C=R699 $M=(R683)
+N2330 L <RTOFF.CS4>
+N2340 JMP [FINE]
+
+[FINE]
+N3000 RET

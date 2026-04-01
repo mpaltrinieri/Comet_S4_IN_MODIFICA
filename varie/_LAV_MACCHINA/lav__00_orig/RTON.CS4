@@ -1,0 +1,14 @@
+{ABILITAZIONE RTCP}
+
+  {N05  $M255                   {disabilita filtri su X,Y,Z}
+N10  (V4243.0=-R819)         {Componente su X}
+N20  (V4243.2=-R765)         {Componente su Y}
+N30  (V4243.4=0)             {Componente su Z}
+N40  (V4244=-R763)           {Pivot-utensile}
+N50  (V4245=R764)            {Naso mandrino}
+N60  G329 XYZAC              {predisposizione assi RTCP}
+N70  RTCOFF                  {disabilita RTCP}
+N80  D0                      {elimina compensazione utensile}
+N90  G320 OFF                {disabilita rotazione dei piani}
+N100 RTCON                   {abilita RTCP}
+N110 RET

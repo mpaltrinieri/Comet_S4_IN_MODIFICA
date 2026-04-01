@@ -1,0 +1,38 @@
+{CALCOLO POSIZIONE CENTRO PUNTA UTENSILE}
+
+{PARAMETRI IN INGRESSO}
+{VALORE OFFSET Y MANDRINO -OK- R763}
+{VALORE OFFSET Z MANDRINO -OK- R764}
+{VALORE OFFSET X MANDRINO -OK- R765}
+{VALORE OFFSET Distanza tra asse A e centro rotazione asse C -OK- R819}
+{VALORE LUNGHEZZA UTENSILE -OK- R619}
+
+{PARAMETRI DI INGRESSO}
+{R6450    Posizione Centro Rotazione Testa asse X
+{R6451    Posizione Centro Rotazione Testa asse Y
+{R6452    Posizione Centro Rotazione Testa asse Z
+{R6453    Posizione Centro Rotazione Testa asse A
+{R6454    Posizione Centro Rotazione Testa asse C
+
+{PARAMETRI DI USCITA
+{R6456    Posizione TCP asse X
+{R6457    Posizione TCP asse Y
+{R6458    Posizione TCP asse Z
+{R6459    Posizione TCP asse A
+{R6460    Posizione TCP asse C
+
+
+N100  R6466=ATN(R763/(R764+R619))               {calcolo angolo generato asse A}
+N110  R6467=(R764+R619)/COS(R6466)              {calcolo ipotenusa generata asse A}
+N120  R6468=R6467*COS(R6453+R6466)              {raggio generato da asse A}     
+N130  R6469=ATN(R765/(R6468-R819))              {angolo generato asse C}  
+N140  R6465=(R6468-R819)/COS(R6469)             {calcolo ipotenusa generata da C} 
+
+N1000 R6460=R6454                               {posizione TCP asse C}
+N1010 R6459=R6453                               {posizione TCP asse A}
+N1020 R6458=R6452+(R6467*SIN(R6453+R6466))      {posizione TCP asse Z}
+N1030 R6457=-R6451+(R6465*SIN(R6469-R6454))     {posizione TCP asse Y}
+N1040 R6456=R6450-(R6465*COS(R6469-R6454))      {posizione TCP asse X}
+
+N1300 L SNGCNT.CS4
+N1310 RET

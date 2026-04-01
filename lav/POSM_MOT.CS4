@@ -1,0 +1,196 @@
+{-----------------------------------------------------------------------------------}
+{----------- POSIZIONAMENTO MORSE MOTORIZZATE IN SINGOLO/MULTIPEZZO ----------------}
+{-----------------------------------------------------------------------------------}
+
+{******************************* ATTENZIONE ***********************************}
+{******** Non usare i parametri R400-R404 : riservati alla MOVMORS.CS4 ********}
+{******************************************************************************}
+
+N02  L SNGCNT.CS4
+
+N05 IF(R6213>0.5) R533=0            {Dopo scarico pezzi non deve essere un riposizionamento
+N10 IF(R533>0.5) JMP [RIPOSIZ]      {Riposizionamento morse
+  {N20 IF(R520>0.5) JMP [RIPOSIZ]      {apertura morse disabilitata da param.profilo: sequenza = al riposizionamento
+
+{ --------- Primo posizionamento in multipezzo --------- }
+N30 L<MOVEMORS.CS4>                 {POS. con morse motorizzate in SINGOLO/MULTIPEZZO
+N40 $M154                           {controllo di sicurezza sulla posizione morse prima del lavoro
+N45 L <SNGCNT.CS4>
+N47 R6213=0                         {Reset flag scarico pezzi eseguiti
+N50 JMP [FINE]                      {fine posizionamento in multipezzo	
+
+
+{-----------------------------------------------------------------------------------}
+{-------------- RiPOSIZIONAMENTO MORSE MOTORIZZATE IN SINGOLO/MULTIPEZZO -----------}
+{-----------------------------------------------------------------------------------}
+
+[RIPOSIZ]
+   {N70 S0                  {RIPOS.MORSE:in entrambi i casi ferma il mandrino
+   {N71 R495=-1             {Assegno un valore di default impossibile per l'appoggio rotazione
+   {N72 R496=-1             {Assegno un valore di default impossibile per l'appoggio velocità
+
+N75 R6213=0             {Reset flag scarico pezzi eseguiti
+N80 $M158                   {Controllo posizione morse inviata da PC attivo 
+
+N90 R405 = R6528+R6531        {Verifico quali morse chiudere se non usate non le chiudo
+
+N94 L <FASTACC.CS4>             {accelerazione veloce assi
+
+N100 IF(R520<0.5) JMP [MOVE_AX]
+
+N101 L<SNGCNT.CS4>
+
+N102 IF(R533<0.5) IF((V6003/2)>(R349-0.01)) IF((V6003/2)<(R349+0.01)) JMP [AX_OK]
+N103 IF(R533>0.5) IF((V6003/2)>=R254) JMP [AX_OK]
+
+N104 $M59                   {chiusura riparo 
+
+[MOVE_AX]
+N132 G0 G53 Z=R349                            {posiziona assi fuori ingombro 
+{ N132 IF(R533<0.5) G0 G53 Z=R349                     {posiziona asse Z a fc positivo 
+{ N134 IF(R533>0.5) IF((V6003/2)<R254) G0 G53 Z=R254  {posiziona assi Z a quota Zout calcolato
+
+[AX_OK]
+
+{Sistemo le barriere : fuori prima se in ingombro 
+
+N150 $M129             {discesa barriere SX e DX}
+
+
+{CONTROLLA}
+N190 IF(R533>1.5) JMP [RIP_MOT_DOPO_CUT]
+N200 $M200             {Tutti i controlli li esegue il PLC è veramente una parte impegnativa
+N210 L<SNGCNT.CS4>
+
+N215 IF(R384<0.5) IF(R385<0.5) IF(R737>0.5) IF(R735>0.5) L<MOVEMORS.CS4>  {serve per endu morse, in caso di ripetizioni pezzi Hdrill setta R533=1
+
+N220 IF(R384<0.5) IF(R385<0.5) JMP [FINERIPM]   {nessuna morsa da riposizionare ed endu morse non attivo}
+
+{Salvo posizioni morse chiamate - uso quella attuale per i non movimenti
+N303 R411 = R543    {Morsa 10 
+N304 R412 = R544    {Morsa 11 
+N305 R413 = R545    {Morsa 12 
+N306 R414 = R546    {Morsa 13 
+N307 R415 = R547    {Morsa 14 
+N308 R416 = R548    {Morsa 15 
+
+
+{--------------------------------------------------------------------------------------}
+{-------------------- Fine dei calcoli apro/chiudo le morse coinvolte -----------------}
+{--------------------------------------------------------------------------------------}
+
+{GIRO_N1}
+{chiudi (per sicurezza) le morse non coinvolte al primo giro : RESTANO FERME (se non esistono non succede niente)
+{--- ATTENZIONE --- Esegui i confronti senza scrivere == 1 per i BIT interni alle VAR_R 
+N1003 IF( (FTL(R384)&'0008') < 0.5) IF( (FTL(R405)&'0008') > 0.5) $M134 {chiusura Morsa 10 in bassa forza 
+N1004 IF( (FTL(R384)&'0010') < 0.5) IF( (FTL(R405)&'0010') > 0.5) $M135 {chiusura Morsa 11 in bassa forza 
+N1005 IF( (FTL(R384)&'0020') < 0.5) IF( (FTL(R405)&'0020') > 0.5) $M136 {chiusura Morsa 12 in bassa forza 
+N1006 IF( (FTL(R384)&'0040') < 0.5) IF( (FTL(R405)&'0040') > 0.5) $M137 {chiusura Morsa 13 in bassa forza 
+N1007 IF( (FTL(R384)&'0080') < 0.5) IF( (FTL(R405)&'0080') > 0.5) $M138 {chiusura Morsa 14 in bassa forza 
+N1008 IF( (FTL(R384)&'0100') < 0.5) IF( (FTL(R405)&'0100') > 0.5) $M139 {chiusura Morsa 15 in bassa forza 
+
+N1100 L <SNGCNT.CS4>
+
+{--- ATTENZIONE --- Esegui i confronti senza scrivere == 1 per i BIT interni alle VAR_R 
+N1203 IF( (FTL(R384)&'0008') < 0.5) IF( (FTL(R405)&'0008') > 0.5) $M274 {chiusura Morsa 10 in alta forza
+N1204 IF( (FTL(R384)&'0010') < 0.5) IF( (FTL(R405)&'0010') > 0.5) $M275 {chiusura Morsa 11 in alta forza
+N1205 IF( (FTL(R384)&'0020') < 0.5) IF( (FTL(R405)&'0020') > 0.5) $M276 {chiusura Morsa 12 in alta forza
+N1206 IF( (FTL(R384)&'0040') < 0.5) IF( (FTL(R405)&'0040') > 0.5) $M277 {chiusura Morsa 13 in alta forza
+N1207 IF( (FTL(R384)&'0080') < 0.5) IF( (FTL(R405)&'0080') > 0.5) $M278 {chiusura Morsa 14 in alta forza
+N1208 IF( (FTL(R384)&'0100') < 0.5) IF( (FTL(R405)&'0100') > 0.5) $M279 {chiusura Morsa 15 in alta forza
+
+N1300 G4 F=R746                {Tempo d'attesa interscambio aperto-chiuso sicuro
+N1300 L <SNGCNT.CS4>
+
+{--- ATTENZIONE --- Due istruzioni sulla stessa riga non vengono processate 
+N1403 IF( (FTL(R384)&'0008') < 0.5) R543=R653
+N1404 IF( (FTL(R384)&'0010') < 0.5) R544=R654
+N1405 IF( (FTL(R384)&'0020') < 0.5) R545=R655
+N1406 IF( (FTL(R384)&'0040') < 0.5) R546=R656
+N1407 IF( (FTL(R384)&'0080') < 0.5) R547=R657
+N1408 IF( (FTL(R384)&'0100') < 0.5) R548=R658
+
+{Apro le morse coinvolte al primo giro : NON RESTANO FERME (se non esistono non succede niente) 
+N1503 IF( (FTL(R384)&'0008') > 0.5) $M294  {disattiva chiusura Morsa 10 in alta forza
+N1504 IF( (FTL(R384)&'0010') > 0.5) $M295  {disattiva chiusura Morsa 11 in alta forza
+N1505 IF( (FTL(R384)&'0020') > 0.5) $M296  {disattiva chiusura Morsa 12 in alta forza
+N1506 IF( (FTL(R384)&'0040') > 0.5) $M297  {disattiva chiusura Morsa 13 in alta forza
+N1507 IF( (FTL(R384)&'0080') > 0.5) $M298  {disattiva chiusura Morsa 14 in alta forza
+N1508 IF( (FTL(R384)&'0100') > 0.5) $M299  {disattiva chiusura Morsa 15 in alta forza
+
+N1600 L <SNGCNT.CS4>
+
+N1703 IF( (FTL(R384)&'0008') > 0.5) $M234  {apertura Morsa 10 
+N1704 IF( (FTL(R384)&'0010') > 0.5) $M235  {apertura Morsa 11 
+N1705 IF( (FTL(R384)&'0020') > 0.5) $M236  {apertura Morsa 12 
+N1706 IF( (FTL(R384)&'0040') > 0.5) $M237  {apertura Morsa 13 
+N1707 IF( (FTL(R384)&'0080') > 0.5) $M238  {apertura Morsa 14 
+N1708 IF( (FTL(R384)&'0100') > 0.5) $M239  {apertura Morsa 15 
+
+N1800 L<MOVEMORS.CS4>              {Posiziono le morse : anche se già ferme e "riposizionate" nella stessa pos. non c'è errore 
+
+N1850 IF (R385==0) JMP [FINERIPM]  {Se non c'è secondo giro fine riposizionamento
+
+{GIRO_N2}
+{Riscrivo le posizioni morse chiamate prima del salvataggio
+N2003 R543 = R411
+N2004 R544 = R412
+N2005 R545 = R413
+N2006 R546 = R414
+N2007 R547 = R415
+N2008 R548 = R416
+
+{prima le chiudo così il pezzo resta fermo
+
+{chiudi (per sicurezza) le altre morse coinvolte al secondo giro : RESTANO FERME (se non esistono non succede niente)
+{non serve copiare il valore vecchio,è già lo stesso : R54X=R65X
+N2103 IF( (FTL(R385)&'0008') < 0.5) IF( (FTL(R405)&'0008') > 0.5) $M134  {chiusura Morsa 10 in bassa forza 
+N2104 IF( (FTL(R385)&'0010') < 0.5) IF( (FTL(R405)&'0010') > 0.5) $M135  {chiusura Morsa 11 in bassa forza 
+N2105 IF( (FTL(R385)&'0020') < 0.5) IF( (FTL(R405)&'0020') > 0.5) $M136  {chiusura Morsa 12 in bassa forza 
+N2106 IF( (FTL(R385)&'0040') < 0.5) IF( (FTL(R405)&'0040') > 0.5) $M137  {chiusura Morsa 13 in bassa forza 
+N2107 IF( (FTL(R385)&'0080') < 0.5) IF( (FTL(R405)&'0080') > 0.5) $M138  {chiusura Morsa 14 in bassa forza 
+N2108 IF( (FTL(R385)&'0100') < 0.5) IF( (FTL(R405)&'0100') > 0.5) $M139  {chiusura Morsa 15 in bassa forza 
+
+N2200 L <SNGCNT.CS4>
+
+N2303 IF( (FTL(R385)&'0008') < 0.5) IF( (FTL(R405)&'0008') > 0.5) $M274  {chiusura Morsa 10 in alta forza 
+N2304 IF( (FTL(R385)&'0010') < 0.5) IF( (FTL(R405)&'0010') > 0.5) $M275  {chiusura Morsa 11 in alta forza 
+N2305 IF( (FTL(R385)&'0020') < 0.5) IF( (FTL(R405)&'0020') > 0.5) $M276  {chiusura Morsa 12 in alta forza 
+N2306 IF( (FTL(R385)&'0040') < 0.5) IF( (FTL(R405)&'0040') > 0.5) $M277  {chiusura Morsa 13 in alta forza 
+N2307 IF( (FTL(R385)&'0080') < 0.5) IF( (FTL(R405)&'0080') > 0.5) $M278  {chiusura Morsa 14 in alta forza 
+N2308 IF( (FTL(R385)&'0100') < 0.5) IF( (FTL(R405)&'0100') > 0.5) $M279  {chiusura Morsa 15 in alta forza 
+
+N2200 G4 F=R746                {Tempo d'attesa interscambio aperto-chiuso sicuro
+N2200 L <SNGCNT.CS4>
+
+{apri le morse coinvolte al secondo giro : NON RESTANO FERME (se non esistono non succede niente) 
+N2500 IF( (FTL(R385)&'0008') > 0.5) $M234  {apertura Morsa 10 
+N2500 IF( (FTL(R385)&'0010') > 0.5) $M235  {apertura Morsa 11 
+N2500 IF( (FTL(R385)&'0020') > 0.5) $M236  {apertura Morsa 12 
+N2500 IF( (FTL(R385)&'0040') > 0.5) $M237  {apertura Morsa 13 
+N2500 IF( (FTL(R385)&'0080') > 0.5) $M238  {apertura Morsa 14 
+N2500 IF( (FTL(R385)&'0100') > 0.5) $M239  {apertura Morsa 15 
+
+N2700 L<MOVEMORS.CS4>          {Posiziono le morse : anche se già ferme e "riposizionate" nella stessa pos. non c'è errore 
+
+[FINERIPM]
+N9000 L <SNGCNT.CS4>
+N9010 $M154                        {controllo di sicurezza sulla posizione morse prima del lavoro
+N9020 IF(R533>0.5) L<CLOSEALL.CS4> {chiudi le morse e mettile in alta pressione solo se riposizionamento 
+
+N9130 IF(R533>0.5) IF( (FTL(R6206) & '0008') > 0.5) $M274       {Chiudi Morsa 10 in alta pressione
+N9140 IF(R533>0.5) IF( (FTL(R6206) & '0010') > 0.5) $M275       {Chiudi Morsa 11 in alta pressione
+N9150 IF(R533>0.5) IF( (FTL(R6206) & '0020') > 0.5) $M276       {Chiudi Morsa 12 in alta pressione
+N9200 IF(R533>0.5) IF( (FTL(R6206) & '0040') > 0.5) $M277       {Chiudi Morsa 13 in alta pressione
+N9210 IF(R533>0.5) IF( (FTL(R6206) & '0080') > 0.5) $M278       {Chiudi Morsa 14 in alta pressione
+N9220 IF(R533>0.5) IF( (FTL(R6206) & '0100') > 0.5) $M279       {Chiudi Morsa 15 in alta pressione
+N9300 JMP [FINE]
+
+[RIP_MOT_DOPO_CUT]
+N10000 L <RIPOS_MOT_SING.CS4>
+N10010 JMP [FINE]
+
+[FINE]
+N11000 L <SNGCNT.CS4>
+N11010 RET
+
