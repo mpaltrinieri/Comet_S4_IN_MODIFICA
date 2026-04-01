@@ -1,3 +1,0 @@
-omcnc72
-omfile
-omcan
