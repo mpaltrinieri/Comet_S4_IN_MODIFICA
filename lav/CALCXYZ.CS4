@@ -7,9 +7,22 @@
 
 
 N20  <%#6=1> <%%#13=4>
+
+IF(R98 < 2.5) JMP[COST2]
+IF(R98 < 2.5) JMP[COST6]
+
+[COST2]
 N30  <%#16=(%V4032/<%V5079.0&'00FF'>&'OCT4')/4>          { concordanza/disc 1 asse MTX }
 N40  <%#17=(%V4032/<(%V5079.0&'FF00')/'0100'>&'OCT4')/4> { concordanza/disc 2 asse MTX }
 N50  <%#18=(%V4032/<%V5079.1&'00FF'>&'OCT4')/4>          { concordanza/disc 3 asse MTX }
+JMP[NOCOST6]
+
+JMP[COST6]
+N30  <%#16=(%V4032/<%V3302.0>&'OCT4')/4>	            { concordanza/disc 1 asse MTX }        
+N40  <%#17=(%V4032/<%V3302.1>&'OCT4')/4>	            { concordanza/disc 2 asse MTX }                
+N50  <%#18=(%V4032/<%V3302.2>&'OCT4')/4>	            { concordanza/disc 3 asse MTX }
+
+[NOCOST6]
 N60  <IFF<ABS(ITF(%#16-%#17-%#18))-1>:N80;N70;N80>       { 0 = discordanza assi MTX }
 N70  <%#6=-1>                                            { inverte segno dell' angolo }
 N80  <ANR=ANR*ITF(%#6)><AN2=AN2*ITF(%#6)><AN3=AN3*ITF(%#6)>

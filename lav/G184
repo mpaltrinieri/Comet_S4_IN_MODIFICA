@@ -179,9 +179,22 @@ N2050
 	G320 OFF
 	(#247 = 1)
 	<%#51=1>
-	<%#16=(%V4032/<%V5079.0&'00FF'>&'OCT4')/4>		{ concordanza/disc 1 asse MTX }
-	<%#17=(%V4032/<(%V5079.0&'FF00')/'0100'>&'OCT4')/4>	{ concordanza/disc 2 asse MTX }
-	<%#18=(%V4032/<%V5079.1&'00FF'>&'OCT4')/4>		{ concordanza/disc 3 asse MTX }
+	
+	IF(R98 < 2.5) JMP[COST2]
+	IF(R98 < 2.5) JMP[COST6]
+
+	[COST2]
+	<%#16=(%V4032/<%V5079.0&'00FF'>&'OCT4')/4>          { concordanza/disc 1 asse MTX }
+	<%#17=(%V4032/<(%V5079.0&'FF00')/'0100'>&'OCT4')/4> { concordanza/disc 2 asse MTX }
+	<%#18=(%V4032/<%V5079.1&'00FF'>&'OCT4')/4>          { concordanza/disc 3 asse MTX }
+	JMP[NOCOST6]
+
+	JMP[COST6]
+	<%#16=(%V4032/<%V3302.0>&'OCT4')/4>	            { concordanza/disc 1 asse MTX }        
+	<%#17=(%V4032/<%V3302.1>&'OCT4')/4>	            { concordanza/disc 2 asse MTX }                
+	<%#18=(%V4032/<%V3302.2>&'OCT4')/4>				{ concordanza/disc 3 asse MTX }
+
+[NOCOST6]
 N2060	<IFF<ABS(ITF(%#16-%#17-%#18))-1>:N2080;N2070;N2080>	{ 0 = discordanza assi MTX }
 N2070	<%#51=-1>						{ inverte segno dell' angolo }
 N2080	<ANR=ANR*ITF(%#51)><AN2=AN2*ITF(%#51)><AN3=AN3*ITF(%#51)>

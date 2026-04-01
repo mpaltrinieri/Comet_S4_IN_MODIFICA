@@ -5,6 +5,13 @@
 -------------------------------------------------------------------------------
 
 
+***************************************************************************************************
+
+01-04-2026:        Versione   CNC 150.900 (Paltrinieri) (Modifiche per COST6)
+                   Versione   OSCNC 7.4.57 | OSCNC 8.0.0
+CALCXYZ.CR4        : aggiunta gestione Costantino 8.0 controllata dalla variabile R98=3
+G184               : aggiunta gestione Costantino 8.0 controllata dalla variabile R98=3
+
 ***************************************************************************************************************************************************************
 
 05-12-2025:        Versione   CNC 150.720 (Formuso) (Corretto errore in macro MAP_TOOL.CS4)
