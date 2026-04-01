@@ -4,6 +4,15 @@
   PROGETTO:       COMET S4
 ------------------------------------------------------------------------------
 
+***************************************************************************************************
+
+01-04-2026:        Versione   PLC 150.900 (Paltrinieri) (Modifiche per COST6)
+                   Versione   OSCNC 7.4.57 | OSCNC 8.0.0
+Rdef.inc           : modicata definizione della variabile con aggiunta dei valori 2 per Costantino 7.4, 3 per Costantino 8.0
+                     R_TIPO_CN             98 // Tipo CN: 0=Spartaco;  1=Costantino 7.2; 2=Costantino 7.4; 3=Costantino 8.0
+plc.c              : aggiunta compilazione condizionale tramite nuova variabile di preprocessore ETTORE_RELEASE80 che permette
+                     di definire il valore 3 nella variabile R[R_TIPO_CN] per Costantino 8.0
+
 
 ***************************************************************************************************************************************************************
 

@@ -38,7 +38,7 @@ void plc(PPLCMAIN_LOCVARS locvars)
 
 
 /**** DEFINIZIONE VERSIONE PLC ****/
-Aris[R_VERSIONE_PLC] = (float)150.800;
+Aris[R_VERSIONE_PLC] = (float)150.900;
 
 /**** Tutti i CNC CT4 e CT6 sono di tipo M ****/
 
@@ -53,11 +53,20 @@ if (PON)
 	//timersCrono_pon();
 	lotime (T_MEM_INVERTER_KO, 300.0f);  // ritardo apertura ripari dopo anomalia inverter (300 sec)
 
-	#ifdef ETTORE_RELEASE
+	#if defined ETTORE_RELEASE && !defined _OMCNC_ECLR && !defined ETTORE_RELEASE80
 		{
 			Aris[R_TIPO_CN] = 1;
 		}
+	#elif defined ETTORE_RELEASE && defined _OMCNC_ECLR && !defined ETTORE_RELEASE80
+	{
+			Aris[R_TIPO_CN] = 2;
+	}
+	#elif defined ETTORE_RELEASE && defined _OMCNC_ECLR && defined ETTORE_RELEASE80
+	{
+			Aris[R_TIPO_CN] = 3;
+	}
 	#endif	
+
 	}
 
 
