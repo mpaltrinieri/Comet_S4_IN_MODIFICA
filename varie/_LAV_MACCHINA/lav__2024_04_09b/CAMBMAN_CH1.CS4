@@ -1,6 +1,0 @@
-
-{------------------ CICLO CAMBIO UTENSILE MANUALE in MAGAZZINO ASSISTITO -------------------}
-
-N10 L <SH_OFF_W_CH1.CS4>
-N20 L <SNGCNT_CH1.CS4>
-N30 RET

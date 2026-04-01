@@ -1,7 +1,0 @@
-
-{---------------- RIPRISTINO CONDIZIONI NORMALI NON RTCP ----------------}
-
-N10   <DTC : OFF>
-N20   R621=0
-N30   G59 X0 Y0 Z0
-N40   RET
