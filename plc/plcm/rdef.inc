@@ -128,7 +128,7 @@ extern double *RR_CH3;
 #define   R_ZERO_ASSI_SIM_V12   93 // Zero simulato attivo dell'asse 23 
 
 
-#define   R_TIPO_CN             98 // Tipo CN: 0=Spartaco;  1=Costantino; 3=Costantino 8.0
+#define   R_TIPO_CN             98 // Tipo CN: 0=Spartaco;  1=Costantino; 2=Costantino 7.4	3=Costantino 8.0
 
 #define   R_TYPE_MACHINE        99 /* Tipo macchina:
 											 0    = non definita

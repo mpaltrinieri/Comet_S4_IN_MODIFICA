@@ -635,6 +635,316 @@
 				CommandLine="rem &quot;$(SolutionDir)\BAT\74EttoreSimuPC__PLC.BAT&quot;"
 			/>
 		</Configuration>
+		<Configuration
+			Name="80EttoreRelease|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\obj"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="Conversione DLL per Costantino"
+				CommandLine="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\bin\icnv.exe&quot; -nologo -ettore &quot;$(TargetPath)&quot; &gt; nul&#x0D;&#x0A;"
+				AdditionalDependencies="&quot;$(TargetPath)&quot;"
+				Outputs="&quot;$(TargetDir)\$(TargetName).plc&quot;"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/plcm.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Gs32767"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\inc&quot;"
+				PreprocessorDefinitions="NSIMU;NDEBUG;ETTORE_RELEASE;RTPLC_ACHILLE;WIN32;_CWIN32;_WINDOWS;_USRDLL;_MULTICHANNEL;_OMCNC_ECLR;ETTORE_RELEASE80"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="false"
+				ForceConformanceInForLoopScope="false"
+				RuntimeTypeInfo="false"
+				UsePrecompiledHeader="0"
+				BrowseInformation="1"
+				WarningLevel="3"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1040"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="true"
+				AdditionalOptions="/section:.edata,W /ignore:4049 /ignore:4078  /ignore:4078  /MERGE:&quot;ISACCNST=ISACDATA&quot; /MERGE:&quot;.rdata=ISACDATA&quot;"
+				AdditionalDependencies="isacfunNOP.obj plcutil_74.lib"
+				AdditionalLibraryDirectories="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\lib\InTime&quot;"
+				IgnoreDefaultLibraryNames="LIBC.LIB;LIBCMT.lib"
+				LinkTimeCodeGeneration="1"
+				ResourceOnlyDLL="true"
+				BaseAddress="0x10000000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				MergeSections="ISACBSS=ISACDATA"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="&quot;$(SolutionDir)\BAT\74EttoreRelease__PLC.BAT&quot;&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="80EttoreSimuCN|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\obj"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description="Conversione DLL per Costantino"
+				CommandLine="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\bin\icnv.exe&quot; -nologo -ettore &quot;$(TargetPath)&quot; &gt; nul&#x0D;&#x0A;"
+				AdditionalDependencies="&quot;$(TargetPath)&quot;"
+				Outputs="&quot;$(TargetDir)\$(TargetName).plc&quot;"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/plcm.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Gs32767"
+				InlineFunctionExpansion="1"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\inc&quot;"
+				PreprocessorDefinitions="NSIMU;NDEBUG;ETTORE_RELEASE;RTPLC_ACHILLE;WIN32;_CWIN32;_WINDOWS;_USRDLL;SIMUCN;_MULTICHANNEL;_OMCNC_ECLR2;ETTORE_RELEASE80"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="false"
+				ForceConformanceInForLoopScope="false"
+				RuntimeTypeInfo="false"
+				UsePrecompiledHeader="0"
+				BrowseInformation="1"
+				WarningLevel="3"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1040"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="true"
+				AdditionalOptions="/section:.edata,W /ignore:4049 /ignore:4078  /ignore:4078  /MERGE:&quot;ISACCNST=ISACDATA&quot; /MERGE:&quot;.rdata=ISACDATA&quot;"
+				AdditionalDependencies="isacfunNOP.obj plcutil_74.lib"
+				AdditionalLibraryDirectories="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\lib\InTime&quot;"
+				IgnoreDefaultLibraryNames="LIBC.LIB;LIBCMT.lib"
+				LinkTimeCodeGeneration="1"
+				ResourceOnlyDLL="true"
+				BaseAddress="0x10000000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				MergeSections="ISACBSS=ISACDATA"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="rem &quot;$(SolutionDir)\BAT\74EttoreSimuCN__PLC.BAT&quot;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="80EttoreSimuPC|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectDir)$(ConfigurationName)\obj"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				Description=""
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName="$(ProjectDir)$(ConfigurationName)/plcm.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Gs32767"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(RTPLCDEV)\rtplc\v1.3_MC_74\inc&quot;"
+				PreprocessorDefinitions="NSIMU;_DEBUG;SIMUPC;ETTORE_RELEASE;RTPLC_ACHILLE;WIN32;_CWIN32;_PLCRT;_WINDOWS;_USRDLL;_MULTICHANNEL;_OMCNC_ECLR;ETTORE_RELEASE80"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="false"
+				ForceConformanceInForLoopScope="false"
+				RuntimeTypeInfo="false"
+				UsePrecompiledHeader="0"
+				AssemblerListingLocation=""
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc90.pdb"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1040"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="isacfun_debug.obj initialize.obj odbc32.lib odbccp32.lib plcutil_74.lib"
+				OutputFile="$(OutDir)\$(ProjectName).dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(RTPLCDEV)\rtplc\v1.3_MC_74\lib\w32"
+				IgnoreDefaultLibraryNames="LIBCD.lib;MSVCRT.lib;MSVCRTD.lib"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile=""
+				LinkTimeCodeGeneration="1"
+				BaseAddress="0x400000"
+				ImportLibrary="$(TargetDir)$(TargetName).lib"
+				MergeSections="ISACBSS=ISACDATA"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="rem &quot;$(SolutionDir)\BAT\74EttoreSimuPC__PLC.BAT&quot;"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -1149,6 +1459,36 @@
 						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\rsit.dll;$(OutDir)\rsen.dll;$(OutDir)\rsfr.dll;$(OutDir)\rssp.dll;$(OutDir)\iodescr_debug.xml"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreRelease|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compilazione risorse I/O"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_debug.xml&quot; &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsit.dll&quot; &quot;$(OutDir)\rsit.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsit.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsen.dll&quot; &quot;$(OutDir)\rsen.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsen.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsfr.dll&quot; &quot;$(OutDir)\rsfr.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsfr.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rssp.dll&quot; &quot;$(OutDir)\rssp.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rssp.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\rsit.dll;$(OutDir)\rsen.dll;$(OutDir)\rsfr.dll;$(OutDir)\rssp.dll;$(OutDir)\iodescr_debug.xml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreSimuCN|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compilazione risorse I/O"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_debug.xml&quot; &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsit.dll&quot; &quot;$(OutDir)\rsit.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsit.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsen.dll&quot; &quot;$(OutDir)\rsen.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsen.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsfr.dll&quot; &quot;$(OutDir)\rsfr.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsfr.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rssp.dll&quot; &quot;$(OutDir)\rssp.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rssp.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\rsit.dll;$(OutDir)\rsen.dll;$(OutDir)\rsfr.dll;$(OutDir)\rssp.dll;$(OutDir)\iodescr_debug.xml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreSimuPC|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Compilazione risorse I/O"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_debug.xml&quot; &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsit.dll&quot; &quot;$(OutDir)\rsit.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsit.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsen.dll&quot; &quot;$(OutDir)\rsen.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsen.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rsfr.dll&quot; &quot;$(OutDir)\rsfr.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rsfr.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;copy /Y &quot;$(PLCDEV)\bin\_rssp.dll&quot; &quot;$(OutDir)\rssp.dll&quot; &gt; nul&#x0D;&#x0A;&quot;$(PLCDEV)\bin\ctores.exe&quot; &quot;$(IntDir)\$(InputName).inc&quot; &quot;$(OutDir)\rssp.dll&quot; -USENAME -LIT -R &gt; nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\rsit.dll;$(OutDir)\rsen.dll;$(OutDir)\rsfr.dll;$(OutDir)\rssp.dll;$(OutDir)\iodescr_debug.xml"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\I_O_DEVICE_IOLINK.inc"
@@ -1206,6 +1546,33 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="74EttoreSimuPC|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_ETH_ISAC.xml&quot; &gt;nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\iodescr_ETH_ISAC.xml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreRelease|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_ETH_ISAC.xml&quot; &gt;nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\iodescr_ETH_ISAC.xml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreSimuCN|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="cscript //B //NoLogo //U &quot;$(SolutionDir)\scripts\inc2all.js&quot; -iio &quot;$(InputPath)&quot; -oio &quot;$(IntDir)\$(InputName).inc&quot;  -oioxml &quot;$(OutDir)\iodescr_ETH_ISAC.xml&quot; &gt;nul&#x0D;&#x0A;"
+						Outputs="$(IntDir)\$(InputName).inc;$(OutDir)\iodescr_ETH_ISAC.xml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="80EttoreSimuPC|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
